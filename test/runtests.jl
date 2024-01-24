@@ -1,6 +1,21 @@
 using GeoStatsFunctions
-using Test
+using Meshes
+using GeoTables
+using Unitful
+using Distances
+using LinearAlgebra
+using CSV, DelimitedFiles
+using Test, Random
+import CoDa: Composition
+
+# environment settings
+datadir = joinpath(@__DIR__, "data")
+
+# list of tests
+testfiles = ["empirical.jl", "variogram.jl", "covariance.jl", "nesting.jl", "fitting.jl", "sampling.jl"]
 
 @testset "GeoStatsFunctions.jl" begin
-    # Write your tests here.
+  for testfile in testfiles
+    include(testfile)
+  end
 end
