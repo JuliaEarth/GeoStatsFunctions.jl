@@ -15,13 +15,7 @@ NuggetEffect(; nugget=1.0) = NuggetEffect(nugget)
 
 (γ::NuggetEffect)(h) = (h > 0) * γ.nugget
 
-function (γ::NuggetEffect)(u::Point, v::Point)
-  d = Euclidean()
-  x = coordinates(u)
-  y = coordinates(v)
-  h = evaluate(d, x, y)
-  γ(h)
-end
+(γ::NuggetEffect)(u::Point, v::Point) = ifelse(u == v, zero(γ.nugget), γ.nugget)
 
 Base.range(::NuggetEffect{T}) where {T} = zero(T)
 
