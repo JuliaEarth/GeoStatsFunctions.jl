@@ -43,9 +43,9 @@
   # result type is defined for nested models
   # see https://github.com/JuliaEarth/GeoStats.jl/issues/121 
   γ = GaussianVariogram() + ExponentialVariogram()
-  @test GeoStatsFunctions.result_type(γ, rand(Point3), rand(Point3)) == Float64
+  @test GeoStatsFunctions.returntype(γ, rand(Point3), rand(Point3)) == Float64
   γ = GaussianVariogram(sill=1.0f0, range=1.0f0, nugget=0.1f0)
-  @test GeoStatsFunctions.result_type(γ, rand(Point3f), rand(Point3f)) == Float32
+  @test GeoStatsFunctions.returntype(γ, rand(Point3f), rand(Point3f)) == Float32
 
   # nested model with matrix coefficients
   C₁ = [1.0 0.5; 0.5 2.0]

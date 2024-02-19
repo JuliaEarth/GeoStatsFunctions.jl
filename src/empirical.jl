@@ -9,7 +9,7 @@ A (robust) estimator of [`EmpiricalVariogram`](@ref).
 """
 abstract type VariogramEstimator end
 
-result_type(estim::VariogramEstimator, z₁, z₂) = typeof(formula(estim, z₁[1], z₁[2], z₂[1], z₂[2]))
+returntype(estim::VariogramEstimator, z₁, z₂) = typeof(formula(estim, z₁[1], z₁[2], z₂[1], z₂[2]))
 
 include("estimators/matheron.jl")
 include("estimators/cressie.jl")
@@ -57,7 +57,7 @@ function accumulate(data, var₁, var₂, estim::VariogramEstimator, algo::Vario
   exit = exitfun(algo)
 
   # accumulation type
-  V = result_type(estim, z₁, z₂)
+  V = returntype(estim, z₁, z₂)
 
   # lag sums and counts
   Σx = zeros(nlags)

@@ -86,11 +86,11 @@ function (γ::Variogram)(U::Geometry, V::Geometry)
 end
 
 """
-    result_type(γ, u, v)
+    returntype(γ, u, v)
 
 Return result type of γ(u, v).
 """
-result_type(γ::Variogram, u, v) = typeof(γ(u, v))
+returntype(γ::Variogram, u, v) = typeof(γ(u, v))
 
 """
     isstationary(γ)
@@ -114,7 +114,7 @@ Evaluate variogram `γ` between all elements in the `domain`.
 function pairwise(γ::Variogram, domain)
   u = first(domain)
   n = length(domain)
-  R = result_type(γ, u, u)
+  R = returntype(γ, u, u)
   Γ = Matrix{R}(undef, n, n)
   pairwise!(Γ, γ, domain)
 end
@@ -147,7 +147,7 @@ function pairwise(γ::Variogram, domain₁, domain₂)
   v = first(domain₂)
   m = length(domain₁)
   n = length(domain₂)
-  R = result_type(γ, u, v)
+  R = returntype(γ, u, v)
   Γ = Matrix{R}(undef, m, n)
   pairwise!(Γ, γ, domain₁, domain₂)
 end
