@@ -15,6 +15,12 @@ end
 
 PowerVariogram(; scaling=1.0, nugget=zero(typeof(scaling)), exponent=1.0) = PowerVariogram(scaling, nugget, exponent)
 
+variotype(::PowerVariogram) = PowerVariogram
+
+isstationary(::Type{<:PowerVariogram}) = false
+
+isisotropic(::PowerVariogram) = true
+
 function (γ::PowerVariogram)(h)
   s = γ.scaling
   a = γ.exponent
@@ -29,9 +35,3 @@ function (γ::PowerVariogram)(u::Point, v::Point)
   h = evaluate(d, x, y)
   γ(h)
 end
-
-variotype(::PowerVariogram) = PowerVariogram
-
-isstationary(::Type{<:PowerVariogram}) = false
-
-isisotropic(::PowerVariogram) = true

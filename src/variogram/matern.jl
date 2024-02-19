@@ -22,6 +22,10 @@ MaternVariogram(ball; sill=1.0, nugget=zero(typeof(sill)), order=1.0) = MaternVa
 MaternVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill)), order=1.0) =
   MaternVariogram(sill, nugget, order, MetricBall(range))
 
+variotype(::MaternVariogram) = MaternVariogram
+
+isstationary(::Type{<:MaternVariogram}) = true
+
 function (γ::MaternVariogram)(h::T) where {T}
   r = radius(γ.ball)
   s = γ.sill
@@ -38,7 +42,3 @@ function (γ::MaternVariogram)(h::T) where {T}
 
   (s - n) * (1 - 2^(1 - ν) / Γ * δ^ν * Β) + (h > 0) * n
 end
-
-variotype(::MaternVariogram) = MaternVariogram
-
-isstationary(::Type{<:MaternVariogram}) = true

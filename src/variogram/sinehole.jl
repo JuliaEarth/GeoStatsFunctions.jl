@@ -19,6 +19,10 @@ SineHoleVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = SineHoleVariogram
 
 SineHoleVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill))) = SineHoleVariogram(sill, nugget, MetricBall(range))
 
+variotype(::SineHoleVariogram) = SineHoleVariogram
+
+isstationary(::Type{<:SineHoleVariogram}) = true
+
 function (γ::SineHoleVariogram)(h::T) where {T}
   r = radius(γ.ball)
   s = γ.sill
@@ -31,7 +35,3 @@ function (γ::SineHoleVariogram)(h::T) where {T}
 
   (s - n) * (1 - sin(c * h′ / r) / (c * h′ / r)) + (h′ > 0) * n
 end
-
-variotype(::SineHoleVariogram) = SineHoleVariogram
-
-isstationary(::Type{<:SineHoleVariogram}) = true

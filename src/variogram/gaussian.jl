@@ -19,6 +19,10 @@ GaussianVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = GaussianVariogram
 
 GaussianVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill))) = GaussianVariogram(sill, nugget, MetricBall(range))
 
+variotype(::GaussianVariogram) = GaussianVariogram
+
+isstationary(::Type{<:GaussianVariogram}) = true
+
 function (γ::GaussianVariogram)(h)
   # add small eps to nugget
   # for numerical stability
@@ -27,7 +31,3 @@ function (γ::GaussianVariogram)(h)
   n = γ.nugget + typeof(s)(1e-6)
   (s - n) * (1 - exp(-3(h / r)^2)) + (h > 0) * n
 end
-
-variotype(::GaussianVariogram) = GaussianVariogram
-
-isstationary(::Type{<:GaussianVariogram}) = true

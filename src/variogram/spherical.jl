@@ -20,6 +20,10 @@ SphericalVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = SphericalVariogr
 SphericalVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill))) =
   SphericalVariogram(sill, nugget, MetricBall(range))
 
+variotype(::SphericalVariogram) = SphericalVariogram
+
+isstationary(::Type{<:SphericalVariogram}) = true
+
 function (γ::SphericalVariogram)(h::T) where {T}
   r = radius(γ.ball)
   s = γ.sill
@@ -33,7 +37,3 @@ function (γ::SphericalVariogram)(h::T) where {T}
 
   (h < r) * (s - n) * s1 + (h ≥ r) * (s - n) * s2 + (h > 0) * n
 end
-
-variotype(::SphericalVariogram) = SphericalVariogram
-
-isstationary(::Type{<:SphericalVariogram}) = true

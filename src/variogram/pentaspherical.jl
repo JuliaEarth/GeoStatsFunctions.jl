@@ -20,6 +20,10 @@ PentasphericalVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = Pentaspheri
 PentasphericalVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill))) =
   PentasphericalVariogram(sill, nugget, MetricBall(range))
 
+variotype(::PentasphericalVariogram) = PentasphericalVariogram
+
+isstationary(::Type{<:PentasphericalVariogram}) = true
+
 function (γ::PentasphericalVariogram)(h::T) where {T}
   r = radius(γ.ball)
   s = γ.sill
@@ -34,7 +38,3 @@ function (γ::PentasphericalVariogram)(h::T) where {T}
 
   (h < r) * (s - n) * s1 + (h ≥ r) * (s - n) * s2 + (h > 0) * n
 end
-
-variotype(::PentasphericalVariogram) = PentasphericalVariogram
-
-isstationary(::Type{<:PentasphericalVariogram}) = true

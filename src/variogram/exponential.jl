@@ -20,13 +20,13 @@ ExponentialVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = ExponentialVar
 ExponentialVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill))) =
   ExponentialVariogram(sill, nugget, MetricBall(range))
 
+variotype(::ExponentialVariogram) = ExponentialVariogram
+
+isstationary(::Type{<:ExponentialVariogram}) = true
+
 function (γ::ExponentialVariogram)(h)
   r = radius(γ.ball)
   s = γ.sill
   n = γ.nugget
   (s - n) * (1 - exp(-3(h / r))) + (h > 0) * n
 end
-
-variotype(::ExponentialVariogram) = ExponentialVariogram
-
-isstationary(::Type{<:ExponentialVariogram}) = true

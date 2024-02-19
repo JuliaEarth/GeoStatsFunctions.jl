@@ -19,6 +19,10 @@ CubicVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = CubicVariogram(sill,
 
 CubicVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill))) = CubicVariogram(sill, nugget, MetricBall(range))
 
+variotype(::CubicVariogram) = CubicVariogram
+
+isstationary(::Type{<:CubicVariogram}) = true
+
 function (γ::CubicVariogram)(h::T) where {T}
   r = radius(γ.ball)
   s = γ.sill
@@ -33,7 +37,3 @@ function (γ::CubicVariogram)(h::T) where {T}
 
   (h < r) * (s - n) * s1 + (h ≥ r) * (s - n) * s2 + (h > 0) * n
 end
-
-variotype(::CubicVariogram) = CubicVariogram
-
-isstationary(::Type{<:CubicVariogram}) = true
