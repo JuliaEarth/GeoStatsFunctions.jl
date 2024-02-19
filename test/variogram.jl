@@ -172,6 +172,19 @@
     @test variotype(γ)() == γ
   end
 
+  # scale
+  for γ in [
+    GaussianVariogram(),
+    SphericalVariogram(),
+    ExponentialVariogram()
+  ]
+    g = GeoStatsFunctions.scale(γ, 2)
+    @test range(g) == 2
+  end
+  γ = GaussianVariogram(range=2.0) + ExponentialVariogram(range=3.0)
+  g = GeoStatsFunctions.scale(γ, 2)
+  @test range(g) == 6
+
   # shows
   γ = CircularVariogram()
   @test sprint(show, γ) == "CircularVariogram(sill: 1.0, nugget: 0.0, range: 1.0, distance: Euclidean)"

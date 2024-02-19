@@ -36,6 +36,8 @@ nugget(γ::NestedVariogram) = raw(sum(γ.cs .* map(nugget, γ.γs)))
 
 Base.range(γ::NestedVariogram) = maximum(range(g) for g in γ.γs)
 
+scale(γ::NestedVariogram, s::Real) = NestedVariogram(γ.cs, map(g -> scale(g, s), γ.γs))
+
 function structures(γ::NestedVariogram)
   ks, gs = γ.cs, γ.γs
 

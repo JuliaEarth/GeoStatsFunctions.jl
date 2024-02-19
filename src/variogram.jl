@@ -59,6 +59,17 @@ Return the maximum range of the variogram `γ`.
 Base.range(γ::Variogram) = maximum(radii(γ.ball))
 
 """
+    scale(γ, s)
+
+Scale metric ball of variogram `γ` with strictly
+positive scaling factor `s`.
+"""
+function scale(γ::Variogram, s::Real)
+  V = variotype(γ)
+  V(s * metricball(γ); sill=sill(γ), nugget=nugget(γ))
+end
+
+"""
     structures(γ)
 
 Return the individual structures of a (possibly nested)
@@ -195,16 +206,6 @@ end
 Return type of γ(u, v).
 """
 returntype(γ::Variogram, u, v) = typeof(γ(u, v))
-
-"""
-    scale(γ, s)
-
-Scale ranges of variogram `γ` with strictly positive scaling factor `s`.
-"""
-function scale(γ::Variogram, s::Real)
-  V = variotype(γ)
-  V(s * metricball(γ); sill=sill(γ), nugget=nugget(γ))
-end
 
 # -----------
 # IO METHODS
