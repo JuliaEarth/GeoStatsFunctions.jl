@@ -181,9 +181,16 @@
     g = GeoStatsFunctions.scale(γ, 2)
     @test range(g) == 2
   end
+
+  # scale with NestedVariogram
   γ = GaussianVariogram(range=2.0) + ExponentialVariogram(range=3.0)
   g = GeoStatsFunctions.scale(γ, 2)
   @test range(g) == 6
+
+  # scale doesn't affect NuggetEffect
+  γ = NuggetEffect()
+  g = GeoStatsFunctions.scale(γ, 2)
+  @test g == γ
 
   # shows
   γ = CircularVariogram()
