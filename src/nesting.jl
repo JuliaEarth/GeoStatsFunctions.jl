@@ -26,51 +26,15 @@ end
 
 NestedVariogram(cs, γs) = NestedVariogram{typeof(cs),typeof(γs)}(cs, γs)
 
-(g::NestedVariogram)(h) = raw(sum(g.cs .* map(γ -> γ(h), g.γs)))
-(g::NestedVariogram)(u::Point, v::Point) = raw(sum(g.cs .* map(γ -> γ(u, v), g.γs)))
+isstationary(γ::NestedVariogram) = all(isstationary, γ.γs)
 
-sill(g::NestedVariogram) = raw(sum(g.cs .* map(sill, g.γs)))
-nugget(g::NestedVariogram) = raw(sum(g.cs .* map(nugget, g.γs)))
-Base.range(g::NestedVariogram) = maximum(range(γ) for γ in g.γs)
-isstationary(g::NestedVariogram) = all(isstationary, g.γs)
-isisotropic(g::NestedVariogram) = all(isisotropic, g.γs)
+isisotropic(γ::NestedVariogram) = all(isisotropic, γ.γs)
 
-# algebraic structure
-*(c, γ::Variogram) = NestedVariogram((c,), (γ,))
-*(c, γ::NestedVariogram) = NestedVariogram(map(x -> c .* x, γ.cs), γ.γs)
-+(γ₁::Variogram, γ₂::Variogram) = NestedVariogram((1, 1), (γ₁, γ₂))
-+(γ₁::NestedVariogram, γ₂::Variogram) = NestedVariogram((γ₁.cs..., 1), (γ₁.γs..., γ₂))
-+(γ₁::Variogram, γ₂::NestedVariogram) = NestedVariogram((1, γ₂.cs...), (γ₁, γ₂.γs...))
-+(γ₁::NestedVariogram, γ₂::NestedVariogram) = NestedVariogram((γ₁.cs..., γ₂.cs...), (γ₁.γs..., γ₂.γs...))
+sill(γ::NestedVariogram) = raw(sum(γ.cs .* map(sill, γ.γs)))
 
-"""
-    structures(γ)
+nugget(γ::NestedVariogram) = raw(sum(γ.cs .* map(nugget, γ.γs)))
 
-Return the individual structures of a (possibly nested)
-variogram as a tuple. The structures are the total nugget
-`cₒ`, and the coefficients (or contributions) `c[i]` for the
-remaining non-trivial structures `g[i]` after normalization
-(i.e. sill=1, nugget=0).
-
-## Examples
-
-```julia
-γ₁ = GaussianVariogram(nugget=1, sill=2)
-γ₂ = SphericalVariogram(nugget=2, sill=3)
-
-γ = 2γ₁ + 3γ₂
-
-cₒ, c, g = structures(γ)
-```
-"""
-function structures(γ::Variogram)
-  cₒ = nugget(γ)
-  c = sill(γ) - nugget(γ)
-  T = typeof(c)
-  γ = @set γ.sill = one(T)
-  γ = @set γ.nugget = zero(T)
-  cₒ, (c,), (γ,)
-end
+Base.range(γ::NestedVariogram) = maximum(range(g) for g in γ.γs)
 
 function structures(γ::NestedVariogram)
   ks, gs = γ.cs, γ.γs
@@ -92,6 +56,17 @@ function structures(γ::NestedVariogram)
 
   cₒ, cs, γs
 end
+
+(γ::NestedVariogram)(h) = raw(sum(γ.cs .* map(g -> g(h), γ.γs)))
+(γ::NestedVariogram)(u::Point, v::Point) = raw(sum(γ.cs .* map(g -> g(u, v), γ.γs)))
+
+# algebraic structure
+*(c, γ::Variogram) = NestedVariogram((c,), (γ,))
+*(c, γ::NestedVariogram) = NestedVariogram(map(x -> c .* x, γ.cs), γ.γs)
++(γ₁::Variogram, γ₂::Variogram) = NestedVariogram((1, 1), (γ₁, γ₂))
++(γ₁::NestedVariogram, γ₂::Variogram) = NestedVariogram((γ₁.cs..., 1), (γ₁.γs..., γ₂))
++(γ₁::Variogram, γ₂::NestedVariogram) = NestedVariogram((1, γ₂.cs...), (γ₁, γ₂.γs...))
++(γ₁::NestedVariogram, γ₂::NestedVariogram) = NestedVariogram((γ₁.cs..., γ₂.cs...), (γ₁.γs..., γ₂.γs...))
 
 # -----------
 # IO METHODS

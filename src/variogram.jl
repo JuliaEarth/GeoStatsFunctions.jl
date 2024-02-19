@@ -10,6 +10,27 @@ A theoretical variogram model (e.g. Gaussian variogram).
 abstract type Variogram end
 
 """
+    variotype(γ)
+
+Return the type constructor of the variogram `γ`.
+"""
+function variotype end
+
+"""
+    isstationary(γ)
+
+Check if variogram `γ` possesses the 2nd-order stationary property.
+"""
+isstationary(γ::Variogram) = isstationary(typeof(γ))
+
+"""
+    isisotropic(γ)
+
+Tells whether or not variogram `γ` is isotropic.
+"""
+isisotropic(γ::Variogram) = isisotropic(γ.ball)
+
+"""
     sill(γ)
 
 Return the sill of the variogram `γ`.
@@ -38,11 +59,33 @@ Return the maximum range of the variogram `γ`.
 Base.range(γ::Variogram) = maximum(radii(γ.ball))
 
 """
-    variotype(γ)
+    structures(γ)
 
-Return the type constructor of the variogram `γ`.
+Return the individual structures of a (possibly nested)
+variogram as a tuple. The structures are the total nugget
+`cₒ`, and the coefficients (or contributions) `c[i]` for the
+remaining non-trivial structures `g[i]` after normalization
+(i.e. sill=1, nugget=0).
+
+## Examples
+
+```julia
+γ₁ = GaussianVariogram(nugget=1, sill=2)
+γ₂ = SphericalVariogram(nugget=2, sill=3)
+
+γ = 2γ₁ + 3γ₂
+
+cₒ, c, g = structures(γ)
+```
 """
-function variotype end
+function structures(γ::Variogram)
+  cₒ = nugget(γ)
+  c = sill(γ) - nugget(γ)
+  T = typeof(c)
+  γ = @set γ.sill = one(T)
+  γ = @set γ.nugget = zero(T)
+  cₒ, (c,), (γ,)
+end
 
 """
     γ(u, v)
@@ -84,27 +127,6 @@ function (γ::Variogram)(U::Geometry, V::Geometry)
   vs = variosample(γ, V)
   mean(γ(u, v) for u in us, v in vs)
 end
-
-"""
-    returntype(γ, u, v)
-
-Return result type of γ(u, v).
-"""
-returntype(γ::Variogram, u, v) = typeof(γ(u, v))
-
-"""
-    isstationary(γ)
-
-Check if variogram `γ` possesses the 2nd-order stationary property.
-"""
-isstationary(γ::Variogram) = isstationary(typeof(γ))
-
-"""
-    isisotropic(γ)
-
-Tells whether or not variogram `γ` is isotropic.
-"""
-isisotropic(γ::Variogram) = isisotropic(γ.ball)
 
 """
     pairwise(γ, domain)
@@ -165,6 +187,23 @@ function pairwise!(Γ, γ::Variogram, domain₁, domain₂)
     end
   end
   Γ
+end
+
+"""
+    returntype(γ, u, v)
+
+Return type of γ(u, v).
+"""
+returntype(γ::Variogram, u, v) = typeof(γ(u, v))
+
+"""
+    scale(γ, s)
+
+Scale ranges of variogram `γ` with strictly positive scaling factor `s`.
+"""
+function scale(γ::Variogram, s::Real)
+  V = variotype(γ)
+  V(s * metricball(γ); sill=sill(γ), nugget=nugget(γ))
 end
 
 # -----------
