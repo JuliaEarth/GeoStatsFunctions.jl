@@ -17,10 +17,51 @@ Evaluate the covariance at objects `x₁` and `x₁`.
 (cov::Covariance)(x₁, x₂) = sill(cov.γ) - cov.γ(x₁, x₂)
 
 """
+    isstationary(cov)
+
+Check if covariance `cov` possesses the 2nd-order stationary property.
+"""
+isstationary(cov::Covariance) = isstationary(typeof(cov.γ))
+
+"""
+    isisotropic(cov)
+
+Tells whether or not covariance `cov` is isotropic.
+"""
+isisotropic(cov::Covariance) = isisotropic(cov.γ.ball)
+
+for fun in (:sill, :nugget, :metricball)
+  eval(quote
+    """
+        $($fun)(cov)
+
+    Returns the $($fun) of the covariance `cov`.
+    """
+    $fun(cov::Covariance) = $fun(cov.γ)
+  end)
+end
+
+"""
+    range(cov)
+
+Return the maximum range of the covariance `cov`."""
+Base.range(cov::Covariance) = maximum(radii(cov.γ.ball))
+
+"""
+    scale(cov, s)
+
+Scale metric ball of covariance `cov` with strictly
+positive scaling factor `s`.
+"""
+function scale(cov::CovType, s::Real) where {CovType <: Covariance}
+  CovType(scale(cov.γ, s))
+end
+
+"""
     pairwise(cov, domain)
-    
+
 Evaluate covariance `cov` between all elements in the `domain`.
-    
+
     pairwise(cov, domain₁, domain₂)
 
 Evaluate covariance `cov` between all elements of `domain₁` and `domain₂`.
