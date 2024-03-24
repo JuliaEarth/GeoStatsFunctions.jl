@@ -18,14 +18,29 @@ Evaluate the covariance at objects `x₁` and `x₁`.
 
 """
     pairwise(cov, domain)
-    
+
 Evaluate covariance `cov` between all elements in the `domain`.
-    
+
     pairwise(cov, domain₁, domain₂)
 
 Evaluate covariance `cov` between all elements of `domain₁` and `domain₂`.
 """
 pairwise(cov::Covariance, args...) = sill(cov.γ) .- pairwise(cov.γ, args...)
+
+"""
+    pairwise!(Γ, cov, domain)
+
+Evaluates covariance `cov` between all elements in the `domain` in-place, filling the matrix `Γ`.
+
+    pairwise!(Γ, cov, domain₁, domain₂)
+
+Evaluates covariance `cov` between all elements of `domain₁` and `domain₂` in-place, filling the matrix `Γ`."""
+function pairwise!(Γ, cov::Covariance, args...)
+  pairwise!(Γ, cov.γ, args...)
+  Γ .*= -one(eltype(Γ))
+  Γ .+= sill(cov.γ)
+  Γ
+end
 
 # -----------
 # IO METHODS
