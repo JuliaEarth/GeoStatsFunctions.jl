@@ -53,9 +53,7 @@ Base.range(cov::Covariance) = maximum(radii(metricbal(cov.γ)))
 Scale metric ball of covariance `cov` with strictly
 positive scaling factor `s`.
 """
-function scale(cov::CovType, s::Real) where {CovType <: Covariance}
-  CovType(scale(cov.γ, s))
-end
+scale(cov::Cov, s::Real) where {Cov <: Covariance} = Cov(scale(cov.γ, s))
 
 """
     pairwise(cov, domain)
