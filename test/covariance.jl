@@ -40,6 +40,15 @@
   @test eltype(Γ_f) == Float32
   @test issymmetric(Γ_f)
 
+  cov = GaussianCovariance(range=1.0, sill=1.0, nugget=0.0)
+  @test isstationary(cov)
+  @test isisotropic(cov)
+  @test sill(cov) == 1.0
+  @test nugget(cov) == 0.0
+  @test metricball(cov) == MetricBall(1.0)
+  @test range(cov) == 1.0
+  @test GeoStatsFunctions.scale(cov, 2) == GaussianCovariance(range=2.0, sill=1.0, nugget=0.0)
+
   # shows
   cov = CircularCovariance()
   @test sprint(show, cov) == "CircularCovariance(sill: 1.0, nugget: 0.0, range: 1.0, distance: Euclidean)"
