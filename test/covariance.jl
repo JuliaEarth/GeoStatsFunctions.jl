@@ -47,7 +47,7 @@
   @test nugget(cov) == 0.0
   @test metricball(cov) == MetricBall(1.0)
   @test range(cov) == 1.0
-  @test scale(cov, 2) == GaussianCovariance(range=2.0, sill=1.0, nugget=0.0)
+  @test GeoStatsFunctions.scale(cov, 2) == GaussianCovariance(range=2.0, sill=1.0, nugget=0.0)
 
   # shows
   cov = CircularCovariance()

@@ -30,22 +30,32 @@ Tells whether or not covariance `cov` is isotropic.
 """
 isisotropic(cov::Covariance) = isisotropic(metricball(cov.γ))
 
-for fun in (:sill, :nugget, :metricball)
-  eval(quote
-    """
-        $($fun)(cov)
+"""
+    sill(cov)
 
-    Returns the $($fun) of the covariance `cov`.
-    """
-    $fun(cov::Covariance) = $fun(cov.γ)
-  end)
-end
+Return the sill of the covariance `cov`.
+"""
+sill(cov::Covariance) = cov.γ.sill
+
+"""
+    nugget(cov)
+
+Return the nugget of the covariance `cov`.
+"""
+nugget(cov::Covariance) = cov.γ.nugget
+
+"""
+    metricball(cov)
+
+Return the metric ball of the covariance `cov`.
+"""
+metricball(cov::Covariance) = cov.γ.ball
 
 """
     range(cov)
 
 Return the maximum range of the covariance `cov`."""
-Base.range(cov::Covariance) = maximum(radii(metricbal(cov.γ)))
+Base.range(cov::Covariance) = maximum(radii(metricball(cov.γ)))
 
 """
     scale(cov, s)
