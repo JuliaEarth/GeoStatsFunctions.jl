@@ -21,41 +21,41 @@ Evaluate the covariance at objects `x₁` and `x₁`.
 
 Check if covariance `cov` possesses the 2nd-order stationary property.
 """
-isstationary(cov::Covariance) = isstationary(typeof(cov.γ))
+isstationary(cov::Covariance) = isstationary(cov.γ)
 
 """
     isisotropic(cov)
 
 Tells whether or not covariance `cov` is isotropic.
 """
-isisotropic(cov::Covariance) = isisotropic(metricball(cov.γ))
+isisotropic(cov::Covariance) = isisotropic(cov.γ)
 
 """
     sill(cov)
 
 Return the sill of the covariance `cov`.
 """
-sill(cov::Covariance) = cov.γ.sill
+sill(cov::Covariance) = sill(cov.γ)
 
 """
     nugget(cov)
 
 Return the nugget of the covariance `cov`.
 """
-nugget(cov::Covariance) = cov.γ.nugget
+nugget(cov::Covariance) = nugget(cov.γ)
 
 """
     metricball(cov)
 
 Return the metric ball of the covariance `cov`.
 """
-metricball(cov::Covariance) = cov.γ.ball
+metricball(cov::Covariance) = metricball(cov.γ)
 
 """
     range(cov)
 
 Return the maximum range of the covariance `cov`."""
-Base.range(cov::Covariance) = maximum(radii(metricball(cov.γ)))
+Base.range(cov::Covariance) = range(cov.γ)
 
 """
     scale(cov, s)
