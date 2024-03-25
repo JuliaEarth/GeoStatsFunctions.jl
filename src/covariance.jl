@@ -37,8 +37,9 @@ Evaluates covariance `cov` between all elements in the `domain` in-place, fillin
 Evaluates covariance `cov` between all elements of `domain₁` and `domain₂` in-place, filling the matrix `Γ`."""
 function pairwise!(Γ, cov::Covariance, args...)
   pairwise!(Γ, cov.γ, args...)
-  Γ .*= -one(eltype(Γ))
-  Γ .+= sill(cov.γ)
+  for i ∈ eachindex(Γ)
+    Γ[i] = sill(cov.γ) - Γ[i]
+  end
   Γ
 end
 

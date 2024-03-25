@@ -40,6 +40,11 @@
   @test eltype(Γ_f) == Float32
   @test issymmetric(Γ_f)
 
+  𝒟 = PointSet(Matrix(1.0I, 3, 3))
+  Γ = Matrix{Float64}(undef, 3, 3)
+  GeoStatsFunctions.pairwise!(Γ, GaussianCovariance(range=1.0, sill=1.0, nugget=1.0), 𝒟)
+  @test issymmetric(Γ)
+
   # shows
   cov = CircularCovariance()
   @test sprint(show, cov) == "CircularCovariance(sill: 1.0, nugget: 0.0, range: 1.0, distance: Euclidean)"
