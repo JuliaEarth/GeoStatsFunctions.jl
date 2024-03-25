@@ -191,7 +191,7 @@ function pairwise(γ::Variogram, domain₁, domain₂)
 end
 
 """
-    pairwise!(Γ, γ, domain)
+    pairwise!(Γ, γ, domain₁, domain₂)
 
 Evaluates covariance `γ` between all elements of `domain₁` and `domain₂` in-place, filling the matrix `Γ`.
 """
