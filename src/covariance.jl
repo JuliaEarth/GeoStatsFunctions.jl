@@ -28,7 +28,7 @@ isstationary(cov::Covariance) = isstationary(typeof(cov.γ))
 
 Tells whether or not covariance `cov` is isotropic.
 """
-isisotropic(cov::Covariance) = isisotropic(cov.γ.ball)
+isisotropic(cov::Covariance) = isisotropic(metricball(cov.γ))
 
 for fun in (:sill, :nugget, :metricball)
   eval(quote
@@ -45,7 +45,7 @@ end
     range(cov)
 
 Return the maximum range of the covariance `cov`."""
-Base.range(cov::Covariance) = maximum(radii(cov.γ.ball))
+Base.range(cov::Covariance) = maximum(radii(metricbal(cov.γ)))
 
 """
     scale(cov, s)
