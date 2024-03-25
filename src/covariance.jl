@@ -10,13 +10,6 @@ Parent type of all covariance functions (e.g. Gaussian covariance).
 abstract type Covariance end
 
 """
-    cov(x₁, x₂)
-
-Evaluate the covariance at objects `x₁` and `x₁`.
-"""
-(cov::Covariance)(x₁, x₂) = sill(cov.γ) - cov.γ(x₁, x₂)
-
-"""
     isstationary(cov)
 
 Check if covariance `cov` possesses the 2nd-order stationary property.
@@ -54,7 +47,8 @@ metricball(cov::Covariance) = metricball(cov.γ)
 """
     range(cov)
 
-Return the maximum range of the covariance `cov`."""
+Return the maximum range of the covariance `cov`.
+"""
 Base.range(cov::Covariance) = range(cov.γ)
 
 """
@@ -64,6 +58,13 @@ Scale metric ball of covariance `cov` with strictly
 positive scaling factor `s`.
 """
 scale(cov::Cov, s::Real) where {Cov <: Covariance} = Cov(scale(cov.γ, s))
+
+"""
+    cov(g₁, g₂)
+
+Evaluate the covariance at geometries `g₁` and `g₁`.
+"""
+(cov::Covariance)(g₁, g₂) = sill(cov.γ) - cov.γ(g₁, g₂)
 
 """
     pairwise(cov, domain)
