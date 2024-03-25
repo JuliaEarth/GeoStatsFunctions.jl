@@ -28,19 +28,20 @@ Evaluate covariance `cov` between all elements of `domain₁` and `domain₂`.
 pairwise(cov::Covariance, args...) = sill(cov.γ) .- pairwise(cov.γ, args...)
 
 """
-    pairwise!(Γ, cov, domain)
+    pairwise!(C, cov, domain)
 
-Evaluates covariance `cov` between all elements in the `domain` in-place, filling the matrix `Γ`.
+Evaluates covariance `cov` between all elements in the `domain` in-place, filling the matrix `C`.
 
-    pairwise!(Γ, cov, domain₁, domain₂)
+    pairwise!(C, cov, domain₁, domain₂)
 
-Evaluates covariance `cov` between all elements of `domain₁` and `domain₂` in-place, filling the matrix `Γ`."""
-function pairwise!(Γ, cov::Covariance, args...)
-  pairwise!(Γ, cov.γ, args...)
-  for i ∈ eachindex(Γ)
-    Γ[i] = sill(cov.γ) - Γ[i]
+Evaluates covariance `cov` between all elements of `domain₁` and `domain₂` in-place, filling the matrix `C`.
+"""
+function pairwise!(C, cov::Covariance, args...)
+  pairwise!(C, cov.γ, args...)
+  for i in eachindex(Γ)
+    C[i] = sill(cov.γ) - C[i]
   end
-  Γ
+  C
 end
 
 # -----------
