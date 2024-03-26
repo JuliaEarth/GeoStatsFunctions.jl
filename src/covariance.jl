@@ -10,11 +10,61 @@ Parent type of all covariance functions (e.g. Gaussian covariance).
 abstract type Covariance end
 
 """
-    cov(x₁, x₂)
+    isstationary(cov)
 
-Evaluate the covariance at objects `x₁` and `x₁`.
+Check if covariance `cov` possesses the 2nd-order stationary property.
 """
-(cov::Covariance)(x₁, x₂) = sill(cov.γ) - cov.γ(x₁, x₂)
+isstationary(cov::Covariance) = isstationary(cov.γ)
+
+"""
+    isisotropic(cov)
+
+Tells whether or not covariance `cov` is isotropic.
+"""
+isisotropic(cov::Covariance) = isisotropic(cov.γ)
+
+"""
+    sill(cov)
+
+Return the sill of the covariance `cov`.
+"""
+sill(cov::Covariance) = sill(cov.γ)
+
+"""
+    nugget(cov)
+
+Return the nugget of the covariance `cov`.
+"""
+nugget(cov::Covariance) = nugget(cov.γ)
+
+"""
+    metricball(cov)
+
+Return the metric ball of the covariance `cov`.
+"""
+metricball(cov::Covariance) = metricball(cov.γ)
+
+"""
+    range(cov)
+
+Return the maximum range of the covariance `cov`.
+"""
+Base.range(cov::Covariance) = range(cov.γ)
+
+"""
+    scale(cov, s)
+
+Scale metric ball of covariance `cov` with strictly
+positive scaling factor `s`.
+"""
+scale(cov::Cov, s::Real) where {Cov <: Covariance} = Cov(scale(cov.γ, s))
+
+"""
+    cov(g₁, g₂)
+
+Evaluate the covariance at geometries `g₁` and `g₁`.
+"""
+(cov::Covariance)(g₁, g₂) = sill(cov.γ) - cov.γ(g₁, g₂)
 
 """
     pairwise(cov, domain)
