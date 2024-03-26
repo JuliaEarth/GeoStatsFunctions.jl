@@ -152,6 +152,11 @@ function pairwise(γ::Variogram, domain)
   pairwise!(Γ, γ, domain)
 end
 
+"""
+    pairwise!(Γ, γ, domain)
+
+Evaluates covariance `γ` between all elements in the `domain` in-place, filling the matrix `Γ`.
+"""
 function pairwise!(Γ, γ::Variogram, domain)
   n = length(domain)
   @inbounds for j in 1:n
@@ -185,6 +190,11 @@ function pairwise(γ::Variogram, domain₁, domain₂)
   pairwise!(Γ, γ, domain₁, domain₂)
 end
 
+"""
+    pairwise!(Γ, γ, domain₁, domain₂)
+
+Evaluates covariance `γ` between all elements of `domain₁` and `domain₂` in-place, filling the matrix `Γ`.
+"""
 function pairwise!(Γ, γ::Variogram, domain₁, domain₂)
   m = length(domain₁)
   n = length(domain₂)
