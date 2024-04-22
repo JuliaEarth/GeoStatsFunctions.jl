@@ -5,7 +5,7 @@ using Unitful
 using Distances
 using LinearAlgebra
 using CSV, DelimitedFiles
-using Test, Random
+using Test, StableRNGs
 import CoDa: Composition
 
 # environment settings

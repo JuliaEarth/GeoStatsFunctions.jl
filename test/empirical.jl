@@ -34,27 +34,28 @@
     @test all(iszero.(n))
 
     # accumulation algorithms give the same result
-    Random.seed!(2021)
-    sdata = georef((z=rand(1000),), rand(3, 1000))
+    rng = StableRNG(123)
+    sdata = georef((z=rand(rng, 1000),), rand(rng, 3, 1000))
     γ₁ = EmpiricalVariogram(sdata, :z, maxlag=0.01, algorithm=:full)
     γ₂ = EmpiricalVariogram(sdata, :z, maxlag=0.01, algorithm=:ball)
     @test isequal(values(γ₁), values(γ₂))
 
     # custom distance is recorded
-    sdata = georef((z=rand(1000),), rand(2, 1000))
+    rng = StableRNG(123)
+    sdata = georef((z=rand(rng, 1000),), rand(rng, 2, 1000))
     γ = EmpiricalVariogram(sdata, :z, distance=Haversine(6371.0), algorithm=:full)
     @test distance(γ) == Haversine(6371.0)
 
     # print methods
-    rng = MersenneTwister(123)
+    rng = StableRNG(123)
     d = georef((z=rand(rng, 100, 100),))
     γ = EmpiricalVariogram(d, :z)
     @test sprint(show, γ) ==
-          "EmpiricalVariogram(abscissa: [0.353553, ..., 13.8426], ordinate: [0.0, ..., 0.0828886], distance: Euclidean(0.0), estimator: MatheronEstimator(), npairs: 2790126)"
+          "EmpiricalVariogram(abscissa: [0.353553, ..., 13.8426], ordinate: [0.0, ..., 0.0841137], distance: Euclidean(0.0), estimator: MatheronEstimator(), npairs: 2790126)"
     @test sprint(show, MIME"text/plain"(), γ) == """
     EmpiricalVariogram
     ├─ abscissa: [0.353553, 1.20607, 2.0, ..., 12.2868, 13.1058, 13.8426]
-    ├─ ordinate: [0.0, 0.0830612, 0.0825728, ..., 0.083112, 0.0828741, 0.0828886]
+    ├─ ordinate: [0.0, 0.084454, 0.0849279, ..., 0.0841661, 0.0841251, 0.0841137]
     ├─ distance: Euclidean(0.0)
     ├─ estimator: MatheronEstimator()
     └─ npairs: 2790126"""
