@@ -35,7 +35,7 @@ function (γ::MaternVariogram)(h::Len)
 
   # shift lag by machine precision to
   # avoid explosion at the origin
-  h′ = h′ + eps(typeof(h′))
+  h′ += eps(typeof(h′))
 
   δ = √(2ν) * 3(h′ / r′)
   Β = besselk(ν, δ)

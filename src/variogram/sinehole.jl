@@ -31,7 +31,7 @@ function (γ::SineHoleVariogram)(h::Len)
 
   # shift lag by machine precision to
   # avoid explosion at the origin
-  h′ = h′ + eps(typeof(h′))
+  h′ += eps(typeof(h′))
   c = oftype(h′, π)
 
   (s - n) * (1 - sin(c * h′ / r′) / (c * h′ / r′)) + (h′ > 0) * n
