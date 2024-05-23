@@ -134,6 +134,10 @@ function fit_impl(
   uy = unit(first(y))
   y = ustrip.(y)
 
+  # strip units of `range` and `maxrange`
+  range′ = isnothing(range) ? range : ustrip(ux, range)
+  maxrange′ = isnothing(maxrange) ? maxrange : ustrip(ux, maxrange) 
+
   # evaluate weights
   f = algo.weightfun
   w = isnothing(f) ? n / sum(n) : map(xᵢ -> ustrip(f(xᵢ)), x)
@@ -151,25 +155,25 @@ function fit_impl(
   λ = sum(yᵢ -> yᵢ^2, y)
 
   # maximum range, sill and nugget
-  xmax = maximum(x)
+  xmax = ustrip(maximum(x))
   ymax = maximum(y)
-  rmax = isnothing(maxrange) ? xmax : maxrange
+  rmax = isnothing(maxrange′) ? xmax : maxrange′
   smax = isnothing(maxsill) ? ymax : maxsill
   nmax = isnothing(maxnugget) ? ymax : maxnugget
 
   # initial guess
-  rₒ = isnothing(range) ? rmax / 3 : range
+  rₒ = isnothing(range′) ? rmax / 3 : range′
   sₒ = isnothing(sill) ? 0.95 * smax : sill
   nₒ = isnothing(nugget) ? 1e-6 : nugget
-  θₒ = [ustrip(ux, rₒ), sₒ, nₒ]
+  θₒ = [rₒ, sₒ, nₒ]
 
   # box constraints
   δ = 1e-8
-  rₗ, rᵤ = isnothing(range) ? (zero(rmax), rmax) : (range - δ * unit(range), range + δ * unit(range))
+  rₗ, rᵤ = isnothing(range′) ? (zero(rmax), rmax) : (range′ - δ, range′ + δ)
   sₗ, sᵤ = isnothing(sill) ? (zero(smax), smax) : (sill - δ, sill + δ)
   nₗ, nᵤ = isnothing(nugget) ? (zero(nmax), nmax) : (nugget - δ, nugget + δ)
-  l = [ustrip(ux, rₗ), sₗ, nₗ]
-  u = [ustrip(ux, rᵤ), sᵤ, nᵤ]
+  l = [rₗ, sₗ, nₗ]
+  u = [rᵤ, sᵤ, nᵤ]
 
   # solve optimization problem
   sol = Optim.optimize(θ -> J(θ) + λ * L(θ), l, u, θₒ)
