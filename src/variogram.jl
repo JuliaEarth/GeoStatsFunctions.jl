@@ -105,9 +105,7 @@ Evaluate the variogram at points `u` and `v`.
 """
 function (γ::Variogram)(u::Point, v::Point)
   d = metric(γ.ball)
-  x = coordinates(u)
-  y = coordinates(v)
-  h = evaluate(d, x, y)
+  h = uevaluate(d, u, v)
   γ(h)
 end
 
@@ -138,6 +136,8 @@ function (γ::Variogram)(U::Geometry, V::Geometry)
   vs = variosample(γ, V)
   mean(γ(u, v) for u in us, v in vs)
 end
+
+(γ::Variogram)(h) = γ(addunit(h, u"m"))
 
 """
     pairwise(γ, domain)

@@ -12,7 +12,7 @@ geospatial `data`.
 ## Parameters
 
   * nlags     - number of lags (default to `20`)
-  * maxlag    - maximum lag (default to 1/10 of maximum lag of data)
+  * maxlag    - maximum lag in length units (default to 1/10 of maximum lag of data)
   * distance  - custom distance function (default to `Euclidean` distance)
   * estimator - variogram estimator (default to `:matheron` estimator)
   * algorithm - accumulation algorithm (default to `:ball`)
@@ -44,8 +44,8 @@ See also: [`DirectionalVariogram`](@ref), [`PlanarVariogram`](@ref),
 * Hoffimann, J and Zadrozny, B. 2019. [Efficient variography with partition variograms]
   (https://www.sciencedirect.com/science/article/pii/S0098300419302936)
 """
-struct EmpiricalVariogram{V,D,E}
-  abscissa::Vector{Float64}
+struct EmpiricalVariogram{ℒ<:Len,V,D,E}
+  abscissa::Vector{ℒ}
   ordinate::Vector{V}
   counts::Vector{Int}
   distance::D
@@ -73,7 +73,7 @@ function EmpiricalVariogram(
   # sanity checks
   @assert nelem > 1 "variogram requires at least 2 elements"
   @assert nlags > 0 "number of lags must be positive"
-  @assert maxlag > 0 "maximum lag distance must be positive"
+  @assert maxlag > zero(maxlag) "maximum lag distance must be positive"
   @assert estimator ∈ (:matheron, :cressie) "invalid variogram estimator"
   @assert algorithm ∈ (:full, :ball) "invalid accumulation algorithm"
 
@@ -82,7 +82,7 @@ function EmpiricalVariogram(
 
   # ball search with NearestNeighbors.jl requires AbstractFloat and MinkowskiMetric
   # https://github.com/KristofferC/NearestNeighbors.jl/issues/13
-  isfloat = coordtype(𝒟) <: AbstractFloat
+  isfloat = Unitful.numtype(Meshes.lentype(𝒟)) <: AbstractFloat
   isminkowski = distance isa MinkowskiMetric
 
   # warn users requesting :ball option with invalid parameters

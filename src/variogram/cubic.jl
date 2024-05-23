@@ -23,17 +23,19 @@ variotype(::CubicVariogram) = CubicVariogram
 
 isstationary(::Type{<:CubicVariogram}) = true
 
-function (γ::CubicVariogram)(h::T) where {T}
+function (γ::CubicVariogram)(h::Len)
   r = radius(γ.ball)
   s = γ.sill
   n = γ.nugget
+  h′, r′ = unitless(h, r)
 
   # constants
+  T = typeof(h′)
   c1 = T(35) / T(4)
   c2 = T(7) / T(2)
   c3 = T(3) / T(4)
-  s1 = 7 * (h / r)^2 - c1 * (h / r)^3 + c2 * (h / r)^5 - c3 * (h / r)^7
+  s1 = 7 * (h′ / r′)^2 - c1 * (h′ / r′)^3 + c2 * (h′ / r′)^5 - c3 * (h′ / r′)^7
   s2 = T(1)
 
-  (h < r) * (s - n) * s1 + (h ≥ r) * (s - n) * s2 + (h > 0) * n
+  (h′ < r′) * (s - n) * s1 + (h′ ≥ r′) * (s - n) * s2 + (h′ > 0) * n
 end

@@ -60,7 +60,8 @@ function accumulate(data, var₁, var₂, estim::VariogramEstimator, algo::Vario
   V = returntype(estim, z₁, z₂)
 
   # lag sums and counts
-  Σx = zeros(nlags)
+  ℒ = Meshes.lentype(𝒫)
+  Σx = zeros(ℒ, nlags)
   Σy = zeros(V, nlags)
   ns = zeros(Int, nlags)
 
@@ -78,7 +79,7 @@ function accumulate(data, var₁, var₂, estim::VariogramEstimator, algo::Vario
       z₂ᵢ = z₂[i]
 
       # evaluate geospatial lag
-      h = evaluate(distance, coordinates(pᵢ), coordinates(pⱼ))
+      h = uevaluate(distance, pᵢ, pⱼ)
 
       # early exit if out of range
       exit(h) && continue

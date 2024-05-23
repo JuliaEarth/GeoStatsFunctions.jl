@@ -40,8 +40,8 @@ end
 function _spacing(γ::Variogram, g::Geometry)
   r = range(γ)
   s = sides(boundingbox(g))
-  l = minimum(filter(>(0), s))
-  r > 0 ? min(r, l) / 3 : l / 3
+  l = minimum(filter(>(zero(eltype(s))), s))
+  r > zero(r) ? min(r, l) / 3 : l / 3
 end
 
 function _dims(γ::Variogram, g::Geometry)

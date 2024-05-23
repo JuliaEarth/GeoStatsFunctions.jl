@@ -24,16 +24,18 @@ variotype(::SphericalVariogram) = SphericalVariogram
 
 isstationary(::Type{<:SphericalVariogram}) = true
 
-function (γ::SphericalVariogram)(h::T) where {T}
+function (γ::SphericalVariogram)(h::Len)
   r = radius(γ.ball)
   s = γ.sill
   n = γ.nugget
+  h′, r′ = unitless(h, r)
 
   # constants
+  T = typeof(h′)
   c1 = T(3) / T(2)
   c2 = T(1) / T(2)
-  s1 = c1 * (h / r) - c2 * (h / r)^3
+  s1 = c1 * (h′ / r′) - c2 * (h′ / r′)^3
   s2 = T(1)
 
-  (h < r) * (s - n) * s1 + (h ≥ r) * (s - n) * s2 + (h > 0) * n
+  (h′ < r′) * (s - n) * s1 + (h′ ≥ r′) * (s - n) * s2 + (h′ > 0) * n
 end

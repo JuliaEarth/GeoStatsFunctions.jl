@@ -21,10 +21,10 @@ isisotropic(::NuggetEffect) = true
 
 sill(γ::NuggetEffect) = γ.nugget
 
-Base.range(::NuggetEffect{T}) where {T} = zero(T)
+Base.range(::NuggetEffect) = 0u"m"
 
 scale(γ::NuggetEffect, ::Real) = γ
 
-(γ::NuggetEffect)(h) = (h > 0) * γ.nugget
+(γ::NuggetEffect)(h::Len) = (h > zero(h)) * γ.nugget
 
 (γ::NuggetEffect)(u::Point, v::Point) = ifelse(u == v, zero(γ.nugget), γ.nugget)

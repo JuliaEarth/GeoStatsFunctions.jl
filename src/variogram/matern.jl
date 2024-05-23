@@ -26,19 +26,20 @@ variotype(::MaternVariogram) = MaternVariogram
 
 isstationary(::Type{<:MaternVariogram}) = true
 
-function (γ::MaternVariogram)(h::T) where {T}
+function (γ::MaternVariogram)(h::Len)
   r = radius(γ.ball)
   s = γ.sill
   n = γ.nugget
   ν = γ.order
+  h′, r′ = unitless(h, r)
 
   # shift lag by machine precision to
   # avoid explosion at the origin
-  h′ = h + eps(T)
+  h′ = h′ + eps(typeof(h′))
 
-  δ = √(2ν) * 3(h′ / r)
+  δ = √(2ν) * 3(h′ / r′)
   Β = besselk(ν, δ)
   Γ = gamma(ν)
 
-  (s - n) * (1 - 2^(1 - ν) / Γ * δ^ν * Β) + (h > 0) * n
+  (s - n) * (1 - 2^(1 - ν) / Γ * δ^ν * Β) + (h′ > 0) * n
 end
