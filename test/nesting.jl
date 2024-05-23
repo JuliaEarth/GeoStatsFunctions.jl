@@ -53,7 +53,7 @@
   γ = C₁ * GaussianVariogram(range=1.0) + C₂ * SphericalVariogram(range=2.0)
   @test range(γ) ≈ 2.0u"m"
   @test sill(γ) ≈ C₁ .+ C₂
-  @test γ(10.0) ≈ sill(γ)
+  @test γ(10.0u"m") ≈ sill(γ)
   @test γ(Point(10.0, 0.0), Point(0.0, 0.0)) ≈ sill(γ)
   @test isstationary(γ)
 
@@ -62,7 +62,7 @@
   γ = C * GaussianVariogram() + C * ExponentialVariogram() + C * CubicVariogram()
   @test range(γ) ≈ 1.0u"m"
   @test sill(γ) ≈ [3.0 0.0; 0.0 3.0]
-  @test γ(10.0) ≈ sill(γ)
+  @test γ(10.0u"m") ≈ sill(γ)
   @test γ(Point(10.0, 0.0), Point(0.0, 0.0)) ≈ sill(γ)
   @test isstationary(γ)
 

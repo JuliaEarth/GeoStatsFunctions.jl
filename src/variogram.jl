@@ -137,8 +137,6 @@ function (γ::Variogram)(U::Geometry, V::Geometry)
   mean(γ(u, v) for u in us, v in vs)
 end
 
-(γ::Variogram)(h) = γ(addunit(h, u"m"))
-
 """
     pairwise(γ, domain)
 

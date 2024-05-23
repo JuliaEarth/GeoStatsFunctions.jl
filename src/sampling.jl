@@ -40,7 +40,7 @@ end
 function _spacing(γ::Variogram, g::Geometry)
   r = range(γ)
   s = sides(boundingbox(g))
-  l = minimum(filter(>(zero(eltype(s))), s))
+  l = minimum(filter(sᵢ -> sᵢ > zero(sᵢ), s))
   r > zero(r) ? min(r, l) / 3 : l / 3
 end
 

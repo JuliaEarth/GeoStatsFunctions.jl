@@ -130,12 +130,13 @@ function fit_impl(
   n = n[n .> 0]
 
   # strip units if necessary
-  𝓊 = unit(first(y))
+  ux = unit(first(x))
+  uy = unit(first(y))
   y = ustrip.(y)
 
   # evaluate weights
   f = algo.weightfun
-  w = isnothing(f) ? n / sum(n) : map(xᵢ -> f(ustrip(xᵢ)), x)
+  w = isnothing(f) ? n / sum(n) : map(xᵢ -> ustrip(f(xᵢ)), x)
 
   # objective function
   function J(θ)
@@ -160,15 +161,15 @@ function fit_impl(
   rₒ = isnothing(range) ? rmax / 3 : range
   sₒ = isnothing(sill) ? 0.95 * smax : sill
   nₒ = isnothing(nugget) ? 1e-6 : nugget
-  θₒ = [ustrip(rₒ), sₒ, nₒ]
+  θₒ = [ustrip(ux, rₒ), sₒ, nₒ]
 
   # box constraints
   δ = 1e-8
-  rₗ, rᵤ = isnothing(range) ? (0.0, rmax) : (range - δ, range + δ)
-  sₗ, sᵤ = isnothing(sill) ? (0.0, smax) : (sill - δ, sill + δ)
-  nₗ, nᵤ = isnothing(nugget) ? (0.0, nmax) : (nugget - δ, nugget + δ)
-  l = [ustrip(rₗ), sₗ, nₗ]
-  u = [ustrip(rᵤ), sᵤ, nᵤ]
+  rₗ, rᵤ = isnothing(range) ? (zero(rmax), rmax) : (range - δ * unit(range), range + δ * unit(range))
+  sₗ, sᵤ = isnothing(sill) ? (zero(smax), smax) : (sill - δ, sill + δ)
+  nₗ, nᵤ = isnothing(nugget) ? (zero(nmax), nmax) : (nugget - δ, nugget + δ)
+  l = [ustrip(ux, rₗ), sₗ, nₗ]
+  u = [ustrip(ux, rᵤ), sᵤ, nᵤ]
 
   # solve optimization problem
   sol = Optim.optimize(θ -> J(θ) + λ * L(θ), l, u, θₒ)
@@ -176,7 +177,7 @@ function fit_impl(
   θ = Optim.minimizer(sol)
 
   # optimal variogram (with units)
-  γ = V(ball(θ[1]), sill=θ[2] * 𝓊, nugget=θ[3] * 𝓊)
+  γ = V(ball(θ[1]), sill=θ[2] * uy, nugget=θ[3] * uy)
 
   γ, ϵ
 end
