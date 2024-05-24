@@ -57,7 +57,7 @@ Base.range(cov::Covariance) = range(cov.γ)
 Scale metric ball of covariance `cov` with strictly
 positive scaling factor `s`.
 """
-scale(cov::Cov, s::Real) where {Cov <: Covariance} = Cov(scale(cov.γ, s))
+scale(cov::Cov, s::Real) where {Cov<:Covariance} = Cov(scale(cov.γ, s))
 
 """
     cov(g₁, g₂)
