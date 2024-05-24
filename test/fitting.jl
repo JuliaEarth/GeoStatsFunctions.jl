@@ -63,4 +63,16 @@
   γ = GeoStatsFunctions.fit(Variogram, g)
   @test unit(sill(γ)) == u"K^2"
   @test unit(nugget(γ)) == u"K^2"
+  γ = GeoStatsFunctions.fit(Variogram, g, range=12.0u"m")
+  @test isapprox(range(γ), 12.0u"m", atol=1e-3u"m")
+  γ = GeoStatsFunctions.fit(Variogram, g, sill=0.06u"K^2")
+  @test isapprox(sill(γ), 0.06u"K^2", atol=1e-3u"K^2")
+  γ = GeoStatsFunctions.fit(Variogram, g, nugget=0.02u"K^2")
+  @test isapprox(nugget(γ), 0.02u"K^2", atol=1e-3u"K^2")
+  γ = GeoStatsFunctions.fit(Variogram, g, maxrange=6.0u"m")
+  @test isapprox(range(γ), 6.0u"m", atol=1e-3u"m")
+  γ = GeoStatsFunctions.fit(Variogram, g, sill=0.03u"K^2")
+  @test isapprox(sill(γ), 0.03u"K^2", atol=1e-3u"K^2")
+  γ = GeoStatsFunctions.fit(Variogram, g, nugget=0.01u"K^2")
+  @test isapprox(nugget(γ), 0.01u"K^2", atol=1e-3u"K^2")
 end

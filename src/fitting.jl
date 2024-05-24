@@ -186,7 +186,7 @@ function fit_impl(
   θ = Optim.minimizer(sol)
 
   # optimal variogram (with units)
-  γ = V(ball(θ[1]), sill=θ[2] * uy, nugget=θ[3] * uy)
+  γ = V(ball(θ[1] * ux), sill=θ[2] * uy, nugget=θ[3] * uy)
 
   γ, ϵ
 end
