@@ -29,5 +29,6 @@ function (γ::GaussianVariogram)(h)
   r = radius(γ.ball)
   s = γ.sill
   n = γ.nugget + typeof(s)(1e-6)
-  (s - n) * (1 - exp(-3(h / r)^2)) + (h > 0) * n
+  h′, r′ = unitless(h, r)
+  (s - n) * (1 - exp(-3(h′ / r′)^2)) + (h′ > 0) * n
 end

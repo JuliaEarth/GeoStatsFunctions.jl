@@ -25,13 +25,12 @@ function (γ::PowerVariogram)(h)
   s = γ.scaling
   a = γ.exponent
   n = γ.nugget
-  s * h^a + (h > 0) * n
+  h′ = ustrip(h)
+  s * h′^a + (h′ > 0) * n
 end
 
 function (γ::PowerVariogram)(u::Point, v::Point)
   d = Euclidean()
-  x = coordinates(u)
-  y = coordinates(v)
-  h = evaluate(d, x, y)
+  h = uevaluate(d, u, v)
   γ(h)
 end

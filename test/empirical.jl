@@ -4,7 +4,7 @@
     sdata = georef((z=ones(3),), Matrix(1.0I, 3, 3))
     γ = EmpiricalVariogram(sdata, :z, nlags=2, maxlag=2.0)
     x, y, n = values(γ)
-    @test x ≈ [1 / 2, √2]
+    @test x ≈ [1 / 2, √2] * u"m"
     @test y[2] == 0.0
     @test n == [0, 3]
 
@@ -20,7 +20,7 @@
     sdata = georef((z=ones(3),), Matrix(1I, 3, 3))
     γ = EmpiricalVariogram(sdata, :z, nlags=2, maxlag=2, algorithm=:full)
     x, y, n = values(γ)
-    @test x ≈ [1 / 2, √2]
+    @test x ≈ [1 / 2, √2] * u"m"
     @test y[2] == 0.0
     @test n == [0, 3]
 
@@ -30,7 +30,7 @@
     𝒟 = georef((z=z,), X)
     γ = EmpiricalVariogram(𝒟, :z, maxlag=1.0, nlags=5)
     x, y, n = values(γ)
-    @test x == [0.1, 0.3, 0.5, 0.7, 0.9]
+    @test x == [0.1, 0.3, 0.5, 0.7, 0.9] * u"m"
     @test all(iszero.(n))
 
     # accumulation algorithms give the same result
@@ -51,10 +51,10 @@
     d = georef((z=rand(rng, 100, 100),))
     γ = EmpiricalVariogram(d, :z)
     @test sprint(show, γ) ==
-          "EmpiricalVariogram(abscissa: [0.353553, ..., 13.8426], ordinate: [0.0, ..., 0.0841137], distance: Euclidean(0.0), estimator: MatheronEstimator(), npairs: 2790126)"
+          "EmpiricalVariogram(abscissa: [0.353553 m, ..., 13.8426 m], ordinate: [0.0, ..., 0.0841137], distance: Euclidean(0.0), estimator: MatheronEstimator(), npairs: 2790126)"
     @test sprint(show, MIME"text/plain"(), γ) == """
     EmpiricalVariogram
-    ├─ abscissa: [0.353553, 1.20607, 2.0, ..., 12.2868, 13.1058, 13.8426]
+    ├─ abscissa: [0.353553 m, 1.20607 m, 2.0 m, ..., 12.2868 m, 13.1058 m, 13.8426 m]
     ├─ ordinate: [0.0, 0.084454, 0.0849279, ..., 0.0841661, 0.0841251, 0.0841137]
     ├─ distance: Euclidean(0.0)
     ├─ estimator: MatheronEstimator()
@@ -64,7 +64,7 @@
     data = georef((z=rand(Composition{3}, 100),), rand(2, 100))
     γ = EmpiricalVariogram(data, :z, maxlag=1.0, algorithm=:full)
     x, y, n = values(γ)
-    @test all(≥(0), x)
+    @test all(≥(0u"m"), x)
     @test all(≥(0), y)
     @test all(>(0), n)
 
@@ -72,7 +72,7 @@
     data = georef((z=[1 * u"K" for i in 1:100],), rand(2, 100))
     γ = EmpiricalVariogram(data, :z, nlags=20)
     x, y, n = values(γ)
-    @test all(≥(0), x)
+    @test all(≥(0u"m"), x)
     @test y == fill(0.0 * u"K^2", 20)
 
     # Matheron's vs Cressie's estimator
@@ -91,7 +91,7 @@
     data = georef((; Z=img))
     γ = EmpiricalVariogram(data, "Z", maxlag=50.0)
     x, y, n = values(γ)
-    @test all(≥(0), x)
+    @test all(≥(0u"m"), x)
     @test all(>(0.8), y[11:end])
     @test all(≥(0), n)
   end
@@ -101,8 +101,20 @@
     data = georef((z=img,))
     γ = EmpiricalVarioplane(data, :z, maxlag=50.0)
     @test sprint(show, γ) == "EmpiricalVarioplane"
-    @test sprint(show, MIME"text/plain"(), γ) ==
-          "EmpiricalVarioplane\n  N° pairs\n  └─0.00° → 372500\n  └─3.67° → 304782\n  └─7.35° → 298306\n  └─11.02° → 297432\n  └─14.69° → 297243\n  ⋮\n  └─165.31° → 293643\n  └─168.98° → 295850\n  └─172.65° → 296931\n  └─176.33° → 306528\n  └─180.00° → 372500"
+    @test sprint(show, MIME"text/plain"(), γ) == """
+    EmpiricalVarioplane
+      N° pairs
+      └─0.00° → 372500
+      └─3.67° → 304782
+      └─7.35° → 298306
+      └─11.02° → 297432
+      └─14.69° → 297243
+      ⋮
+      └─165.31° → 293643
+      └─168.98° → 295850
+      └─172.65° → 296931
+      └─176.33° → 306528
+      └─180.00° → 372500"""
   end
 
   @testset "Directional" begin

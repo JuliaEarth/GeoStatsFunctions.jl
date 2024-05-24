@@ -28,5 +28,6 @@ function (γ::ExponentialVariogram)(h)
   r = radius(γ.ball)
   s = γ.sill
   n = γ.nugget
-  (s - n) * (1 - exp(-3(h / r))) + (h > 0) * n
+  h′, r′ = unitless(h, r)
+  (s - n) * (1 - exp(-3(h′ / r′))) + (h′ > 0) * n
 end

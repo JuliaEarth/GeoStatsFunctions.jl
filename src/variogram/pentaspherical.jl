@@ -24,17 +24,19 @@ variotype(::PentasphericalVariogram) = PentasphericalVariogram
 
 isstationary(::Type{<:PentasphericalVariogram}) = true
 
-function (γ::PentasphericalVariogram)(h::T) where {T}
+function (γ::PentasphericalVariogram)(h)
   r = radius(γ.ball)
   s = γ.sill
   n = γ.nugget
+  h′, r′ = unitless(h, r)
 
   # constants
+  T = typeof(h′)
   c1 = T(15) / T(8)
   c2 = T(5) / T(4)
   c3 = T(3) / T(8)
-  s1 = c1 * (h / r) - c2 * (h / r)^3 + c3 * (h / r)^5
+  s1 = c1 * (h′ / r′) - c2 * (h′ / r′)^3 + c3 * (h′ / r′)^5
   s2 = T(1)
 
-  (h < r) * (s - n) * s1 + (h ≥ r) * (s - n) * s2 + (h > 0) * n
+  (h′ < r′) * (s - n) * s1 + (h′ ≥ r′) * (s - n) * s2 + (h′ > 0) * n
 end

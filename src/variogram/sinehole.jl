@@ -23,15 +23,16 @@ variotype(::SineHoleVariogram) = SineHoleVariogram
 
 isstationary(::Type{<:SineHoleVariogram}) = true
 
-function (γ::SineHoleVariogram)(h::T) where {T}
+function (γ::SineHoleVariogram)(h)
   r = radius(γ.ball)
   s = γ.sill
   n = γ.nugget
+  h′, r′ = unitless(h, r)
 
   # shift lag by machine precision to
   # avoid explosion at the origin
-  h′ = h + eps(T)
-  c = T(π)
+  h′ += eps(typeof(h′))
+  c = oftype(h′, π)
 
-  (s - n) * (1 - sin(c * h′ / r) / (c * h′ / r)) + (h′ > 0) * n
+  (s - n) * (1 - sin(c * h′ / r′) / (c * h′ / r′)) + (h′ > 0) * n
 end
