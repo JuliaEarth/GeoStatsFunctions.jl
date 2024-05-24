@@ -45,7 +45,7 @@
   γ = GaussianVariogram() + ExponentialVariogram()
   @test GeoStatsFunctions.returntype(γ, Point(0.0, 0.0, 0.0), Point(0.0, 0.0, 0.0)) == Float64
   γ = GaussianVariogram(sill=1.0f0, range=1.0f0, nugget=0.1f0)
-  @test GeoStatsFunctions.returntype(γ, Point(0f0, 0f0, 0f0), Point(0f0, 0f0, 0f0)) == Float32
+  @test GeoStatsFunctions.returntype(γ, Point(0.0f0, 0.0f0, 0.0f0), Point(0.0f0, 0.0f0, 0.0f0)) == Float32
 
   # nested model with matrix coefficients
   C₁ = [1.0 0.5; 0.5 2.0]
