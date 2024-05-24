@@ -129,7 +129,7 @@ function fit_impl(
   y = y[n .> 0]
   n = n[n .> 0]
 
-  # strip units if necessary
+  # strip units of coordinates
   ux = unit(eltype(x))
   uy = unit(eltype(y))
   x′ = ustrip.(x)
