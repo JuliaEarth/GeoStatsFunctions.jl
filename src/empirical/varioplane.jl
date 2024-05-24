@@ -4,7 +4,7 @@
 
 """
     EmpiricalVarioplane(data, var₁, var₂=var₁;
-                        normal=spheredir(0,0),
+                        normal=Vec(0,0,1),
                         nangs=50, ptol=0.5u"m", dtol=0.5u"m",
                         [parameters])
 
@@ -24,7 +24,7 @@ function EmpiricalVarioplane(
   data::AbstractGeoTable,
   var₁,
   var₂=var₁;
-  normal=spheredir(0, 0),
+  normal=Vec(0, 0, 1),
   nangs=50,
   ptol=0.5u"m",
   dtol=0.5u"m",
