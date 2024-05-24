@@ -132,6 +132,7 @@ function fit_impl(
   # strip units if necessary
   ux = unit(eltype(x))
   uy = unit(eltype(y))
+  x′ = ustrip.(x)
   y′ = ustrip.(y)
 
   # strip units of kwargs
@@ -149,7 +150,7 @@ function fit_impl(
   # objective function
   function J(θ)
     γ = V(ball(θ[1]), sill=θ[2], nugget=θ[3])
-    sum(i -> w[i] * (γ(x[i]) - y′[i])^2, eachindex(w, x, y′))
+    sum(i -> w[i] * (γ(x′[i]) - y′[i])^2, eachindex(w, x′, y′))
   end
 
   # linear constraint (sill ≥ nugget)
@@ -159,7 +160,7 @@ function fit_impl(
   λ = sum(yᵢ -> yᵢ^2, y′)
 
   # maximum range, sill and nugget
-  xmax = ustrip(maximum(x))
+  xmax = maximum(x′)
   ymax = maximum(y′)
   rmax = isnothing(maxrange′) ? xmax : maxrange′
   smax = isnothing(maxsill′) ? ymax : maxsill′
