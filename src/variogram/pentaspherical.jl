@@ -24,7 +24,7 @@ variotype(::PentasphericalVariogram) = PentasphericalVariogram
 
 isstationary(::Type{<:PentasphericalVariogram}) = true
 
-function (γ::PentasphericalVariogram)(h::Len)
+function (γ::PentasphericalVariogram)(h)
   r = radius(γ.ball)
   s = γ.sill
   n = γ.nugget

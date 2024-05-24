@@ -24,7 +24,7 @@ variotype(::SphericalVariogram) = SphericalVariogram
 
 isstationary(::Type{<:SphericalVariogram}) = true
 
-function (γ::SphericalVariogram)(h::Len)
+function (γ::SphericalVariogram)(h)
   r = radius(γ.ball)
   s = γ.sill
   n = γ.nugget

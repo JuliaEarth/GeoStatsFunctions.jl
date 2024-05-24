@@ -26,7 +26,7 @@ variotype(::MaternVariogram) = MaternVariogram
 
 isstationary(::Type{<:MaternVariogram}) = true
 
-function (γ::MaternVariogram)(h::Len)
+function (γ::MaternVariogram)(h)
   r = radius(γ.ball)
   s = γ.sill
   n = γ.nugget

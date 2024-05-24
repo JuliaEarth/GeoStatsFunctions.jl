@@ -21,7 +21,7 @@ isstationary(::Type{<:PowerVariogram}) = false
 
 isisotropic(::PowerVariogram) = true
 
-function (γ::PowerVariogram)(h::Len)
+function (γ::PowerVariogram)(h)
   s = γ.scaling
   a = γ.exponent
   n = γ.nugget

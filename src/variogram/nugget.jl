@@ -25,6 +25,6 @@ Base.range(::NuggetEffect) = 0u"m"
 
 scale(γ::NuggetEffect, ::Real) = γ
 
-(γ::NuggetEffect)(h::Len) = (h > zero(h)) * γ.nugget
+(γ::NuggetEffect)(h) = (h > zero(h)) * γ.nugget
 
 (γ::NuggetEffect)(u::Point, v::Point) = ifelse(u == v, zero(γ.nugget), γ.nugget)

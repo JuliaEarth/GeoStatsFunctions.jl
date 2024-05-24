@@ -19,7 +19,7 @@ variotype(::CircularVariogram) = CircularVariogram
 
 isstationary(::Type{<:CircularVariogram}) = true
 
-function (γ::CircularVariogram)(h::Len)
+function (γ::CircularVariogram)(h)
   r = radius(γ.ball)
   s = γ.sill
   n = γ.nugget

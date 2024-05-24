@@ -7,7 +7,11 @@ const Len{T} = Quantity{T,u"𝐋"}
 addunit(x::Number, u) = x * u
 addunit(::Quantity, _) = throw(ArgumentError("invalid units, please check the documentation"))
 
-unitless(xs::Quantity...) = ustrip.(promote(xs...))
+unitless(a::Number, b::Quantity) = a, ustrip(b)
+function unitless(a::Quantity, b::Quantity)
+  u = Unitful.promote_unit(unit(a), unit(b))
+  ustrip(u, a), ustrip(u, b)
+end
 
 function uevaluate(distance, p₁, p₂)
   u₁ = unit(Meshes.lentype(p₁))

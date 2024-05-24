@@ -23,7 +23,7 @@ variotype(::SineHoleVariogram) = SineHoleVariogram
 
 isstationary(::Type{<:SineHoleVariogram}) = true
 
-function (γ::SineHoleVariogram)(h::Len)
+function (γ::SineHoleVariogram)(h)
   r = radius(γ.ball)
   s = γ.sill
   n = γ.nugget

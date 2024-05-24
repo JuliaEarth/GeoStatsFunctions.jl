@@ -23,7 +23,7 @@ variotype(::CubicVariogram) = CubicVariogram
 
 isstationary(::Type{<:CubicVariogram}) = true
 
-function (γ::CubicVariogram)(h::Len)
+function (γ::CubicVariogram)(h)
   r = radius(γ.ball)
   s = γ.sill
   n = γ.nugget

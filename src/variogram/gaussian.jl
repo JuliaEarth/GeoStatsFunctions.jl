@@ -23,7 +23,7 @@ variotype(::GaussianVariogram) = GaussianVariogram
 
 isstationary(::Type{<:GaussianVariogram}) = true
 
-function (γ::GaussianVariogram)(h::Len)
+function (γ::GaussianVariogram)(h)
   # add small eps to nugget
   # for numerical stability
   r = radius(γ.ball)

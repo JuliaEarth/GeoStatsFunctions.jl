@@ -1,6 +1,6 @@
 @testset "Variogram" begin
   rng = StableRNG(123)
-  h = range(0, stop=10, length=50) * u"m"
+  h = range(0, stop=10, length=50)
   x, y = rand(rng, Point{3}), rand(rng, Point{3})
 
   # stationary variogram models
@@ -61,12 +61,12 @@
 
   # some variograms are non-decreasing
   for γ in (γnd ∪ [sum(γnd)])
-    @test all(γ.(h) .≤ γ.(h .+ 1u"m"))
+    @test all(γ.(h) .≤ γ.(h .+ 1))
   end
 
   # variograms are valid at the origin
   for γ in (γs ∪ γn ∪ γnd)
-    @test !isnan(γ(0.0u"m")) && !isinf(γ(0.0u"m"))
+    @test !isnan(γ(0.0)) && !isinf(γ(0.0))
   end
 
   # practical ranges
@@ -97,8 +97,8 @@
   # nugget regularization
   γ = GaussianVariogram(range=20.0, nugget=0.1)
   C = sill(γ) .- GeoStatsFunctions.pairwise(γ, pset)
-  @test γ(0u"m") == 0
-  @test γ(1e-6u"m") > 0
+  @test γ(0) == 0
+  @test γ(1e-6) > 0
   @test cond(C) < 100.0
 
   # sill and nugget in single precision
@@ -125,7 +125,7 @@
   # unitful non-stationary types
   γn = [PowerVariogram(scaling=1.0u"K^2")]
   for γ in γs
-    @test unit(γ(1.0u"m")) == u"K^2"
+    @test unit(γ(1.0)) == u"K^2"
   end
 
   𝒟 = PointSet(Matrix(1.0I, 3, 3))

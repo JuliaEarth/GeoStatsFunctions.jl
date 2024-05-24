@@ -130,13 +130,17 @@ function fit_impl(
   n = n[n .> 0]
 
   # strip units if necessary
-  ux = unit(first(x))
-  uy = unit(first(y))
-  y = ustrip.(y)
+  ux = unit(eltype(x))
+  uy = unit(eltype(y))
+  y′ = ustrip.(y)
 
-  # strip units of `range` and `maxrange`
+  # strip units of kwargs
   range′ = isnothing(range) ? range : ustrip(ux, range)
-  maxrange′ = isnothing(maxrange) ? maxrange : ustrip(ux, maxrange) 
+  sill′ = isnothing(sill) ? sill : ustrip(uy, sill)
+  nugget′ = isnothing(nugget) ? nugget : ustrip(uy, nugget)
+  maxrange′ = isnothing(maxrange) ? maxrange : ustrip(ux, maxrange)
+  maxsill′ = isnothing(maxsill) ? maxsill : ustrip(uy, maxsill)
+  maxnugget′ = isnothing(maxnugget) ? maxnugget : ustrip(uy, maxnugget)
 
   # evaluate weights
   f = algo.weightfun
@@ -145,33 +149,33 @@ function fit_impl(
   # objective function
   function J(θ)
     γ = V(ball(θ[1]), sill=θ[2], nugget=θ[3])
-    sum(i -> w[i] * (γ(x[i]) - y[i])^2, eachindex(w, x, y))
+    sum(i -> w[i] * (γ(x[i]) - y′[i])^2, eachindex(w, x, y′))
   end
 
   # linear constraint (sill ≥ nugget)
   L(θ) = θ[2] ≥ θ[3] ? 0.0 : θ[3] - θ[2]
 
   # penalty for linear constraint (J + λL)
-  λ = sum(yᵢ -> yᵢ^2, y)
+  λ = sum(yᵢ -> yᵢ^2, y′)
 
   # maximum range, sill and nugget
   xmax = ustrip(maximum(x))
-  ymax = maximum(y)
+  ymax = maximum(y′)
   rmax = isnothing(maxrange′) ? xmax : maxrange′
-  smax = isnothing(maxsill) ? ymax : maxsill
-  nmax = isnothing(maxnugget) ? ymax : maxnugget
+  smax = isnothing(maxsill′) ? ymax : maxsill′
+  nmax = isnothing(maxnugget′) ? ymax : maxnugget′
 
   # initial guess
   rₒ = isnothing(range′) ? rmax / 3 : range′
-  sₒ = isnothing(sill) ? 0.95 * smax : sill
-  nₒ = isnothing(nugget) ? 1e-6 : nugget
+  sₒ = isnothing(sill′) ? 0.95 * smax : sill′
+  nₒ = isnothing(nugget′) ? 1e-6 : nugget′
   θₒ = [rₒ, sₒ, nₒ]
 
   # box constraints
   δ = 1e-8
   rₗ, rᵤ = isnothing(range′) ? (zero(rmax), rmax) : (range′ - δ, range′ + δ)
-  sₗ, sᵤ = isnothing(sill) ? (zero(smax), smax) : (sill - δ, sill + δ)
-  nₗ, nᵤ = isnothing(nugget) ? (zero(nmax), nmax) : (nugget - δ, nugget + δ)
+  sₗ, sᵤ = isnothing(sill′) ? (zero(smax), smax) : (sill′ - δ, sill′ + δ)
+  nₗ, nᵤ = isnothing(nugget′) ? (zero(nmax), nmax) : (nugget′ - δ, nugget′ + δ)
   l = [rₗ, sₗ, nₗ]
   u = [rᵤ, sᵤ, nᵤ]
 

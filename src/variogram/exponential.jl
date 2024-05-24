@@ -24,7 +24,7 @@ variotype(::ExponentialVariogram) = ExponentialVariogram
 
 isstationary(::Type{<:ExponentialVariogram}) = true
 
-function (γ::ExponentialVariogram)(h::Len)
+function (γ::ExponentialVariogram)(h)
   r = radius(γ.ball)
   s = γ.sill
   n = γ.nugget
