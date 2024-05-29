@@ -5,6 +5,7 @@
 module GeoStatsFunctionsMakieExt
 
 using GeoStatsFunctions
+using Unitful
 
 import Makie
 import GeoStatsFunctions: varioplot, varioplot!
@@ -43,8 +44,8 @@ function Makie.plot!(plot::VarioPlot{<:Tuple{EmpiricalVariogram}})
 
   # get the data
   xyn = Makie.@lift values($γ)
-  x = Makie.@lift $xyn[1]
-  y = Makie.@lift $xyn[2]
+  x = Makie.@lift ustrip.($xyn[1])
+  y = Makie.@lift ustrip.($xyn[2])
   n = Makie.@lift $xyn[3]
 
   # discard empty bins
@@ -86,12 +87,12 @@ function Makie.plot!(plot::VarioPlot{<:Tuple{EmpiricalVarioplane}})
   θs = Makie.@lift $v.θs
 
   # polar radius
-  rs = Makie.@lift values($γs[1])[1]
+  rs = Makie.@lift ustrip.(values($γs[1])[1])
 
   # variogram values for all variograms
   Z = Makie.@lift let
     zs = map($γs) do γ
-      _, zs, __ = values(γ)
+      zs = ustrip.(values(γ)[2])
 
       # handle NaN values (i.e. empty bins)
       isnan(zs[1]) && (zs[1] = 0)
@@ -119,7 +120,7 @@ function Makie.plot!(plot::VarioPlot{<:Tuple{EmpiricalVarioplane}})
 
   # show model range
   if rshow[]
-    ls = Makie.@lift [range(GeoStatsFunctions.fit($rmodel, γ)) for γ in $γs]
+    ls = Makie.@lift [ustrip(range(GeoStatsFunctions.fit($rmodel, γ))) for γ in $γs]
     ls = Makie.@lift [$ls; $ls]
     zs = Makie.@lift fill(maximum($Z) + 1, length($ls))
     Makie.lines!(plot, θs, ls, zs, color=plot[:rcolor])
@@ -147,7 +148,7 @@ function Makie.plot!(plot::VarioPlot{<:Tuple{Variogram}})
 
   # start at 1e-6 instead of 0 to avoid
   # nugget artifact in visualization
-  x = Makie.@lift range(1e-6, stop=$L, length=100)
+  x = Makie.@lift range(1e-6, stop=ustrip($L), length=100)
   y = Makie.@lift $γ.($x)
 
   # visualize variogram
@@ -155,7 +156,7 @@ function Makie.plot!(plot::VarioPlot{<:Tuple{Variogram}})
 end
 
 _maxlag(γ::Variogram) = 3range(γ)
-_maxlag(γ::PowerVariogram) = 3.0
-_maxlag(γ::NuggetEffect) = 3.0
+_maxlag(γ::PowerVariogram) = 3.0u"m"
+_maxlag(γ::NuggetEffect) = 3.0u"m"
 
 end
