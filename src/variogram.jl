@@ -10,7 +10,7 @@ A theoretical variogram model (e.g. Gaussian variogram).
 abstract type Variogram end
 
 """
-    GeoStatsFunctions.constructor(γ)
+    constructor(γ)
 
 Return the type constructor of the variogram `γ`.
 """
