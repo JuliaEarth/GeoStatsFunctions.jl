@@ -19,7 +19,7 @@ GaussianVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = GaussianVariogram
 
 GaussianVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill))) = GaussianVariogram(sill, nugget, MetricBall(range))
 
-variotype(::GaussianVariogram) = GaussianVariogram
+constructor(::GaussianVariogram) = GaussianVariogram
 
 isstationary(::Type{<:GaussianVariogram}) = true
 

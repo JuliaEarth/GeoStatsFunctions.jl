@@ -13,7 +13,7 @@ end
 
 NuggetEffect(; nugget=1.0) = NuggetEffect(nugget)
 
-variotype(::NuggetEffect) = NuggetEffect
+constructor(::NuggetEffect) = NuggetEffect
 
 isstationary(::Type{<:NuggetEffect}) = true
 

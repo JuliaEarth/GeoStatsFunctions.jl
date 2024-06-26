@@ -15,7 +15,7 @@ CircularVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = CircularVariogram
 
 CircularVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill))) = CircularVariogram(sill, nugget, MetricBall(range))
 
-variotype(::CircularVariogram) = CircularVariogram
+constructor(::CircularVariogram) = CircularVariogram
 
 isstationary(::Type{<:CircularVariogram}) = true
 

@@ -19,7 +19,7 @@ CubicVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = CubicVariogram(sill,
 
 CubicVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill))) = CubicVariogram(sill, nugget, MetricBall(range))
 
-variotype(::CubicVariogram) = CubicVariogram
+constructor(::CubicVariogram) = CubicVariogram
 
 isstationary(::Type{<:CubicVariogram}) = true
 

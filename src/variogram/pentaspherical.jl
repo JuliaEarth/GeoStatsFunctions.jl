@@ -20,7 +20,7 @@ PentasphericalVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = Pentaspheri
 PentasphericalVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill))) =
   PentasphericalVariogram(sill, nugget, MetricBall(range))
 
-variotype(::PentasphericalVariogram) = PentasphericalVariogram
+constructor(::PentasphericalVariogram) = PentasphericalVariogram
 
 isstationary(::Type{<:PentasphericalVariogram}) = true
 
