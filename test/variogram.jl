@@ -156,7 +156,7 @@
   @test size(Γ) == (3, 4)
   @test all(Γ .> 0)
 
-  # variotype
+  # constructor
   for γ in [
     CircularVariogram(),
     CubicVariogram(),
@@ -169,7 +169,7 @@
     SineHoleVariogram(),
     SphericalVariogram()
   ]
-    @test variotype(γ)() == γ
+    @test GeoStatsFunctions.constructor(γ)() == γ
   end
 
   # scale

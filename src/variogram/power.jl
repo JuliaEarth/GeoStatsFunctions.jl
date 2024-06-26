@@ -15,7 +15,7 @@ end
 
 PowerVariogram(; scaling=1.0, nugget=zero(typeof(scaling)), exponent=1.0) = PowerVariogram(scaling, nugget, exponent)
 
-variotype(::PowerVariogram) = PowerVariogram
+constructor(::PowerVariogram) = PowerVariogram
 
 isstationary(::Type{<:PowerVariogram}) = false
 

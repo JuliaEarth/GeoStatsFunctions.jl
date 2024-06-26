@@ -20,7 +20,7 @@ SphericalVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = SphericalVariogr
 SphericalVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill))) =
   SphericalVariogram(sill, nugget, MetricBall(range))
 
-variotype(::SphericalVariogram) = SphericalVariogram
+constructor(::SphericalVariogram) = SphericalVariogram
 
 isstationary(::Type{<:SphericalVariogram}) = true
 

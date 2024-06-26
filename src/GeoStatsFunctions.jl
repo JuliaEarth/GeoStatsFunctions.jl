@@ -63,7 +63,6 @@ export
   sill,
   nugget,
   metricball,
-  variotype,
   isstationary,
   isisotropic,
   structures,

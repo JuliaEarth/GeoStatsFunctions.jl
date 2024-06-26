@@ -20,7 +20,7 @@ ExponentialVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = ExponentialVar
 ExponentialVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill))) =
   ExponentialVariogram(sill, nugget, MetricBall(range))
 
-variotype(::ExponentialVariogram) = ExponentialVariogram
+constructor(::ExponentialVariogram) = ExponentialVariogram
 
 isstationary(::Type{<:ExponentialVariogram}) = true
 

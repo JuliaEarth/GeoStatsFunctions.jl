@@ -10,11 +10,11 @@ A theoretical variogram model (e.g. Gaussian variogram).
 abstract type Variogram end
 
 """
-    variotype(γ)
+    GeoStatsFunctions.constructor(γ)
 
 Return the type constructor of the variogram `γ`.
 """
-function variotype end
+function constructor end
 
 """
     isstationary(γ)
@@ -65,7 +65,7 @@ Scale metric ball of variogram `γ` with strictly
 positive scaling factor `s`.
 """
 function scale(γ::Variogram, s::Real)
-  V = variotype(γ)
+  V = constructor(γ)
   V(s * metricball(γ); sill=sill(γ), nugget=nugget(γ))
 end
 

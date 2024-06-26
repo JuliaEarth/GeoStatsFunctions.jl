@@ -19,7 +19,7 @@ SineHoleVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = SineHoleVariogram
 
 SineHoleVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill))) = SineHoleVariogram(sill, nugget, MetricBall(range))
 
-variotype(::SineHoleVariogram) = SineHoleVariogram
+constructor(::SineHoleVariogram) = SineHoleVariogram
 
 isstationary(::Type{<:SineHoleVariogram}) = true
 
