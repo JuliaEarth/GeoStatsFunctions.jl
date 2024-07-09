@@ -84,10 +84,11 @@
 
   # ill-conditioned models and nugget regularization
   # see https://github.com/JuliaEarth/GeoStats.jl/issues/29
-  pset = PointSet([
+  cmat = [
     93.0 90.0 89.0 94.0 93.0 97.0 95.0 88.0 96.0 98.0
     40.0 33.0 34.0 36.0 30.0 39.0 39.0 28.0 25.0 35.0
-  ])
+  ]
+  pset = PointSet(Tuple.(eachcol(cmat)))
 
   # ill-conditioned covariance
   γ = GaussianVariogram(range=20.0)
@@ -128,12 +129,12 @@
     @test unit(γ(1.0)) == u"K^2"
   end
 
-  𝒟 = PointSet(Matrix(1.0I, 3, 3))
+  𝒟 = PointSet([(1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0)])
   Γ = GeoStatsFunctions.pairwise(GaussianVariogram(), 𝒟)
   @test eltype(Γ) == Float64
   @test issymmetric(Γ)
 
-  𝒟 = PointSet(Matrix(1.0f0I, 3, 3))
+  𝒟 = PointSet([(1.0f0, 0.0f0, 0.0f0), (0.0f0, 1.0f0, 0.0f0), (0.0f0, 0.0f0, 1.0f0)])
   Γ_f = GeoStatsFunctions.pairwise(GaussianVariogram(range=1.0f0, sill=1.0f0, nugget=0.0f0), 𝒟)
   @test eltype(Γ_f) == Float32
   @test issymmetric(Γ_f)

@@ -30,12 +30,12 @@
     @test cov(x, y) == 1.5 - γ(x, y)
   end
 
-  𝒟 = PointSet(Matrix(1.0I, 3, 3))
+  𝒟 = PointSet([(1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0)])
   Γ = GeoStatsFunctions.pairwise(GaussianCovariance(), 𝒟)
   @test eltype(Γ) == Float64
   @test issymmetric(Γ)
 
-  𝒟 = PointSet(Matrix(1.0f0I, 3, 3))
+  𝒟 = PointSet([(1.0f0, 0.0f0, 0.0f0), (0.0f0, 1.0f0, 0.0f0), (0.0f0, 0.0f0, 1.0f0)])
   Γ_f = GeoStatsFunctions.pairwise(GaussianCovariance(range=1.0f0, sill=1.0f0, nugget=0.0f0), 𝒟)
   @test eltype(Γ_f) == Float32
   @test issymmetric(Γ_f)
