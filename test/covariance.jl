@@ -1,5 +1,5 @@
 @testset "Covariance" begin
-  x, y = rand(Point{3}), rand(Point{3})
+  x, y = rand(Point), rand(Point)
   for (CovType, VarioType) in [
     (CircularCovariance, CircularVariogram),
     (CubicCovariance, CubicVariogram),

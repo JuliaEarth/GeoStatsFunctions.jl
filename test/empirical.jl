@@ -1,7 +1,7 @@
 @testset "Empirical" begin
   @testset "Variogram" begin
     # homogeneous field has zero variogram
-    sdata = georef((z=ones(3),), Matrix(1.0I, 3, 3))
+    sdata = georef((z=ones(3),), [(1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0)])
     γ = EmpiricalVariogram(sdata, :z, nlags=2, maxlag=2.0)
     x, y, n = values(γ)
     @test x ≈ [1 / 2, √2] * u"m"
@@ -9,7 +9,7 @@
     @test n == [0, 3]
 
     # basic test on number of lags
-    sdata = georef((z=[1.0, 0.0, 1.0],), [25.0 50.0 75.0; 25.0 75.0 50.0])
+    sdata = georef((z=[1.0, 0.0, 1.0],), [(25.0, 25.0), (50.0, 75.0), (75.0, 50.0)])
     γ = EmpiricalVariogram(sdata, :z, nlags=20, maxlag=1.0)
     x, y, n = values(γ)
     @test length(x) == 20
@@ -17,7 +17,7 @@
     @test length(n) == 20
 
     # empirical variogram on integer coordinates
-    sdata = georef((z=ones(3),), Matrix(1I, 3, 3))
+    sdata = georef((z=ones(3),), [(1, 0, 0), (0, 1, 0), (0, 0, 1)])
     γ = EmpiricalVariogram(sdata, :z, nlags=2, maxlag=2, algorithm=:full)
     x, y, n = values(γ)
     @test x ≈ [1 / 2, √2] * u"m"
@@ -25,9 +25,8 @@
     @test n == [0, 3]
 
     # empirical variogram with only missing data
-    X = rand(2, 3)
     z = Union{Float64,Missing}[missing, missing, missing]
-    𝒟 = georef((z=z,), X)
+    𝒟 = georef((z=z,), rand(Point, 3))
     γ = EmpiricalVariogram(𝒟, :z, maxlag=1.0, nlags=5)
     x, y, n = values(γ)
     @test x == [0.1, 0.3, 0.5, 0.7, 0.9] * u"m"
@@ -35,14 +34,14 @@
 
     # accumulation algorithms give the same result
     rng = StableRNG(123)
-    sdata = georef((z=rand(rng, 1000),), rand(rng, 3, 1000))
+    sdata = georef((z=rand(rng, 1000),), rand(rng, Point, 1000))
     γ₁ = EmpiricalVariogram(sdata, :z, maxlag=0.01, algorithm=:full)
     γ₂ = EmpiricalVariogram(sdata, :z, maxlag=0.01, algorithm=:ball)
     @test isequal(values(γ₁), values(γ₂))
 
     # custom distance is recorded
     rng = StableRNG(123)
-    sdata = georef((z=rand(rng, 1000),), rand(rng, 2, 1000))
+    sdata = georef((z=rand(rng, 2),), [(1.0, 0.0), (0.0, 1.0)])
     γ = EmpiricalVariogram(sdata, :z, distance=Haversine(6371.0), algorithm=:full)
     @test distance(γ) == Haversine(6371.0)
 
@@ -61,7 +60,7 @@
     └─ npairs: 2790126"""
 
     # test variography with compositional data
-    data = georef((z=rand(Composition{3}, 100),), rand(2, 100))
+    data = georef((z=rand(Composition{3}, 100),), rand(Point, 100))
     γ = EmpiricalVariogram(data, :z, maxlag=1.0, algorithm=:full)
     x, y, n = values(γ)
     @test all(≥(0u"m"), x)
@@ -69,7 +68,7 @@
     @test all(>(0), n)
 
     # test variography with unitful data
-    data = georef((z=[1 * u"K" for i in 1:100],), rand(2, 100))
+    data = georef((z=[1 * u"K" for i in 1:100],), rand(Point, 100))
     γ = EmpiricalVariogram(data, :z, nlags=20)
     x, y, n = values(γ)
     @test all(≥(0u"m"), x)

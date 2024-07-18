@@ -1,7 +1,7 @@
 @testset "Variogram" begin
   rng = StableRNG(123)
   h = range(0, stop=10, length=50)
-  x, y = rand(rng, Point{3}), rand(rng, Point{3})
+  x, y = rand(rng, Point), rand(rng, Point)
 
   # stationary variogram models
   γs = [
