@@ -2,13 +2,13 @@
   γ = GaussianVariogram()
   seg = Segment((0.0, 0.0), (1.0, 1.0))
   ps = variosample(γ, seg) |> collect
-  @test all(p -> Point(0.0, 0.0) ⪯ p ⪯ Point(1.0, 1.0), ps)
+  @test all(p -> Point(0.0, 0.0) ≤ p ≤ Point(1.0, 1.0), ps)
   @test length(ps) == 3
 
   γ = GaussianVariogram()
   quad = Quadrangle((0.0, 0.0), (1.0, 0.0), (1.0, 1.0), (0.0, 1.0))
   ps = variosample(γ, quad) |> collect
-  @test all(p -> Point(0.0, 0.0) ⪯ p ⪯ Point(1.0, 1.0), ps)
+  @test all(p -> Point(0.0, 0.0) ≤ p ≤ Point(1.0, 1.0), ps)
   @test length(ps) == 3 * 3
 
   γ = GaussianVariogram()
@@ -23,7 +23,7 @@
     (0.0, 1.0, 1.0)
   )
   ps = variosample(γ, hex) |> collect
-  @test all(p -> Point(0.0, 0.0, 0.0) ⪯ p ⪯ Point(1.0, 1.0, 1.0), ps)
+  @test all(p -> Point(0.0, 0.0, 0.0) ≤ p ≤ Point(1.0, 1.0, 1.0), ps)
   @test length(ps) == 3 * 3 * 3
 
   # regularization properties
