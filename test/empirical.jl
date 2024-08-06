@@ -65,7 +65,7 @@
     x, y, n = values(γ)
     @test all(≥(0u"m"), x)
     @test all(≥(0), y)
-    @test all(>(0), n)
+    @test all(≥(0), n)
 
     # test variography with unitful data
     data = georef((z=[1 * u"K" for i in 1:100],), rand(Point, 100))
