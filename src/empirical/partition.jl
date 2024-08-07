@@ -22,7 +22,7 @@ function EmpiricalVariogram(partition::Partition, var₁, var₂=var₁; kwargs.
   @assert !isempty(filtered) "invalid partition of geospatial data"
 
   γ(d) = EmpiricalVariogram(d, var₁, var₂; kwargs...)
-  foldxt(merge, Map(γ), collect(filtered))
+  tmapreduce(γ, merge, collect(filtered))
 end
 
 """

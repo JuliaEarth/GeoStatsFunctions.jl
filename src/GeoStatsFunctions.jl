@@ -13,7 +13,7 @@ using Distances
 using Bessels: gamma, besselk
 using InteractiveUtils: subtypes
 using NearestNeighbors: MinkowskiMetric
-using Transducers: Map, foldxt
+using OhMyThreads: tmapreduce
 using LinearAlgebra
 using Statistics
 using Setfield
