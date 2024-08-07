@@ -55,7 +55,7 @@ function EmpiricalVarioplane(
     dir = DirectionPartition(cos(θ) * u + sin(θ) * v, tol=dtol)
 
     γ(plane) = EmpiricalVariogram(partition(rng, plane, dir), var₁, var₂; kwargs...)
-    foldxt(merge, Map(γ), collect(planes))
+    tmapreduce(γ, merge, collect(planes))
   end
 
   EmpiricalVarioplane(collect(θs), γs)
