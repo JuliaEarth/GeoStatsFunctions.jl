@@ -44,8 +44,8 @@ function Makie.plot!(plot::VarioPlot{<:Tuple{EmpiricalVariogram}})
 
   # get the data
   xyn = Makie.@lift values($γ)
-  x = Makie.@lift ustrip.($xyn[1])
-  y = Makie.@lift ustrip.($xyn[2])
+  x = Makie.@lift $xyn[1]
+  y = Makie.@lift $xyn[2]
   n = Makie.@lift $xyn[3]
 
   # discard empty bins
@@ -64,9 +64,8 @@ function Makie.plot!(plot::VarioPlot{<:Tuple{EmpiricalVariogram}})
 
   # visualize text counts
   if plot[:tshow][]
-    bincounts = Makie.@lift string.($n)
-    positions = Makie.@lift collect(zip($x, $y))
-    Makie.text!(plot, bincounts, position=positions, fontsize=plot[:tsize])
+    text = Makie.@lift string.($n)
+    Makie.text!(plot, x, y, text=text, fontsize=plot[:tsize])
   end
 end
 
@@ -140,7 +139,7 @@ function Makie.plot!(plot::VarioPlot{<:Tuple{Variogram}})
   # retrieve maximum lag
   maxlag = plot[:maxlag]
 
-  L = if isnothing(maxlag[])
+  H = if isnothing(maxlag[])
     Makie.@lift _maxlag($γ)
   else
     maxlag
@@ -148,7 +147,7 @@ function Makie.plot!(plot::VarioPlot{<:Tuple{Variogram}})
 
   # start at 1e-6 instead of 0 to avoid
   # nugget artifact in visualization
-  x = Makie.@lift range(1e-6, stop=ustrip($L), length=100)
+  x = Makie.@lift range(1e-6unit($H), stop=$H, length=100)
   y = Makie.@lift $γ.($x)
 
   # visualize variogram
