@@ -142,7 +142,7 @@ function Makie.plot!(plot::VarioPlot{<:Tuple{Variogram}})
   H = if isnothing(maxlag[])
     Makie.@lift _maxlag($γ)
   else
-    maxlag
+    Makie.@lift _addunit($maxlag, u"m")
   end
 
   # start at 1e-6 instead of 0 to avoid
@@ -154,8 +154,18 @@ function Makie.plot!(plot::VarioPlot{<:Tuple{Variogram}})
   Makie.lines!(plot, x, y, color=plot[:vcolor])
 end
 
+# ---------------------------
+# helper types and functions
+# ---------------------------
+
+const Len{T} = Quantity{T,u"𝐋"}
+
 _maxlag(γ::Variogram) = 3range(γ)
-_maxlag(γ::PowerVariogram) = 3.0u"m"
-_maxlag(γ::NuggetEffect) = 3.0u"m"
+_maxlag(::PowerVariogram) = 3.0u"m"
+_maxlag(::NuggetEffect) = 3.0u"m"
+
+_addunit(x::Number, u) = x * u
+_addunit(x::Len, _) = x
+_addunit(x::Quantity, _) = throw(ArgumentError("$(unit(x)) is not a valid length unit"))
 
 end
