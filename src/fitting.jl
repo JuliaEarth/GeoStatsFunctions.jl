@@ -169,7 +169,7 @@ function fit_impl(
   # initial guess
   rₒ = isnothing(range′) ? rmax / 3 : range′
   sₒ = isnothing(sill′) ? 0.95 * smax : sill′
-  nₒ = isnothing(nugget′) ? 1e-6 : nugget′
+  nₒ = isnothing(nugget′) ? 0.01 * smax : nugget′
   θₒ = [rₒ, sₒ, nₒ]
 
   # box constraints
