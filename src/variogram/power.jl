@@ -31,6 +31,6 @@ end
 
 function (γ::PowerVariogram)(u::Point, v::Point)
   d = Euclidean()
-  h = uevaluate(d, u, v)
+  h = evaluate(d, u, v)
   γ(h)
 end

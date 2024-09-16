@@ -1,6 +1,7 @@
 [deps]
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 CoDa = "5900dafe-f573-5c72-b367-76665857777b"
+CoordRefSystems = "b46f11dc-f210-4604-bfba-323c1ec968cb"
 DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 Distances = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"
 GeoTables = "e502b557-6362-48c1-8219-d30d308dcdb0"

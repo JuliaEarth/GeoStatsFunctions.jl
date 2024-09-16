@@ -79,7 +79,7 @@ function accumulate(data, var₁, var₂, estim::VariogramEstimator, algo::Vario
       z₂ᵢ = z₂[i]
 
       # evaluate geospatial lag
-      h = uevaluate(distance, pᵢ, pⱼ)
+      h = evaluate(distance, pᵢ, pⱼ)
 
       # early exit if out of range
       exit(h) && continue

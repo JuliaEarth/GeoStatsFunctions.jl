@@ -41,7 +41,7 @@
 
     # custom distance is recorded
     rng = StableRNG(123)
-    sdata = georef((z=rand(rng, 2),), [(1.0, 0.0), (0.0, 1.0)])
+    sdata = georef((z=rand(rng, 2),), [Point(LatLon(0.0, 0.0)), Point(LatLon(0.0, 90.0))])
     γ = EmpiricalVariogram(sdata, :z, distance=Haversine(6371.0), algorithm=:full)
     @test distance(γ) == Haversine(6371.0)
 

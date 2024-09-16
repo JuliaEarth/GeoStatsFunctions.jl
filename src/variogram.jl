@@ -105,7 +105,7 @@ Evaluate the variogram at points `u` and `v`.
 """
 function (γ::Variogram)(u::Point, v::Point)
   d = metric(γ.ball)
-  h = uevaluate(d, u, v)
+  h = evaluate(d, u, v)
   γ(h)
 end
 
