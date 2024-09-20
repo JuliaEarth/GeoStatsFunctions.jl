@@ -50,14 +50,14 @@
     d = georef((z=rand(rng, 100, 100),))
     γ = EmpiricalVariogram(d, :z)
     @test sprint(show, γ) ==
-          "EmpiricalVariogram(abscissa: [0.353553 m, ..., 13.8426 m], ordinate: [0.0, ..., 0.0841137], distance: Euclidean(0.0), estimator: MatheronEstimator(), npairs: 2790126)"
+          "EmpiricalVariogram(abscissa: [0.25 m, ..., 9.93304 m], ordinate: [0.0, ..., 0.0841979], distance: Euclidean(0.0), estimator: MatheronEstimator(), npairs: 1447200)"
     @test sprint(show, MIME"text/plain"(), γ) == """
     EmpiricalVariogram
-    ├─ abscissa: [0.353553 m, 1.20607 m, 2.0 m, ..., 12.2868 m, 13.1058 m, 13.8426 m]
-    ├─ ordinate: [0.0, 0.084454, 0.0849279, ..., 0.0841661, 0.0841251, 0.0841137]
+    ├─ abscissa: [0.25 m, 1.0 m, 1.41421 m, ..., 8.7407 m, 9.28182 m, 9.93304 m]
+    ├─ ordinate: [0.0, 0.0843099, 0.0845995, ..., 0.0838336, 0.0839823, 0.0841979]
     ├─ distance: Euclidean(0.0)
     ├─ estimator: MatheronEstimator()
-    └─ npairs: 2790126"""
+    └─ npairs: 1447200"""
 
     # test variography with compositional data
     data = georef((z=rand(Composition{3}, 100),), rand(Point, 100))
