@@ -24,6 +24,11 @@ using Printf
 import Base: merge, +, *
 import Meshes: isisotropic
 
+# temporary fix for ⋅ with missing values
+# https://github.com/JuliaLang/julia/issues/40743
+import LinearAlgebra: ⋅
+⋅(::Missing, ::Missing) = missing
+
 include("utils.jl")
 include("empirical.jl")
 include("variogram.jl")
@@ -33,10 +38,7 @@ include("fitting.jl")
 include("sampling.jl")
 include("varioplot.jl")
 
-# temporary fix for ⋅ with missing values
-# https://github.com/JuliaLang/julia/issues/40743
-import LinearAlgebra: ⋅
-⋅(::Missing, ::Missing) = missing
+include("precompile.jl")
 
 export
   # empirical variograms
