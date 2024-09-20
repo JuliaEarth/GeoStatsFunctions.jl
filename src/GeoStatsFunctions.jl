@@ -30,12 +30,22 @@ import LinearAlgebra: ⋅
 ⋅(::Missing, ::Missing) = missing
 
 include("utils.jl")
+
+# empirical models
+include("estimators.jl")
+include("algorithms.jl")
 include("empirical.jl")
+
+# theoretical models
 include("variogram.jl")
 include("covariance.jl")
 include("nesting.jl")
+
+# operations
 include("fitting.jl")
 include("sampling.jl")
+
+# plotting
 include("varioplot.jl")
 
 include("precompile.jl")
