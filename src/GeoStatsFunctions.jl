@@ -14,6 +14,8 @@ using Bessels: gamma, besselk
 using InteractiveUtils: subtypes
 using NearestNeighbors: MinkowskiMetric
 using OhMyThreads: tmapreduce
+using DataScienceTraits
+using CategoricalArrays
 using LinearAlgebra
 using Statistics
 using Setfield
@@ -31,6 +33,9 @@ import LinearAlgebra: ⋅
 
 include("utils.jl")
 
+# relevant matrices
+include("matrices.jl")
+
 # empirical models
 include("estimators.jl")
 include("algorithms.jl")
@@ -39,6 +44,7 @@ include("empirical.jl")
 # theoretical models
 include("variogram.jl")
 include("covariance.jl")
+include("transiogram.jl")
 include("nesting.jl")
 
 # operations
@@ -81,6 +87,7 @@ export
   variosample,
 
   # theoretical covariance
+  Covariance,
   CircularCovariance,
   CubicCovariance,
   ExponentialCovariance,
@@ -89,6 +96,10 @@ export
   PentasphericalCovariance,
   SineHoleCovariance,
   SphericalCovariance,
+
+  # theoretical transiogram
+  Transiogram,
+  ExponentialTransiogram,
 
   # fitting algorithms
   VariogramFitAlgo,
