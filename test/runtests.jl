@@ -4,6 +4,7 @@ using Meshes
 using GeoTables
 using Unitful
 using Distances
+using StaticArrays
 using LinearAlgebra
 using CSV, DelimitedFiles
 using Test, StableRNGs

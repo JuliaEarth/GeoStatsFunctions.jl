@@ -16,6 +16,7 @@ using NearestNeighbors: MinkowskiMetric
 using OhMyThreads: tmapreduce
 using DataScienceTraits
 using CategoricalArrays
+using StaticArrays
 using LinearAlgebra
 using Statistics
 using Setfield
@@ -100,6 +101,7 @@ export
   # theoretical transiogram
   Transiogram,
   ExponentialTransiogram,
+  ratematrix,
 
   # fitting algorithms
   VariogramFitAlgo,
