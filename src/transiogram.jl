@@ -3,7 +3,7 @@
 # ------------------------------------------------------------------
 
 """
-    Variogram
+    Transiogram
 
 A theoretical transiogram model (e.g. exponential transiogram).
 
