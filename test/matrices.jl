@@ -1,6 +1,6 @@
 @testset "Matrices" begin
   dom = CylindricalTrajectory(rand(Point, 100))
-  tab = (; z = rand(1:3, 100))
+  tab = (; z=rand(1:3, 100))
   gtb = georef(tab, dom)
 
   # transition count matrix

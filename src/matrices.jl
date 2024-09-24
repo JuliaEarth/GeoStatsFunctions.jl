@@ -10,8 +10,7 @@ stored in geospatial `data` using a minimum lag `minlag`.
 
 See also [`probmatrix`](@ref), [`countmatrix`](@ref)
 """
-ratematrix(data::AbstractGeoTable, var; minlag=_defaultminlag(data)) =
-  ratematrix(_domvals(data, var)..., minlag)
+ratematrix(data::AbstractGeoTable, var; minlag=_defaultminlag(data)) = ratematrix(_domvals(data, var)..., minlag)
 
 """
     probmatrix(data, var; [parameters])
@@ -21,8 +20,7 @@ stored in geospatial `data` using a minimum lag `minlag`.
 
 See also [`ratematrix`](@ref), [`countmatrix`](@ref)
 """
-probmatrix(data::AbstractGeoTable, var; minlag=_defaultminlag(data)) =
-  probmatrix(_domvals(data, var)..., minlag)
+probmatrix(data::AbstractGeoTable, var; minlag=_defaultminlag(data)) = probmatrix(_domvals(data, var)..., minlag)
 
 """
     countmatrix(data, var; [parameters])
@@ -32,8 +30,7 @@ stored in geospatial `data` using a minimum lag `minlag`.
 
 See also [`ratematrix`](@ref), [`probmatrix`](@ref)
 """
-countmatrix(data::AbstractGeoTable, var; minlag=_defaultminlag(data)) =
-  countmatrix(_domvals(data, var)..., minlag)
+countmatrix(data::AbstractGeoTable, var; minlag=_defaultminlag(data)) = countmatrix(_domvals(data, var)..., minlag)
 
 function ratematrix(dom, vals, minlag)
   # transition probabilities
@@ -78,22 +75,22 @@ function countmatrix(dom, vals, minlag)
     c₂ = c[i + 1]
     h = evaluate(Euclidean(), centroid(dom, i), centroid(dom, i + 1))
     m = ceil(Int, h / 2Δh)
-    C[c₁,c₁] += m
-    C[c₂,c₂] += m
-    C[c₁,c₂] += 1
+    C[c₁, c₁] += m
+    C[c₂, c₂] += m
+    C[c₁, c₂] += 1
   end
 
   # add head of first element
   c₁ = c[1]
   h = evaluate(Euclidean(), centroid(dom, 1), centroid(dom, 2))
   m = ceil(Int, h / 2Δh)
-  C[c₁,c₁] += m
+  C[c₁, c₁] += m
 
   # add tail of last element
   c₂ = c[n]
   h = evaluate(Euclidean(), centroid(dom, n - 1), centroid(dom, n))
   m = ceil(Int, h / 2Δh)
-  C[c₂,c₂] += m
+  C[c₂, c₂] += m
 
   C
 end
