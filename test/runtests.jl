@@ -14,15 +14,8 @@ import CoDa: Composition
 datadir = joinpath(@__DIR__, "data")
 
 # list of tests
-testfiles = [
-  "matrices.jl",
-  "empirical.jl",
-  "variogram.jl",
-  "covariance.jl",
-  "transiogram.jl",
-  "fitting.jl",
-  "sampling.jl"
-]
+testfiles =
+  ["matrices.jl", "empirical.jl", "variogram.jl", "covariance.jl", "transiogram.jl", "fitting.jl", "sampling.jl"]
 
 @testset "GeoStatsFunctions.jl" begin
   for testfile in testfiles

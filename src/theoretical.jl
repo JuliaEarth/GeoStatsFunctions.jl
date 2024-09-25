@@ -23,7 +23,6 @@ Tells whether or not the geostatistical function `f` is isotropic.
 """
 isisotropic(f::GeoStatsFunction) = isisotropic(metricball(f))
 
-
 """
     metricball(f)
 
