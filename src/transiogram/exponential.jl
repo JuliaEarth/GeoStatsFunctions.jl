@@ -3,29 +3,36 @@
 # ------------------------------------------------------------------
 
 """
-    ExponentialTransiogram(R)
+    ExponentialTransiogram(rate, [ball])
 
-An exponential transiogram with transition rate matrix `R`.
+An exponential transiogram with transition `rate` matrix.
+Optionally, specify a metric `ball` to model anisotropy.
 
 ## References
 
 * Carle, S.F. & Fogg, G.E. 1996. [Transition probability-based
   indicator geostatistics](https://link.springer.com/article/10.1007/BF02083656)
 """
-struct ExponentialTransiogram{M<:StaticMatrix} <: Transiogram
-  R::M
+struct ExponentialTransiogram{R<:StaticMatrix,B<:MetricBall} <: Transiogram
+  rate::R
+  ball::B
 
-  function ExponentialTransiogram{M}(R) where {M<:StaticMatrix}
-    if !allequal(size(R))
+  function ExponentialTransiogram{R,B}(rate, ball) where {R<:StaticMatrix,B<:MetricBall}
+    if !allequal(size(rate))
       throw(ArgumentError("transition rate matrix must be square"))
     end
-    new(R)
+    new(rate, ball)
   end
 end
 
-function ExponentialTransiogram(R::AbstractMatrix)
-  S = SMatrix{size(R)...}(R)
-  ExponentialTransiogram{typeof(S)}(S)
+function ExponentialTransiogram(rate::AbstractMatrix, ball::MetricBall)
+  srate = SMatrix{size(rate)...}(rate)
+  ExponentialTransiogram{typeof(srate),typeof(ball)}(srate, ball)
+end
+
+function ExponentialTransiogram(rate::AbstractMatrix)
+  ball = MetricBall(1 / unit(eltype(rate)))
+  ExponentialTransiogram(rate, ball)
 end
 
 """
@@ -33,4 +40,6 @@ end
 
 Return the transition rate matrix of the transiogram `t`.
 """
-ratematrix(t::ExponentialTransiogram) = t.R
+ratematrix(t::ExponentialTransiogram) = t.rate
+
+(t::ExponentialTransiogram)(h) = exp(h * t.rate)
