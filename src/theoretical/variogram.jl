@@ -10,25 +10,11 @@ A theoretical variogram function (e.g. Gaussian variogram).
 abstract type Variogram <: GeoStatsFunction end
 
 """
-    constructor(γ)
-
-Return the type constructor of the variogram `γ`.
-"""
-function constructor end
-
-"""
     isstationary(γ)
 
 Check if variogram `γ` possesses the 2nd-order stationary property.
 """
 isstationary(γ::Variogram) = isstationary(typeof(γ))
-
-"""
-    isisotropic(γ)
-
-Tells whether or not variogram `γ` is isotropic.
-"""
-isisotropic(γ::Variogram) = isisotropic(γ.ball)
 
 """
     sill(γ)
@@ -43,13 +29,6 @@ sill(γ::Variogram) = γ.sill
 Return the nugget of the variogram `γ`.
 """
 nugget(γ::Variogram) = γ.nugget
-
-"""
-    metricball(γ)
-
-Return the metric ball of the variogram `γ`.
-"""
-metricball(γ::Variogram) = γ.ball
 
 """
     range(γ)
@@ -97,123 +76,6 @@ function structures(γ::Variogram)
   γ = @set γ.nugget = zero(T)
   cₒ, (c,), (γ,)
 end
-
-"""
-    γ(u, v)
-
-Evaluate the variogram at points `u` and `v`.
-"""
-function (γ::Variogram)(u::Point, v::Point)
-  d = metric(γ.ball)
-  h = evaluate(d, u, v)
-  γ(h)
-end
-
-"""
-    γ(U, v)
-
-Evaluate the variogram at geometry `U` and point `v`.
-"""
-function (γ::Variogram)(U::Geometry, v::Point)
-  us = variosample(γ, U)
-  mean(γ(u, v) for u in us)
-end
-
-"""
-    γ(u, V)
-
-Evaluate the variogram at point `u` and geometry `V`.
-"""
-(γ::Variogram)(u::Point, V::Geometry) = γ(V, u)
-
-"""
-    γ(U, V)
-
-Evaluate the variogram at geometries `U` and `V`.
-"""
-function (γ::Variogram)(U::Geometry, V::Geometry)
-  us = variosample(γ, U)
-  vs = variosample(γ, V)
-  mean(γ(u, v) for u in us, v in vs)
-end
-
-"""
-    pairwise(γ, domain)
-
-Evaluate variogram `γ` between all elements in the `domain`.
-"""
-function pairwise(γ::Variogram, domain)
-  u = first(domain)
-  n = length(domain)
-  R = returntype(γ, u, u)
-  Γ = Matrix{R}(undef, n, n)
-  pairwise!(Γ, γ, domain)
-end
-
-"""
-    pairwise!(Γ, γ, domain)
-
-Evaluates covariance `γ` between all elements in the `domain` in-place, filling the matrix `Γ`.
-"""
-function pairwise!(Γ, γ::Variogram, domain)
-  n = length(domain)
-  @inbounds for j in 1:n
-    vⱼ = domain[j]
-    sⱼ = variosample(γ, vⱼ)
-    for i in (j + 1):n
-      vᵢ = domain[i]
-      sᵢ = variosample(γ, vᵢ)
-      Γ[i, j] = mean(γ(pᵢ, pⱼ) for pᵢ in sᵢ, pⱼ in sⱼ)
-    end
-    Γ[j, j] = mean(γ(pⱼ, pⱼ) for pⱼ in sⱼ, pⱼ in sⱼ)
-    for i in 1:(j - 1)
-      Γ[i, j] = Γ[j, i] # leverage the symmetry
-    end
-  end
-  Γ
-end
-
-"""
-    pairwise(γ, domain₁, domain₂)
-
-Evaluate variogram `γ` between all elements of `domain₁` and `domain₂`.
-"""
-function pairwise(γ::Variogram, domain₁, domain₂)
-  u = first(domain₁)
-  v = first(domain₂)
-  m = length(domain₁)
-  n = length(domain₂)
-  R = returntype(γ, u, v)
-  Γ = Matrix{R}(undef, m, n)
-  pairwise!(Γ, γ, domain₁, domain₂)
-end
-
-"""
-    pairwise!(Γ, γ, domain₁, domain₂)
-
-Evaluates covariance `γ` between all elements of `domain₁` and `domain₂` in-place, filling the matrix `Γ`.
-"""
-function pairwise!(Γ, γ::Variogram, domain₁, domain₂)
-  m = length(domain₁)
-  n = length(domain₂)
-  @inbounds for j in 1:n
-    vⱼ = domain₂[j]
-    sⱼ = variosample(γ, vⱼ)
-    for i in 1:m
-      vᵢ = domain₁[i]
-      sᵢ = variosample(γ, vᵢ)
-      Γ[i, j] = mean(γ(pᵢ, pⱼ) for pᵢ in sᵢ, pⱼ in sⱼ)
-    end
-  end
-  Γ
-end
-
-"""
-    returntype(γ, u, v)
-
-Return type of γ(u, v).
-"""
-returntype(γ::Variogram, u, v) = typeof(γ(u, v))
 
 # -----------
 # IO METHODS

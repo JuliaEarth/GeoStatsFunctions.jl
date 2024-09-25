@@ -10,102 +10,62 @@ A theoretical covariance function (e.g. Gaussian covariance).
 abstract type Covariance <: GeoStatsFunction end
 
 """
-    isstationary(cov)
+    isstationary(c)
 
-Check if covariance `cov` possesses the 2nd-order stationary property.
+Check if covariance `c` possesses the 2nd-order stationary property.
 """
-isstationary(cov::Covariance) = isstationary(cov.γ)
-
-"""
-    isisotropic(cov)
-
-Tells whether or not covariance `cov` is isotropic.
-"""
-isisotropic(cov::Covariance) = isisotropic(cov.γ)
+isstationary(c::Covariance) = isstationary(c.γ)
 
 """
-    sill(cov)
+    sill(c)
 
-Return the sill of the covariance `cov`.
+Return the sill of the covariance `c`.
 """
-sill(cov::Covariance) = sill(cov.γ)
-
-"""
-    nugget(cov)
-
-Return the nugget of the covariance `cov`.
-"""
-nugget(cov::Covariance) = nugget(cov.γ)
+sill(c::Covariance) = sill(c.γ)
 
 """
-    metricball(cov)
+    nugget(c)
 
-Return the metric ball of the covariance `cov`.
+Return the nugget of the covariance `c`.
 """
-metricball(cov::Covariance) = metricball(cov.γ)
-
-"""
-    range(cov)
-
-Return the maximum range of the covariance `cov`.
-"""
-Base.range(cov::Covariance) = range(cov.γ)
+nugget(c::Covariance) = nugget(c.γ)
 
 """
-    scale(cov, s)
+    metricball(c)
 
-Scale metric ball of covariance `cov` with strictly
+Return the metric ball of the covariance `c`.
+"""
+metricball(c::Covariance) = metricball(c.γ)
+
+"""
+    range(c)
+
+Return the maximum range of the covariance `c`.
+"""
+Base.range(c::Covariance) = range(c.γ)
+
+"""
+    scale(c, s)
+
+Scale metric ball of covariance `c` with strictly
 positive scaling factor `s`.
 """
-scale(cov::Cov, s::Real) where {Cov<:Covariance} = Cov(scale(cov.γ, s))
+scale(c::C, s::Real) where {C<:Covariance} = C(scale(c.γ, s))
 
-"""
-    cov(g₁, g₂)
-
-Evaluate the covariance at geometries `g₁` and `g₁`.
-"""
-(cov::Covariance)(g₁, g₂) = sill(cov.γ) - cov.γ(g₁, g₂)
-
-"""
-    pairwise(cov, domain)
-
-Evaluate covariance `cov` between all elements in the `domain`.
-
-    pairwise(cov, domain₁, domain₂)
-
-Evaluate covariance `cov` between all elements of `domain₁` and `domain₂`.
-"""
-pairwise(cov::Covariance, args...) = sill(cov.γ) .- pairwise(cov.γ, args...)
-
-"""
-    pairwise!(C, cov, domain)
-
-Evaluates covariance `cov` between all elements in the `domain` in-place, filling the matrix `C`.
-
-    pairwise!(C, cov, domain₁, domain₂)
-
-Evaluates covariance `cov` between all elements of `domain₁` and `domain₂` in-place, filling the matrix `C`.
-"""
-function pairwise!(C, cov::Covariance, args...)
-  pairwise!(C, cov.γ, args...)
-  for i in eachindex(Γ)
-    C[i] = sill(cov.γ) - C[i]
-  end
-  C
-end
+(c::Covariance)(h) = sill(c.γ) - c.γ(h)
 
 # -----------
 # IO METHODS
 # -----------
 
-function Base.show(io::IO, cov::T) where {T<:Covariance}
+function Base.show(io::IO, c::T) where {T<:Covariance}
   name = string(nameof(T))
-  _showcompact(io, name, cov.γ)
+  _showcompact(io, name, c.γ)
 end
 
-function Base.show(io::IO, ::MIME"text/plain", cov::T) where {T<:Covariance}
+function Base.show(io::IO, ::MIME"text/plain", c::T) where {T<:Covariance}
   name = string(nameof(T))
-  _showfull(io, name, cov.γ)
+  _showfull(io, name, c.γ)
 end
 
 # heper macro to define covariances

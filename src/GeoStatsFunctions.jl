@@ -46,7 +46,6 @@ include("theoretical.jl")
 
 # operations
 include("fitting.jl")
-include("sampling.jl")
 
 # plotting
 include("varioplot.jl")
@@ -81,7 +80,6 @@ export
   isstationary,
   isisotropic,
   structures,
-  variosample,
 
   # theoretical covariance
   Covariance,
