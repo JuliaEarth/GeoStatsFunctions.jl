@@ -5,9 +5,9 @@
 """
     Covariance
 
-Parent type of all covariance functions (e.g. Gaussian covariance).
+A theoretical covariance function (e.g. Gaussian covariance).
 """
-abstract type Covariance end
+abstract type Covariance <: GeoStatsFunction end
 
 """
     isstationary(cov)

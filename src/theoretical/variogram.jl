@@ -5,9 +5,9 @@
 """
     Variogram
 
-A theoretical variogram model (e.g. Gaussian variogram).
+A theoretical variogram function (e.g. Gaussian variogram).
 """
-abstract type Variogram end
+abstract type Variogram <: GeoStatsFunction end
 
 """
     constructor(γ)
