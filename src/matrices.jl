@@ -37,8 +37,8 @@ function ratematrix(dom, vals, minlag)
   T = probmatrix(dom, vals, minlag)
 
   # convert probabilities into rates
-  Δh = minlag
-  log(T) / Δh
+  δh = minlag
+  log(T) / δh
 end
 
 function probmatrix(dom, vals, minlag)
@@ -64,7 +64,7 @@ function countmatrix(dom, vals, minlag)
   k = length(levels(z))
 
   # minimum lag
-  Δh = minlag
+  δh = minlag
 
   # initialize matrix with counts
   C = zeros(Int, k, k)
@@ -74,7 +74,7 @@ function countmatrix(dom, vals, minlag)
     c₁ = c[i]
     c₂ = c[i + 1]
     h = evaluate(Euclidean(), centroid(dom, i), centroid(dom, i + 1))
-    m = ceil(Int, h / 2Δh)
+    m = ceil(Int, h / 2δh)
     C[c₁, c₁] += m
     C[c₂, c₂] += m
     C[c₁, c₂] += 1
@@ -83,13 +83,13 @@ function countmatrix(dom, vals, minlag)
   # add head of first element
   c₁ = c[1]
   h = evaluate(Euclidean(), centroid(dom, 1), centroid(dom, 2))
-  m = ceil(Int, h / 2Δh)
+  m = ceil(Int, h / 2δh)
   C[c₁, c₁] += m
 
   # add tail of last element
   c₂ = c[n]
   h = evaluate(Euclidean(), centroid(dom, n - 1), centroid(dom, n))
-  m = ceil(Int, h / 2Δh)
+  m = ceil(Int, h / 2δh)
   C[c₂, c₂] += m
 
   C
