@@ -31,6 +31,13 @@ Return the metric ball of the geostatistical function `f`.
 metricball(f::GeoStatsFunction) = f.ball
 
 """
+    range(f)
+
+Return the maximum effective range of the geostatistical function `f`.
+"""
+Base.range(f::GeoStatsFunction) = maximum(radii(metricball(f)))
+
+"""
     f(p₁, p₂)
 
 Evaluate the geostatistical function at points `p₁` and `p₂`.

@@ -31,13 +31,6 @@ Return the nugget of the variogram `γ`.
 nugget(γ::Variogram) = γ.nugget
 
 """
-    range(γ)
-
-Return the maximum range of the variogram `γ`.
-"""
-Base.range(γ::Variogram) = maximum(radii(γ.ball))
-
-"""
     scale(γ, s)
 
 Scale metric ball of variogram `γ` with strictly

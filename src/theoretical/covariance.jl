@@ -9,6 +9,14 @@ A theoretical covariance function (e.g. Gaussian covariance).
 """
 abstract type Covariance <: GeoStatsFunction end
 
+# ---------------------
+# GEOSTATSFUNCTION API
+# ---------------------
+
+metricball(c::Covariance) = metricball(c.γ)
+
+(c::Covariance)(h) = sill(c.γ) - c.γ(h)
+
 """
     isstationary(c)
 
@@ -31,28 +39,12 @@ Return the nugget of the covariance `c`.
 nugget(c::Covariance) = nugget(c.γ)
 
 """
-    metricball(c)
-
-Return the metric ball of the covariance `c`.
-"""
-metricball(c::Covariance) = metricball(c.γ)
-
-"""
-    range(c)
-
-Return the maximum range of the covariance `c`.
-"""
-Base.range(c::Covariance) = range(c.γ)
-
-"""
     scale(c, s)
 
 Scale metric ball of covariance `c` with strictly
 positive scaling factor `s`.
 """
 scale(c::C, s::Real) where {C<:Covariance} = C(scale(c.γ, s))
-
-(c::Covariance)(h) = sill(c.γ) - c.γ(h)
 
 # -----------
 # IO METHODS

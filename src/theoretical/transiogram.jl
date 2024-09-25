@@ -14,6 +14,12 @@ A theoretical transiogram function (e.g. exponential transiogram).
 """
 abstract type Transiogram <: GeoStatsFunction end
 
+# ---------------------
+# GEOSTATSFUNCTION API
+# ---------------------
+
+Base.range(t::Transiogram) = maximum(1 ./ -diag(ratematrix(t)))
+
 # ----------------
 # IMPLEMENTATIONS
 # ----------------

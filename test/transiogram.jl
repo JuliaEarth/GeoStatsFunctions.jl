@@ -4,6 +4,7 @@
   t = ExponentialTransiogram(R)
   @test t isa ExponentialTransiogram
   @test ratematrix(t) isa StaticMatrix
+  @test range(t) == maximum(1 ./ -diag(R))
 
   # invalid transition rate matrix
   A = rand(3, 2)
