@@ -32,21 +32,17 @@ import Meshes: isisotropic
 import LinearAlgebra: ⋅
 ⋅(::Missing, ::Missing) = missing
 
+# utilities
 include("utils.jl")
 
 # relevant matrices
 include("matrices.jl")
 
 # empirical models
-include("estimators.jl")
-include("algorithms.jl")
 include("empirical.jl")
 
 # theoretical models
-include("variogram.jl")
-include("covariance.jl")
-include("transiogram.jl")
-include("nesting.jl")
+include("theoretical.jl")
 
 # operations
 include("fitting.jl")
