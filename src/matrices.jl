@@ -10,7 +10,7 @@ Computes the transition rate matrix for categorical variable
 
 See also [`probmatrix`](@ref), [`countmatrix`](@ref)
 """
-ratematrix(data::AbstractGeoTable, var; minlag=_defaultminlag(data)) = ratematrix(_domvals(data, var)..., minlag)
+ratematrix(data::AbstractGeoTable, var; minlag=_defaultminlag(data)) = _ratematrix(_domvals(data, var)..., minlag)
 
 """
     probmatrix(data, var; [parameters])
@@ -20,7 +20,7 @@ Computes the transition probability matrix for categorical variable
 
 See also [`ratematrix`](@ref), [`countmatrix`](@ref)
 """
-probmatrix(data::AbstractGeoTable, var; minlag=_defaultminlag(data)) = probmatrix(_domvals(data, var)..., minlag)
+probmatrix(data::AbstractGeoTable, var; minlag=_defaultminlag(data)) = _probmatrix(_domvals(data, var)..., minlag)
 
 """
     countmatrix(data, var; [parameters])
@@ -30,26 +30,26 @@ Computes the transition count matrix for categorical variable
 
 See also [`ratematrix`](@ref), [`probmatrix`](@ref)
 """
-countmatrix(data::AbstractGeoTable, var; minlag=_defaultminlag(data)) = countmatrix(_domvals(data, var)..., minlag)
+countmatrix(data::AbstractGeoTable, var; minlag=_defaultminlag(data)) = _countmatrix(_domvals(data, var)..., minlag)
 
-function ratematrix(dom, vals, minlag)
+function _ratematrix(dom, vals, minlag)
   # transition probabilities
-  T = probmatrix(dom, vals, minlag)
+  T = _probmatrix(dom, vals, minlag)
 
   # convert probabilities into rates
   δh = minlag
   log(T) / δh
 end
 
-function probmatrix(dom, vals, minlag)
+function _probmatrix(dom, vals, minlag)
   # transition counts
-  C = countmatrix(dom, vals, minlag)
+  C = _countmatrix(dom, vals, minlag)
 
   # convert counts into probabilities
   C ./ sum(C, dims=2)
 end
 
-function countmatrix(dom, vals, minlag)
+function _countmatrix(dom, vals, minlag)
   # sanity check
   if elscitype(vals) != Categorical
     throw(ArgumentError("count matrix only defined for categorical variables"))
