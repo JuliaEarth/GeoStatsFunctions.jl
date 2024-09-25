@@ -20,7 +20,6 @@ testfiles = [
   "variogram.jl",
   "covariance.jl",
   "transiogram.jl",
-  "nesting.jl",
   "fitting.jl",
   "sampling.jl"
 ]

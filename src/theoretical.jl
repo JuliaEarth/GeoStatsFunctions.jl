@@ -5,4 +5,3 @@
 include("theoretical/variogram.jl")
 include("theoretical/covariance.jl")
 include("theoretical/transiogram.jl")
-include("theoretical/nesting.jl")
