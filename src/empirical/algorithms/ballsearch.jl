@@ -8,7 +8,7 @@
 Accumulate pairs of points in geospatial data with
 nearest neighbors inside metric ball.
 """
-struct BallSearchAccum{ℒ<:Len,D} <: VariogramAccumAlgo
+struct BallSearchAccum{ℒ<:Len,D} <: AccumAlgorithm
   nlags::Int
   maxlag::ℒ
   distance::D

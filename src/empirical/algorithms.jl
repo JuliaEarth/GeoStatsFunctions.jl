@@ -3,21 +3,21 @@
 # ------------------------------------------------------------------
 
 """
-    VariogramAccumAlgo
+    AccumAlgorithm
 
-Algorithm for accumulating pairs of points in
-[`EmpiricalVariogram`](@ref) estimation.
+Algorithm for accumulating pairs of points in the
+estimation of geostatistical functions.
 """
-abstract type VariogramAccumAlgo end
+abstract type AccumAlgorithm end
 
 """
-    accumulate(data, var₁, var₂, estim, algo)
+    accumulate(data, var₁, var₂, estimator, algo)
 
 Accumulate pairs of points in `data` for variables
-`var₁` and `var₂` with variogram estimator `estim`
-and accumulation algorithm `algo`.
+`var₁` and `var₂` with `estimator` and accumulation
+algorithm `algo`.
 """
-function accumulate(data, var₁, var₂, estim::VariogramEstimator, algo::VariogramAccumAlgo)
+function accumulate(data, var₁, var₂, estimator::Estimator, algo::AccumAlgorithm)
   # retrieve algorithm parameters
   nlags = algo.nlags
   maxlag = algo.maxlag
@@ -45,7 +45,7 @@ function accumulate(data, var₁, var₂, estim::VariogramEstimator, algo::Vario
   exit = exitfun(algo)
 
   # accumulation type
-  V = returntype(estim, z₁, z₂)
+  V = returntype(estimator, z₁, z₂)
 
   # lag sums and counts
   ℒ = Meshes.lentype(𝒫)
@@ -73,7 +73,7 @@ function accumulate(data, var₁, var₂, estim::VariogramEstimator, algo::Vario
       exit(h) && continue
 
       # evaluate (cross-)variance
-      v = formula(estim, z₁ᵢ, z₁ⱼ, z₂ᵢ, z₂ⱼ)
+      v = formula(estimator, z₁ᵢ, z₁ⱼ, z₂ᵢ, z₂ⱼ)
 
       # bin (or lag) where to accumulate result
       lag = ceil(Int, h / δh)
@@ -91,7 +91,7 @@ function accumulate(data, var₁, var₂, estim::VariogramEstimator, algo::Vario
   lags = range(δh / 2, stop=maxlag - δh / 2, length=nlags)
 
   # ordinate function
-  ordfun(Σy, n) = normsum(estim, Σy, n)
+  ordfun(Σy, n) = normsum(estimator, Σy, n)
 
   # variogram abscissa
   xs = @. Σx / ns

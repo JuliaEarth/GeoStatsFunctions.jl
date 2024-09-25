@@ -7,7 +7,7 @@
 
 Matheron's variogram estimator.
 """
-struct MatheronEstimator <: VariogramEstimator end
+struct MatheronEstimator <: Estimator end
 
 formula(::MatheronEstimator, z₁ᵢ, z₁ⱼ, z₂ᵢ, z₂ⱼ) = (z₁ᵢ - z₁ⱼ) ⋅ (z₂ᵢ - z₂ⱼ)
 

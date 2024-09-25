@@ -8,7 +8,7 @@
 Accumulate pairs of points in geospatial data with
 exhaustive (or full) search.
 """
-struct FullSearchAccum{ℒ<:Len,D} <: VariogramAccumAlgo
+struct FullSearchAccum{ℒ<:Len,D} <: AccumAlgorithm
   nlags::Int
   maxlag::ℒ
   distance::D

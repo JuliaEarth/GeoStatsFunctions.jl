@@ -12,7 +12,7 @@ Cressie's variogram estimator (equation 6.1 of Webster, R and Oliver, MA).
 * Webster, R and Oliver, MA. 2007. [Geostatistics for Environmental Scientists]
   (https://onlinelibrary.wiley.com/doi/book/10.1002/9780470517277)
 """
-struct CressieEstimator <: VariogramEstimator end
+struct CressieEstimator <: Estimator end
 
 function k(n)
   a, b, c = 0.457, 0.494, 0.045
