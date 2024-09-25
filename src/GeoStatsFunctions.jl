@@ -61,6 +61,11 @@ export
   distance,
   estimator,
 
+  # theoretical function
+  GeoStatsFunction,
+  isisotropic,
+  metricball,
+
   # theoretical variograms
   Variogram,
   NuggetEffect,
@@ -74,11 +79,9 @@ export
   SineHoleVariogram,
   CircularVariogram,
   NestedVariogram,
+  isstationary,
   sill,
   nugget,
-  metricball,
-  isstationary,
-  isisotropic,
   structures,
 
   # theoretical covariance
