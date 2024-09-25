@@ -103,7 +103,7 @@ function _domvals(data, var)
   dom = domain(data)
   tab = values(data)
   cols = Tables.columns(tab)
-  vals = Tables.getcolumn(cols, var)
+  vals = Tables.getcolumn(cols, Symbol(var))
   dom, vals
 end
 
