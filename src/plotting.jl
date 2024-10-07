@@ -36,3 +36,31 @@ Plot the variogram or varioplane `γ` with given `options`.
 """
 function varioplot end
 function varioplot! end
+
+"""
+    transioplot(t; [options])
+
+Plot the transiogram `t` with given `options`.
+
+## Empirical transiogram options:
+
+* `color`       - color of variogram
+* `pointsize`   - size of points of variogram
+* `segmentsize` - size of segments of variogram
+* `showtext`    - show text counts
+* `textsize`    - size of text counts
+* `showhist`    - show histogram
+* `histcolor`   - color of histogram
+
+## Theoretical transiogram options:
+
+* `maxlag` - maximum lag for theoretical model
+
+### Notes
+
+* This function will only work in the presence of
+  a Makie.jl backend via package extensions in
+  Julia v1.9 or later versions of the language.
+"""
+function transioplot end
+function transioplot! end

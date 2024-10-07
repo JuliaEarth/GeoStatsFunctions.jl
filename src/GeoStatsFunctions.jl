@@ -44,11 +44,9 @@ include("empirical.jl")
 # theoretical models
 include("theoretical.jl")
 
-# operations
+# misc operations
 include("fitting.jl")
-
-# plotting
-include("varioplot.jl")
+include("plotting.jl")
 
 include("precompile.jl")
 
@@ -106,6 +104,8 @@ export
 
   # plotting
   varioplot,
-  varioplot!
+  varioplot!,
+  transioplot,
+  transioplot!
 
 end

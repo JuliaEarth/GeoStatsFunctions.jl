@@ -145,17 +145,3 @@ function Makie.plot!(plot::VarioPlot{<:Tuple{Variogram}})
   # visualize variogram
   Makie.lines!(plot, x, y, color=plot[:color])
 end
-
-# ---------------------------
-# helper types and functions
-# ---------------------------
-
-const Len{T} = Quantity{T,u"𝐋"}
-
-_maxlag(γ::Variogram) = 3range(γ)
-_maxlag(::PowerVariogram) = 3.0u"m"
-_maxlag(::NuggetEffect) = 3.0u"m"
-
-_addunit(x::Number, u) = x * u
-_addunit(x::Len, _) = x
-_addunit(x::Quantity, _) = throw(ArgumentError("$(unit(x)) is not a valid length unit"))
