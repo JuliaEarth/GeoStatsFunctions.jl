@@ -5,19 +5,19 @@
 Makie.@recipe(VarioPlot, γ) do scene
   Makie.Attributes(
     # empirical variogram options
-    vcolor=:slategray,
-    psize=12,
-    ssize=1.5,
-    tshow=true,
-    tsize=12,
-    hshow=true,
-    hcolor=:slategray,
+    color=:slategray,
+    pointsize=12,
+    segmentsize=1.5,
+    showtext=true,
+    textsize=12,
+    showhist=true,
+    histcolor=:slategray,
 
     # empirical varioplane options
-    vscheme=:viridis,
-    rshow=true,
-    rmodel=SphericalVariogram,
-    rcolor=:white,
+    colormap=:viridis,
+    showrange=true,
+    rangecolor=:white,
+    rangemodel=SphericalVariogram,
 
     # theoretical variogram options
     maxlag=nothing
@@ -46,18 +46,18 @@ function Makie.plot!(plot::VarioPlot{<:Tuple{EmpiricalVariogram}})
   n = Makie.@lift $n[$n .> 0]
 
   # visualize frequencies as bars
-  if plot[:hshow][]
+  if plot[:showhist][]
     f = Makie.@lift $n * (maximum($y) / maximum($n)) / 10
-    Makie.barplot!(plot, x, f, color=plot[:hcolor], alpha=0.3, gap=0.0)
+    Makie.barplot!(plot, x, f, color=plot[:histcolor], alpha=0.3, gap=0.0)
   end
 
   # visualize variogram
-  Makie.scatterlines!(plot, x, y, color=plot[:vcolor], markersize=plot[:psize], linewidth=plot[:ssize])
+  Makie.scatterlines!(plot, x, y, color=plot[:color], markersize=plot[:pointsize], linewidth=plot[:segmentsize])
 
   # visualize text counts
-  if plot[:tshow][]
+  if plot[:showtext][]
     text = Makie.@lift string.($n)
-    Makie.text!(plot, x, y, text=text, fontsize=plot[:tsize])
+    Makie.text!(plot, x, y, text=text, fontsize=plot[:textsize])
   end
 end
 
@@ -68,8 +68,8 @@ function Makie.plot!(plot::VarioPlot{<:Tuple{EmpiricalVarioplane}})
   v = plot[:γ]
 
   # retrieve range model
-  rshow = plot[:rshow]
-  rmodel = plot[:rmodel]
+  showrange = plot[:showrange]
+  rangemodel = plot[:rangemodel]
 
   # underyling variograms
   γs = Makie.@lift $v.γs
@@ -107,14 +107,14 @@ function Makie.plot!(plot::VarioPlot{<:Tuple{EmpiricalVarioplane}})
   # transpose for plotting
   Z = Makie.@lift transpose($Z)
 
-  Makie.surface!(plot, θs, rs, Z, colormap=plot[:vscheme], shading=Makie.NoShading)
+  Makie.surface!(plot, θs, rs, Z, colormap=plot[:colormap], shading=Makie.NoShading)
 
   # show model range
-  if rshow[]
-    ls = Makie.@lift [ustrip(range(GeoStatsFunctions.fit($rmodel, γ))) for γ in $γs]
+  if showrange[]
+    ls = Makie.@lift [ustrip(range(GeoStatsFunctions.fit($rangemodel, γ))) for γ in $γs]
     ls = Makie.@lift [$ls; $ls]
     zs = Makie.@lift fill(maximum($Z) + 1, length($ls))
-    Makie.lines!(plot, θs, ls, zs, color=plot[:rcolor])
+    Makie.lines!(plot, θs, ls, zs, color=plot[:rangecolor])
   end
 end
 
@@ -143,7 +143,7 @@ function Makie.plot!(plot::VarioPlot{<:Tuple{Variogram}})
   y = Makie.@lift $γ.($x)
 
   # visualize variogram
-  Makie.lines!(plot, x, y, color=plot[:vcolor])
+  Makie.lines!(plot, x, y, color=plot[:color])
 end
 
 # ---------------------------
