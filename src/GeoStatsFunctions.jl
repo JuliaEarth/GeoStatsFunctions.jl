@@ -26,6 +26,7 @@ using Printf
 
 import Base: merge, +, *
 import Meshes: isisotropic
+import CategoricalArrays: levels
 
 # temporary fix for ⋅ with missing values
 # https://github.com/JuliaLang/julia/issues/40743
