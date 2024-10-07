@@ -17,4 +17,18 @@
   R = GeoStatsFunctions.ratematrix(gtb, "z")
   @test size(R) == (3, 3)
   @test eltype(R) == typeof(1 / 1u"m")
+
+  # basic properties of transition rate matrix
+  csv = CSV.File(joinpath(datadir, "facies5.csv"))
+  gtb = georef(csv, ("X", "Y", "Z"))
+  R = GeoStatsFunctions.ratematrix(gtb, "FACIES")
+  @test size(R) == (5, 5)
+  @test all(<(0 / u"m"), diag(R))
+
+  # basic properties of transition rate matrix
+  csv = CSV.File(joinpath(datadir, "facies15.csv"))
+  gtb = georef(csv, ("X", "Y"))
+  R = GeoStatsFunctions.ratematrix(gtb, "FACIES")
+  @test size(R) == (15, 15)
+  @test all(<(0 / u"m"), diag(R))
 end
