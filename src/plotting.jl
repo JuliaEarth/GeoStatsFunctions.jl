@@ -7,11 +7,15 @@
 
 Plot the variogram or varioplane `γ` with given `options`.
 
+## Common variogram options:
+
+* `color`  - color of variogram
+* `size`   - size of variogram
+* `maxlag` - maximum lag of variogram
+
 ## Empirical variogram options:
 
-* `color`       - color of variogram
 * `pointsize`   - size of points of variogram
-* `segmentsize` - size of segments of variogram
 * `showtext`    - show text counts
 * `textsize`    - size of text counts
 * `showhist`    - show histogram
@@ -23,10 +27,6 @@ Plot the variogram or varioplane `γ` with given `options`.
 * `showrange`  - show varioplane range
 * `rangecolor` - color of varioplane range
 * `rangemodel` - range model (e.g. `SphericalVariogram`)
-
-## Theoretical variogram options:
-
-* `maxlag` - maximum lag for theoretical model
 
 ### Notes
 
@@ -42,19 +42,11 @@ function varioplot! end
 
 Plot the transiogram `t` with given `options`.
 
-## Empirical transiogram options:
+## Common transiogram options:
 
-* `color`       - color of variogram
-* `pointsize`   - size of points of variogram
-* `segmentsize` - size of segments of variogram
-* `showtext`    - show text counts
-* `textsize`    - size of text counts
-* `showhist`    - show histogram
-* `histcolor`   - color of histogram
-
-## Theoretical transiogram options:
-
-* `maxlag` - maximum lag for theoretical model
+* `color`  - color of transiogram
+* `size`   - size of transiogram
+* `maxlag` - maximum lag of variogram
 
 ### Notes
 

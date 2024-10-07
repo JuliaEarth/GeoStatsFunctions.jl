@@ -3,16 +3,9 @@
 # ------------------------------------------------------------------
 
 function transioplot(t::Transiogram;
-  # empirical transiogram options
+  # common transiogram options
   color=:slategray,
-  pointsize=12,
-  segmentsize=1.5,
-  showtext=true,
-  textsize=12,
-  showhist=true,
-  histcolor=:slategray,
-
-  # theoretical transiogram options
+  size=1.5,
   maxlag=nothing
 )
   # retrieve maximum lag
@@ -33,7 +26,7 @@ function transioplot(t::Transiogram;
   for i in 1:L, j in 1:L
     ax = Makie.Axis(fig[i, j])
     ys = getindex.(y, i, j)
-    Makie.lines!(ax, x, ys, color = color)
+    Makie.lines!(ax, x, ys, color=color, linewidth=size)
   end
   fig
 end

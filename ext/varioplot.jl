@@ -4,10 +4,13 @@
 
 Makie.@recipe(VarioPlot, γ) do scene
   Makie.Attributes(
-    # empirical variogram options
+    # common variogram options
     color=:slategray,
+    size=1.5,
+    maxlag=nothing,
+
+    # empirical variogram options
     pointsize=12,
-    segmentsize=1.5,
     showtext=true,
     textsize=12,
     showhist=true,
@@ -17,10 +20,7 @@ Makie.@recipe(VarioPlot, γ) do scene
     colormap=:viridis,
     showrange=true,
     rangecolor=:white,
-    rangemodel=SphericalVariogram,
-
-    # theoretical variogram options
-    maxlag=nothing
+    rangemodel=SphericalVariogram
   )
 end
 
@@ -52,7 +52,7 @@ function Makie.plot!(plot::VarioPlot{<:Tuple{EmpiricalVariogram}})
   end
 
   # visualize variogram
-  Makie.scatterlines!(plot, x, y, color=plot[:color], markersize=plot[:pointsize], linewidth=plot[:segmentsize])
+  Makie.scatterlines!(plot, x, y, color=plot[:color], markersize=plot[:pointsize], linewidth=plot[:size])
 
   # visualize text counts
   if plot[:showtext][]
@@ -143,5 +143,5 @@ function Makie.plot!(plot::VarioPlot{<:Tuple{Variogram}})
   y = Makie.@lift $γ.($x)
 
   # visualize variogram
-  Makie.lines!(plot, x, y, color=plot[:color])
+  Makie.lines!(plot, x, y, color=plot[:color], linewidth=plot[:size])
 end
