@@ -71,10 +71,10 @@ end
 
 function Base.show(io::IO, ::MIME"text/plain", γ::EmpiricalVarioplane)
   θs = [@sprintf "%.2f" rad2deg(θ) for θ in γ.θs]
-  ns = [sum(values(g)[3]) for g in γ.γs]
-  lines = ["  └─$(θ)° → $n" for (θ, n) in zip(θs, ns)]
+  nθ = length(θs)
+  lines = ["  └─$(θ)°" for θ in θs]
   lines = length(lines) > 11 ? vcat(lines[1:5], ["  ⋮"], lines[(end - 4):end]) : lines
   println(io, γ)
-  println(io, "  N° pairs")
+  println(io, "  $nθ angles")
   print(io, join(lines, "\n"))
 end
