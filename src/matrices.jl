@@ -2,10 +2,14 @@
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
 
+# ----------
+# EMPIRICAL
+# ----------
+
 """
     ratematrix(data, var; [parameters])
 
-Computes the transition rate matrix for categorical variable
+Estimate the transition rate matrix for categorical variable
 `var` stored in geospatial `data` using a minimum lag `minlag`.
 
 See also [`probmatrix`](@ref), [`countmatrix`](@ref)
@@ -15,7 +19,7 @@ ratematrix(data::AbstractGeoTable, var; minlag=_defaultminlag(data)) = _ratematr
 """
     probmatrix(data, var; [parameters])
 
-Computes the transition probability matrix for categorical variable
+Estimate the transition probability matrix for categorical variable
 `var` stored in geospatial `data` using a minimum lag `minlag`.
 
 See also [`ratematrix`](@ref), [`countmatrix`](@ref)
@@ -25,7 +29,7 @@ probmatrix(data::AbstractGeoTable, var; minlag=_defaultminlag(data)) = _probmatr
 """
     countmatrix(data, var; [parameters])
 
-Computes the transition count matrix for categorical variable
+Estimate the transition count matrix for categorical variable
 `var` stored in geospatial `data` using a minimum lag `minlag`.
 
 See also [`ratematrix`](@ref), [`probmatrix`](@ref)
@@ -93,6 +97,46 @@ function _countmatrix(dom, vals, minlag)
   C[c₂, c₂] += m
 
   C
+end
+
+# ------------
+# THEORETICAL
+# ------------
+
+"""
+    baseratematrix(l, p)
+
+Transition rate matrix from mean lengths `l` and proportions `p`
+that assumes random transitions based on relative proportions.
+
+The transition rate for the pair `i -> j` is given by `-1 / l[i]`
+if `i == j` and by `(p[j] / (1 - p[i])) / l[i]` otherwise.
+
+## References
+
+* Carle et al 1998. [Conditional Simulation of Hydrofacies Architecture:
+  A Transition Probability/Markov Approach](https://doi.org/10.2110/sepmcheg.01.147)
+"""
+function baseratematrix(l, p)
+  nₗ = length(l)
+  nₚ = length(p)
+
+  # sanity checks
+  if nₗ != nₚ
+    throw(ArgumentError("lengths and proportions must have the same length"))
+  end
+  if !all(pᵢ -> 0 ≤ pᵢ ≤ 1, p)
+    throw(ArgumentError("proportions must be in interval [0, 1]"))
+  end
+
+  # Eq. 17 and 18 of Carle et al 1998.
+  map(Iterators.product(1:nₗ, 1:nₗ)) do (i, j)
+    if i == j
+      -1 / l[i]
+    else
+      (p[j] / (1 - p[i])) / l[i]
+    end
+  end
 end
 
 # -----------------

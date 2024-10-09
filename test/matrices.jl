@@ -31,4 +31,10 @@
   R = GeoStatsFunctions.ratematrix(gtb, "FACIES")
   @test size(R) == (15, 15)
   @test all(<(0 / u"m"), diag(R))
+
+  # base transition rate matrix
+  R = GeoStatsFunctions.baseratematrix([1,2,3]u"m", [0.2,0.5,0.3])
+  @test R == [         -1/1    0.5/(1-0.2)/1    0.3/(1-0.2)/1
+              0.2/(1-0.5)/2             -1/2    0.3/(1-0.5)/2
+              0.2/(1-0.3)/3    0.5/(1-0.3)/3             -1/3]u"m^-1"
 end
