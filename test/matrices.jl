@@ -1,4 +1,17 @@
 @testset "Matrices" begin
+  # helper function for tests
+  function testratematrix(R)
+    m, n = size(R)
+    for i in 1:m, j in 1:n
+      if i == j
+        @test R[i, j] < 0 / u"m"
+      else
+        @test 0 / u"m" ≤ R[i, j] ≤ -R[i, i]
+      end
+    end
+  end
+
+  # synthetic geotable
   dom = CylindricalTrajectory(rand(Point, 100))
   tab = (; z=rand(1:3, 100))
   gtb = georef(tab, dom)
@@ -23,14 +36,14 @@
   gtb = georef(csv, ("X", "Y", "Z"))
   R = GeoStatsFunctions.ratematrix(gtb, "FACIES")
   @test size(R) == (5, 5)
-  @test all(<(0 / u"m"), diag(R))
+  testratematrix(R)
 
   # basic properties of transition rate matrix
   csv = CSV.File(joinpath(datadir, "facies15.csv"))
   gtb = georef(csv, ("X", "Y"))
   R = GeoStatsFunctions.ratematrix(gtb, "FACIES")
   @test size(R) == (15, 15)
-  @test all(<(0 / u"m"), diag(R))
+  testratematrix(R)
 
   # base transition rate matrix
   R = GeoStatsFunctions.baseratematrix([1.0, 2.0, 3.0]u"m", [0.2, 0.5, 0.3])
