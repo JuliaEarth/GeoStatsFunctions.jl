@@ -21,12 +21,6 @@ abstract type Transiogram <: GeoStatsFunction end
 Base.range(t::Transiogram) = maximum(ranges(t))
 
 # ----------------
-# TRANSIOGRAM API
-# ----------------
-
-ranges(t::Transiogram) = 1 ./ -diag(ratematrix(t))
-
-# ----------------
 # IMPLEMENTATIONS
 # ----------------
 

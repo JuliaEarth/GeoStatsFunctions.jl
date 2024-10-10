@@ -97,7 +97,6 @@ export
   # theoretical transiogram
   Transiogram,
   ExponentialTransiogram,
-  ratematrix,
 
   # fitting algorithms
   VariogramFitAlgo,
