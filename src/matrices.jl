@@ -48,6 +48,9 @@ end
 function _probmatrix(dom, vals, minlag)
   # transition counts
   C = _countmatrix(dom, vals, minlag)
+  
+  # Laplace smoothing
+  C .+= 1
 
   # convert counts into probabilities
   C ./ sum(C, dims=2)
