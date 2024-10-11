@@ -36,10 +36,7 @@ import LinearAlgebra: ⋅
 # utilities
 include("utils.jl")
 
-# relevant matrices
-include("matrices.jl")
-
-# empirical models
+# empirical estimates
 include("empirical.jl")
 
 # theoretical models
