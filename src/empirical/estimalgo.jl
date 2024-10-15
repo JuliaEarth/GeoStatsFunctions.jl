@@ -2,7 +2,11 @@
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
 
-# helper function to retrieve estimator and algorithm from user input
+"""
+    estimalgo(domain, nlags, maxlag, distance, estimator, algorithm)
+
+Retrieve concrete estimator and algorithm from user input.
+"""
 function estimalgo(dom, nlags, maxlag, distance, estimator, algorithm)
   # sanity checks
   @assert nelements(dom) > 1 "variogram requires at least 2 elements"

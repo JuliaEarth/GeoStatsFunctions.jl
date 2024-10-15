@@ -11,13 +11,12 @@ estimation of geostatistical functions.
 abstract type AccumAlgorithm end
 
 """
-    accumulate(data, var₁, var₂, estimator, algo)
+    accumulate(data, vars, estimator, algo)
 
 Accumulate pairs of points in `data` for variables
-`var₁` and `var₂` with `estimator` and accumulation
-algorithm `algo`.
+`vars` with `estimator` and accumulation `algo`.
 """
-function accumulate(data, var₁, var₂, estimator::Estimator, algo::AccumAlgorithm)
+function accumulate(data, vars, estimator::Estimator, algo::AccumAlgorithm)
   # retrieve algorithm parameters
   nlags = algo.nlags
   maxlag = algo.maxlag
@@ -32,8 +31,8 @@ function accumulate(data, var₁, var₂, estimator::Estimator, algo::AccumAlgor
 
   # vectors for variables
   cols = Tables.columns(𝒯)
-  z₁ = Tables.getcolumn(cols, Symbol(var₁))
-  z₂ = Tables.getcolumn(cols, Symbol(var₂))
+  z₁ = Tables.getcolumn(cols, Symbol(vars[1]))
+  z₂ = Tables.getcolumn(cols, Symbol(vars[2]))
 
   # neighbors function
   neighbors = neighfun(algo, 𝒫)

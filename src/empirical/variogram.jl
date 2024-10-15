@@ -75,7 +75,7 @@ function EmpiricalVariogram(
   estim, algo = estimalgo(𝒟, nlags, maxlag, distance, estimator, algorithm)
 
   # accumulate data with chosen algorithm
-  counts, abscissa, ordinate = accumulate(𝒮, var₁, var₂, estim, algo)
+  counts, abscissa, ordinate = accumulate(𝒮, (var₁, var₂), estim, algo)
 
   EmpiricalVariogram(counts, abscissa, ordinate, distance, estim)
 end
