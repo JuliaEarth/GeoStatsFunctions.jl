@@ -97,8 +97,7 @@ function EmpiricalVariogram(
   end
 
   # empirical variograms are defined on point sets
-  𝒫 = PointSet([centroid(𝒟, i) for i in 1:nelem])
-  𝒮 = georef(𝒯, 𝒫)
+  𝒮 = georef(𝒯, [centroid(𝒟, i) for i in 1:nelem])
 
   # accumulate data with chosen algorithm
   abscissa, ordinate, counts = accumulate(𝒮, var₁, var₂, estim, algo)
