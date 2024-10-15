@@ -94,11 +94,9 @@ Optionally, forward `parameters` for the underlying [`EmpiricalVariogram`](@ref)
   (https://www.sciencedirect.com/science/article/pii/S0098300419302936)
 """
 function EmpiricalVariogram(partition::Partition, var₁, var₂=var₁; kwargs...)
-  # retain geospatial data with at least 2 points
+  # retain geospatial data with at least two elements
   filtered = Iterators.filter(d -> nelements(domain(d)) > 1, partition)
-
   @assert !isempty(filtered) "invalid partition of geospatial data"
-
   γ(d) = EmpiricalVariogram(d, var₁, var₂; kwargs...)
   tmapreduce(γ, merge, collect(filtered))
 end
