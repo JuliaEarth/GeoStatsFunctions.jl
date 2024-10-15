@@ -39,8 +39,10 @@ See also: [`DirectionalVariogram`](@ref), [`PlanarVariogram`](@ref),
 
 * Chilès, JP and Delfiner, P. 2012. [Geostatistics: Modeling Spatial Uncertainty]
   (https://onlinelibrary.wiley.com/doi/book/10.1002/9781118136188)
+
 * Webster, R and Oliver, MA. 2007. [Geostatistics for Environmental Scientists]
   (https://onlinelibrary.wiley.com/doi/book/10.1002/9780470517277)
+
 * Hoffimann, J and Zadrozny, B. 2019. [Efficient variography with partition variograms]
   (https://www.sciencedirect.com/science/article/pii/S0098300419302936)
 """
