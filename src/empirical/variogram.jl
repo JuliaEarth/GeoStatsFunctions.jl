@@ -64,42 +64,15 @@ function EmpiricalVariogram(
   estimator=:matheron,
   algorithm=:ball
 )
-
   # retrieve table and domain
   𝒯 = values(data)
   𝒟 = domain(data)
 
-  # retrieve number of elements
-  nelem = nelements(𝒟)
+  # empirical estimators are defined on point sets
+  𝒮 = georef(𝒯, [centroid(𝒟, i) for i in 1:nelements(𝒟)])
 
-  # sanity checks
-  @assert nelem > 1 "variogram requires at least 2 elements"
-  @assert nlags > 0 "number of lags must be positive"
-  @assert maxlag > zero(maxlag) "maximum lag distance must be positive"
-  @assert estimator ∈ (:matheron, :cressie) "invalid variogram estimator"
-  @assert algorithm ∈ (:full, :ball) "invalid accumulation algorithm"
-
-  # choose variogram estimator
-  estim = estimator == :matheron ? MatheronEstimator() : CressieEstimator()
-
-  # ball search with NearestNeighbors.jl requires AbstractFloat and MinkowskiMetric
-  # https://github.com/KristofferC/NearestNeighbors.jl/issues/13
-  isfloat = Unitful.numtype(Meshes.lentype(𝒟)) <: AbstractFloat
-  isminkowski = distance isa MinkowskiMetric
-
-  # warn users requesting :ball option with invalid parameters
-  (algorithm == :ball && !isfloat) && @warn ":ball algorithm requires floating point coordinates, falling back to :full"
-  (algorithm == :ball && !isminkowski) && @warn ":ball algorithm requires Minkowski metric, falling back to :full"
-
-  # choose accumulation algorithm
-  algo = if algorithm == :ball && isfloat && isminkowski
-    BallSearchAccum(nlags, maxlag, distance)
-  else
-    FullSearchAccum(nlags, maxlag, distance)
-  end
-
-  # empirical variograms are defined on point sets
-  𝒮 = georef(𝒯, [centroid(𝒟, i) for i in 1:nelem])
+  # retrieve estimator and algorithm
+  estim, algo = estimalgo(𝒟, nlags, maxlag, distance, estimator, algorithm)
 
   # accumulate data with chosen algorithm
   abscissa, ordinate, counts = accumulate(𝒮, var₁, var₂, estim, algo)
