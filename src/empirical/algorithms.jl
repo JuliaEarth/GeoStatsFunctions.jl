@@ -5,16 +5,16 @@
 """
     AccumAlgorithm
 
-Algorithm for accumulating pairs of points in the
-estimation of geostatistical functions.
+Algorithm used for accumulating values in
+the estimation of geostatistical functions.
 """
 abstract type AccumAlgorithm end
 
 """
     accumulate(data, vars, estimator, algo)
 
-Accumulate pairs of points in `data` for variables
-`vars` with `estimator` and accumulation `algo`.
+Accumulate values for pairs of variables `vars` stored
+in `data` with `estimator` and accumulation `algo`.
 """
 function accumulate(data, vars, estimator::Estimator, algo::AccumAlgorithm)
   # retrieve algorithm parameters
