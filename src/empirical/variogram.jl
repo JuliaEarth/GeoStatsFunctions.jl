@@ -47,9 +47,9 @@ See also: [`DirectionalVariogram`](@ref), [`PlanarVariogram`](@ref),
   (https://www.sciencedirect.com/science/article/pii/S0098300419302936)
 """
 struct EmpiricalVariogram{ℒ<:Len,V,D,E}
+  counts::Vector{Int}
   abscissa::Vector{ℒ}
   ordinate::Vector{V}
-  counts::Vector{Int}
   distance::D
   estimator::E
 end
@@ -75,9 +75,9 @@ function EmpiricalVariogram(
   estim, algo = estimalgo(𝒟, nlags, maxlag, distance, estimator, algorithm)
 
   # accumulate data with chosen algorithm
-  abscissa, ordinate, counts = accumulate(𝒮, var₁, var₂, estim, algo)
+  counts, abscissa, ordinate = accumulate(𝒮, var₁, var₂, estim, algo)
 
-  EmpiricalVariogram(abscissa, ordinate, counts, distance, estim)
+  EmpiricalVariogram(counts, abscissa, ordinate, distance, estim)
 end
 
 """
@@ -160,12 +160,12 @@ assuming that both variograms have the same number of lags, distance
 and estimator.
 """
 function merge(γα::EmpiricalVariogram{V,D,E}, γβ::EmpiricalVariogram{V,D,E}) where {V,D,E}
+  nα = γα.counts
+  nβ = γβ.counts
   xα = γα.abscissa
   xβ = γβ.abscissa
   yα = γα.ordinate
   yβ = γβ.ordinate
-  nα = γα.counts
-  nβ = γβ.counts
 
   # copy distance and estimator
   d = γα.distance
@@ -183,7 +183,7 @@ function merge(γα::EmpiricalVariogram{V,D,E}, γβ::EmpiricalVariogram{V,D,E})
   x[n .== 0] .= xα[n .== 0]
   y[n .== 0] .= 0
 
-  EmpiricalVariogram(x, y, n, d, e)
+  EmpiricalVariogram(n, x, y, d, e)
 end
 
 # -----------

@@ -49,9 +49,9 @@ function accumulate(data, var₁, var₂, estimator::Estimator, algo::AccumAlgor
 
   # lag sums and counts
   ℒ = Meshes.lentype(𝒫)
+  ns = zeros(Int, nlags)
   Σx = zeros(ℒ, nlags)
   Σy = zeros(V, nlags)
-  ns = zeros(Int, nlags)
 
   # loop over points inside ball
   @inbounds for j in 1:nelements(𝒫)
@@ -80,9 +80,9 @@ function accumulate(data, var₁, var₂, estimator::Estimator, algo::AccumAlgor
       lag == 0 && @warn "duplicate coordinates found, consider using `UniqueCoords`"
 
       if 0 < lag ≤ nlags && !ismissing(v)
+        ns[lag] += 1
         Σx[lag] += h
         Σy[lag] += v
-        ns[lag] += 1
       end
     end
   end
@@ -101,7 +101,7 @@ function accumulate(data, var₁, var₂, estimator::Estimator, algo::AccumAlgor
   ys = @. ordfun(Σy, ns)
   ys[ns .== 0] .= zero(eltype(ys))
 
-  xs, ys, ns
+  ns, xs, ys
 end
 
 include("algorithms/fullsearch.jl")
