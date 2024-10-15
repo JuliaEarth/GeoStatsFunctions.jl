@@ -7,5 +7,4 @@ include("empirical/estimators.jl")
 include("empirical/algorithms.jl")
 
 include("empirical/variogram.jl")
-include("empirical/partition.jl")
 include("empirical/varioplane.jl")
