@@ -11,12 +11,12 @@ the estimation of geostatistical functions.
 abstract type AccumAlgorithm end
 
 """
-    accumulate(data, vars, estimator, algo)
+    accumulate(data, pairs, estimator, algo)
 
-Accumulate values for pairs of variables `vars` stored
+Accumulate values for `pairs` of variables stored
 in `data` with `estimator` and accumulation `algo`.
 """
-function accumulate(data, vars, estimator::Estimator, algo::AccumAlgorithm)
+function accumulate(data, pairs::AbstractVector, estimator::Estimator, algo::AccumAlgorithm)
   # retrieve algorithm parameters
   nlags = algo.nlags
   maxlag = algo.maxlag
@@ -29,10 +29,11 @@ function accumulate(data, vars, estimator::Estimator, algo::AccumAlgorithm)
   𝒯 = values(data)
   𝒫 = domain(data)
 
-  # vectors for variables
+  # table columns
   cols = Tables.columns(𝒯)
-  z₁ = Tables.getcolumn(cols, Symbol(vars[1]))
-  z₂ = Tables.getcolumn(cols, Symbol(vars[2]))
+
+  # get column from variable name
+  get(var) = Tables.getcolumn(cols, Symbol(var))
 
   # neighbors function
   neighbors = neighfun(algo, 𝒫)
@@ -43,27 +44,27 @@ function accumulate(data, vars, estimator::Estimator, algo::AccumAlgorithm)
   # early exit condition
   exit = exitfun(algo)
 
-  # accumulation type
-  V = returntype(estimator, z₁, z₂)
-
-  # lag sums and counts
+  # lag counts and abscissa sums
   ℒ = Meshes.lentype(𝒫)
   ns = zeros(Int, nlags)
   Σx = zeros(ℒ, nlags)
-  Σy = zeros(V, nlags)
 
-  # loop over points inside ball
+  # ordinate sums
+  Σ = map(pairs) do (var₁, var₂)
+    z₁ = get(var₁)
+    z₂ = get(var₂)
+    V = returntype(estimator, z₁, z₂)
+    zeros(V, nlags)
+  end
+
+  # loop over pairs of points
   @inbounds for j in 1:nelements(𝒫)
     pⱼ = 𝒫[j]
-    z₁ⱼ = z₁[j]
-    z₂ⱼ = z₂[j]
     for i in neighbors(j)
       # skip to avoid double counting
       skip(i, j) && continue
 
       pᵢ = 𝒫[i]
-      z₁ᵢ = z₁[i]
-      z₂ᵢ = z₂[i]
 
       # evaluate geospatial lag
       h = evaluate(distance, pᵢ, pⱼ)
@@ -71,36 +72,55 @@ function accumulate(data, vars, estimator::Estimator, algo::AccumAlgorithm)
       # early exit if out of range
       exit(h) && continue
 
-      # evaluate (cross-)variance
-      v = formula(estimator, z₁ᵢ, z₁ⱼ, z₂ᵢ, z₂ⱼ)
-
       # bin (or lag) where to accumulate result
       lag = ceil(Int, h / δh)
       lag == 0 && @warn "duplicate coordinates found, consider using `UniqueCoords`"
 
-      if 0 < lag ≤ nlags && !ismissing(v)
-        ns[lag] += 1
-        Σx[lag] += h
-        Σy[lag] += v
+      # accumulate if lag is valid
+      if 0 < lag ≤ nlags
+        for (k, (var₁, var₂)) in enumerate(pairs)
+          # retrieve variable values
+          z₁ = get(var₁)
+          z₂ = get(var₂)
+          Σy = Σ[k]
+
+          # evaluate function estimator
+          v = formula(estimator, z₁[i], z₁[j], z₂[i], z₂[j])
+
+          # accumulate if value is valid
+          if !ismissing(v)
+            ns[lag] += 1
+            Σx[lag] += h
+            Σy[lag] += v
+          end
+        end
       end
     end
   end
 
-  # bin (or lag) size
-  lags = range(δh / 2, stop=maxlag - δh / 2, length=nlags)
-
   # ordinate function
   ordfun(Σy, n) = normsum(estimator, Σy, n)
 
-  # variogram abscissa
+  # bin (or lag) size
+  lags = range(δh / 2, stop=maxlag - δh / 2, length=nlags)
+
+  # abscissa
   xs = @. Σx / ns
   xs[ns .== 0] .= lags[ns .== 0]
 
-  # variogram ordinate
-  ys = @. ordfun(Σy, ns)
-  ys[ns .== 0] .= zero(eltype(ys))
+  # ordinate
+  Y = map(Σ) do Σy
+    ys = @. ordfun(Σy, ns)
+    ys[ns .== 0] .= zero(eltype(ys))
+    ys
+  end
 
-  ns, xs, ys
+  ns, xs, Y
+end
+
+function accumulate(data, (var₁, var₂), estimator::Estimator, algo::AccumAlgorithm)
+  ns, xs, Y = accumulate(data, [(var₁, var₂)], estimator, algo)
+  ns, xs, first(Y)
 end
 
 include("algorithms/fullsearch.jl")
