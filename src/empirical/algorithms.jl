@@ -79,7 +79,7 @@ function accumulate(data, pairs::AbstractVector, estimator::Estimator, algo::Acc
       # accumulate if lag is valid
       if 0 < lag ≤ nlags
         for (k, (var₁, var₂)) in enumerate(pairs)
-          # retrieve variable values
+          # retrieve values and sums for pair
           z₁ = get(var₁)
           z₂ = get(var₂)
           Σy = Σ[k]
