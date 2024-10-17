@@ -16,7 +16,94 @@ abstract type AccumAlgorithm end
 Accumulate values for `pairs` of variables stored
 in `data` with `estimator` and accumulation `algo`.
 """
-function accumulate(data, pairs::AbstractArray, estimator::Estimator, algo::AccumAlgorithm)
+function accumulate(data, (var₁, var₂), estimator::Estimator, algo::AccumAlgorithm)
+  # retrieve algorithm parameters
+  nlags = algo.nlags
+  maxlag = algo.maxlag
+  distance = algo.distance
+
+  # compute lag size
+  δh = maxlag / nlags
+
+  # table and point set
+  𝒯 = values(data)
+  𝒫 = domain(data)
+
+  # vectors for variables
+  cols = Tables.columns(𝒯)
+  z₁ = Tables.getcolumn(cols, Symbol(var₁))
+  z₂ = Tables.getcolumn(cols, Symbol(var₂))
+
+  # neighbors function
+  neighbors = neighfun(algo, 𝒫)
+
+  # skip condition
+  skip = skipfun(algo)
+
+  # early exit condition
+  exit = exitfun(algo)
+
+  # accumulation type
+  V = returntype(estimator, z₁, z₂)
+
+  # lag sums and counts
+  ℒ = Meshes.lentype(𝒫)
+  ns = zeros(Int, nlags)
+  Σx = zeros(ℒ, nlags)
+  Σy = zeros(V, nlags)
+
+  # loop over points inside ball
+  @inbounds for j in 1:nelements(𝒫)
+    pⱼ = 𝒫[j]
+    z₁ⱼ = z₁[j]
+    z₂ⱼ = z₂[j]
+    for i in neighbors(j)
+      # skip to avoid double counting
+      skip(i, j) && continue
+
+      pᵢ = 𝒫[i]
+      z₁ᵢ = z₁[i]
+      z₂ᵢ = z₂[i]
+
+      # evaluate geospatial lag
+      h = evaluate(distance, pᵢ, pⱼ)
+
+      # early exit if out of range
+      exit(h) && continue
+
+      # evaluate (cross-)variance
+      v = formula(estimator, z₁ᵢ, z₁ⱼ, z₂ᵢ, z₂ⱼ)
+
+      # bin (or lag) where to accumulate result
+      lag = ceil(Int, h / δh)
+      lag == 0 && @warn "duplicate coordinates found, consider using `UniqueCoords`"
+
+      if 0 < lag ≤ nlags && !ismissing(v)
+        ns[lag] += 1
+        Σx[lag] += h
+        Σy[lag] += v
+      end
+    end
+  end
+
+  # ordinate function
+  ordfun(Σy, n) = normsum(estimator, Σy, n)
+
+  # bin (or lag) size
+  lags = range(δh / 2, stop=maxlag - δh / 2, length=nlags)
+
+  # variogram abscissa
+  xs = @. Σx / ns
+  xs[ns .== 0] .= lags[ns .== 0]
+
+  # variogram ordinate
+  ys = @. ordfun(Σy, ns)
+  ys[ns .== 0] .= zero(eltype(ys))
+
+  ns, xs, ys
+end
+
+function accumulate(data, pairs, estimator::CarleEstimator, algo::AccumAlgorithm)
   # retrieve algorithm parameters
   nlags = algo.nlags
   maxlag = algo.maxlag
@@ -116,11 +203,6 @@ function accumulate(data, pairs::AbstractArray, estimator::Estimator, algo::Accu
   end
 
   ns, xs, Y
-end
-
-function accumulate(data, (var₁, var₂), estimator::Estimator, algo::AccumAlgorithm)
-  ns, xs, Y = accumulate(data, [(var₁, var₂)], estimator, algo)
-  ns, xs, first(Y)
 end
 
 include("algorithms/fullsearch.jl")
