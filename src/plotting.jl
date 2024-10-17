@@ -47,6 +47,7 @@ Plot the transiogram `t` with given `options`.
 * `color`  - color of transiogram
 * `size`   - size of transiogram
 * `maxlag` - maximum lag of variogram
+* `levels` - categorical levels
 
 ### Notes
 

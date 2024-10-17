@@ -12,6 +12,7 @@ function transioplot(
   color=:slategray,
   size=1.5,
   maxlag=nothing,
+  levels=nothing,
 
   # empirical transiogram options
   pointsize=12,
@@ -20,30 +21,45 @@ function transioplot(
   showhist=true,
   histcolor=:slategray
 )
-  # retrieve coordinates and counts
-  x = t.abscissas
-  y = t.ordinates[1]
-  n = t.counts
+  # number of labels
+  L = Base.size(t.ordinates, 1)
 
-  # discard empty bins
-  x = x[n .> 0]
-  y = y[n .> 0]
-  n = n[n .> 0]
+  # retrieve labels
+  l = isnothing(levels) ? (1:L) : levels
 
-  # visualize frequencies as bars
-  if showhist
-    f = n * (maximum(y) / maximum(n)) / 10
-    Makie.barplot!(plot, x, f, color=histcolor, alpha=0.3, gap=0.0)
+  fig = Makie.Figure()
+  for i in 1:L, j in 1:L
+    lᵢ, lⱼ = l[i], l[j]
+    ax = Makie.Axis(fig[i, j])
+
+    # retrieve coordinates and counts
+    x = t.abscissas
+    y = t.ordinates[i, j]
+    n = t.counts
+
+    # discard empty bins
+    x = x[n .> 0]
+    y = y[n .> 0]
+    n = n[n .> 0]
+
+    # visualize frequencies as bars
+    if showhist
+      f = n * (maximum(y) / maximum(n)) / 10
+      Makie.barplot!(ax, x, f, color=histcolor, alpha=0.3, gap=0.0)
+    end
+
+    # visualize transiogram
+    Makie.scatterlines!(ax, x, y, color=color, markersize=pointsize, linewidth=size, label="$lᵢ → $lⱼ")
+
+    # visualize text counts
+    if showtext
+      text = string.(n)
+      Makie.text!(ax, x, y, text=text, fontsize=textsize)
+    end
+
+    Makie.axislegend(position=i == j ? :rt : :rb)
   end
-
-  # visualize variogram
-  Makie.scatterlines!(plot, x, y, color=color, markersize=pointsize, linewidth=size)
-
-  # visualize text counts
-  if showtext
-    text = string.(n)
-    Makie.text!(plot, x, y, text=text, fontsize=textsize)
-  end
+  fig
 end
 
 # ------------
