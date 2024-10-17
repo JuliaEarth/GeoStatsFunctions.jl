@@ -16,6 +16,6 @@ struct CarleEstimator <: Estimator end
 
 formula(::CarleEstimator, z₁ᵢ, z₁ⱼ, z₂ᵢ, z₂ⱼ) = SVector{2,Int}(z₁ᵢ * z₂ⱼ, z₁ᵢ)
 
-normsum(::CarleEstimator, Σy, n) = (Σy[1] / Σy[2]) / n
+normsum(::CarleEstimator, Σy, n) = Σy[1] / Σy[2]
 
 combine(::CarleEstimator, yα, nα, yβ, nβ) = (yα * nα + yβ * nβ) / (nα + nβ)
