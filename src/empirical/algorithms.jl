@@ -29,10 +29,15 @@ function accumulate(data, (var₁, var₂), estimator::Estimator, algo::AccumAlg
   𝒯 = values(data)
   𝒫 = domain(data)
 
-  # vectors for variables
+  # table columns
   cols = Tables.columns(𝒯)
-  z₁ = Tables.getcolumn(cols, Symbol(var₁))
-  z₂ = Tables.getcolumn(cols, Symbol(var₂))
+
+  # get column from variable name
+  get(var) = Tables.getcolumn(cols, Symbol(var))
+
+  # vectors for variables
+  z₁ = get(var₁)
+  z₂ = get(var₂)
 
   # neighbors function
   neighbors = neighfun(algo, 𝒫)
@@ -43,27 +48,23 @@ function accumulate(data, (var₁, var₂), estimator::Estimator, algo::AccumAlg
   # early exit condition
   exit = exitfun(algo)
 
-  # accumulation type
-  V = returntype(estimator, z₁, z₂)
-
-  # lag sums and counts
+  # lag counts and abscissa sums
   ℒ = Meshes.lentype(𝒫)
   ns = zeros(Int, nlags)
   Σx = zeros(ℒ, nlags)
+
+  # ordinate sums
+  V = returntype(estimator, z₁, z₂)
   Σy = zeros(V, nlags)
 
-  # loop over points inside ball
+  # loop over pairs of points
   @inbounds for j in 1:nelements(𝒫)
     pⱼ = 𝒫[j]
-    z₁ⱼ = z₁[j]
-    z₂ⱼ = z₂[j]
     for i in neighbors(j)
       # skip to avoid double counting
       skip(i, j) && continue
 
       pᵢ = 𝒫[i]
-      z₁ᵢ = z₁[i]
-      z₂ᵢ = z₂[i]
 
       # evaluate geospatial lag
       h = evaluate(distance, pᵢ, pⱼ)
@@ -71,17 +72,21 @@ function accumulate(data, (var₁, var₂), estimator::Estimator, algo::AccumAlg
       # early exit if out of range
       exit(h) && continue
 
-      # evaluate (cross-)variance
-      v = formula(estimator, z₁ᵢ, z₁ⱼ, z₂ᵢ, z₂ⱼ)
-
       # bin (or lag) where to accumulate result
       lag = ceil(Int, h / δh)
       lag == 0 && @warn "duplicate coordinates found, consider using `UniqueCoords`"
 
-      if 0 < lag ≤ nlags && !ismissing(v)
-        ns[lag] += 1
-        Σx[lag] += h
-        Σy[lag] += v
+      # accumulate if lag is valid
+      if 0 < lag ≤ nlags
+        # evaluate function estimator
+        v = formula(estimator, z₁[i], z₁[j], z₂[i], z₂[j])
+
+        # accumulate if value is valid
+        if !ismissing(v)
+          ns[lag] += 1
+          Σx[lag] += h
+          Σy[lag] += v
+        end
       end
     end
   end
@@ -92,11 +97,11 @@ function accumulate(data, (var₁, var₂), estimator::Estimator, algo::AccumAlg
   # bin (or lag) size
   lags = range(δh / 2, stop=maxlag - δh / 2, length=nlags)
 
-  # variogram abscissa
+  # abscissa
   xs = @. Σx / ns
   xs[ns .== 0] .= lags[ns .== 0]
 
-  # variogram ordinate
+  # ordinate
   ys = @. ordfun(Σy, ns)
   ys[ns .== 0] .= zero(eltype(ys))
 
