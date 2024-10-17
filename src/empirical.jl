@@ -17,3 +17,4 @@ include("empirical/estimalgo.jl")
 
 include("empirical/variogram.jl")
 include("empirical/varioplane.jl")
+include("empirical/transiogram.jl")

@@ -15,6 +15,7 @@ using InteractiveUtils: subtypes
 using NearestNeighbors: MinkowskiMetric
 using OhMyThreads: tmapreduce
 using DataScienceTraits
+using TableTransforms
 using CategoricalArrays
 using StaticArrays
 using LinearAlgebra
@@ -49,15 +50,16 @@ include("plotting.jl")
 include("precompile.jl")
 
 export
-  # empirical variograms
+  # empirical functions
   EmpiricalVariogram,
   EmpiricalVarioplane,
   DirectionalVariogram,
   PlanarVariogram,
+  EmpiricalTransiogram,
   distance,
   estimator,
 
-  # theoretical function
+  # theoretical functions
   GeoStatsFunction,
   isisotropic,
   metricball,
