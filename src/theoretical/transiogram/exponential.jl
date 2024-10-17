@@ -58,8 +58,6 @@ ExponentialTransiogram(lens::AbstractVector, props::AbstractVector; levels=1:len
 
 ranges(t::Transiogram) = 1 ./ -diag(t.rate)
 
-levels(t::ExponentialTransiogram) = t.levs
-
 (t::ExponentialTransiogram)(h) = exp(h * t.rate)
 
 # -----------------

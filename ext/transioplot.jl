@@ -55,11 +55,12 @@ function transioplot(
   # common transiogram options
   color=:slategray,
   size=1.5,
-  maxlag=nothing
+  maxlag=nothing,
+  levels=nothing
 )
   # effective ranges and labels
   r = GeoStatsFunctions.ranges(t)
-  l = GeoStatsFunctions.levels(t)
+  l = isnothing(levels) ? (1:length(r)) : levels
 
   # number of labels
   L = length(l)

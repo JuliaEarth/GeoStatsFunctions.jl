@@ -27,7 +27,6 @@ using Printf
 
 import Base: merge, +, *
 import Meshes: isisotropic
-import CategoricalArrays: levels
 
 # temporary fix for ⋅ with missing values
 # https://github.com/JuliaLang/julia/issues/40743
@@ -37,10 +36,10 @@ import LinearAlgebra: ⋅
 # utilities
 include("utils.jl")
 
-# empirical estimates
+# empirical functions
 include("empirical.jl")
 
-# theoretical models
+# theoretical functions
 include("theoretical.jl")
 
 # misc operations
@@ -52,12 +51,12 @@ include("precompile.jl")
 export
   # empirical functions
   EmpiricalVariogram,
-  EmpiricalVarioplane,
+  EmpiricalTransiogram,
+
+  # convenience functions
   DirectionalVariogram,
   PlanarVariogram,
-  EmpiricalTransiogram,
-  distance,
-  estimator,
+  EmpiricalVarioplane,
 
   # theoretical functions
   GeoStatsFunction,

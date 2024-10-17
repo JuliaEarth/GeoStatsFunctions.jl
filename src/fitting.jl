@@ -119,7 +119,7 @@ function fit_impl(
   maxnugget=nothing
 )
   # custom ball of given radius
-  ball(r) = MetricBall(r, distance(g))
+  ball(r) = MetricBall(r, g.distance)
 
   # coordinates of empirical variogram
   x = g.abscissas

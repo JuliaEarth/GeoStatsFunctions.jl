@@ -41,7 +41,7 @@
     rng = StableRNG(123)
     sdata = georef((z=rand(rng, 2),), [Point(LatLon(0.0, 0.0)), Point(LatLon(0.0, 90.0))])
     g = EmpiricalVariogram(sdata, :z, distance=Haversine(6371.0), algorithm=:full)
-    @test distance(g) == Haversine(6371.0)
+    @test g.distance == Haversine(6371.0)
 
     # print methods
     rng = StableRNG(123)
