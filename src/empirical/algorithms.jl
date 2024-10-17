@@ -88,7 +88,7 @@ function accumulate(data, pairs::AbstractArray, estimator::Estimator, algo::Accu
           v = formula(estimator, z₁[i], z₁[j], z₂[i], z₂[j])
 
           # accumulate if value is valid
-          if !ismissing(v)
+          if all(!ismissing, v)
             ns[lag] += 1
             Σx[lag] += h
             Σy[lag] += v
