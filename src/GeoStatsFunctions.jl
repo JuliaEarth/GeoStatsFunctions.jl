@@ -97,7 +97,6 @@ export
   ExponentialTransiogram,
 
   # fitting algorithms
-  VariogramFitAlgo,
   WeightedLeastSquares,
 
   # plotting
