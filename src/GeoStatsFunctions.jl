@@ -55,7 +55,9 @@ export
 
   # convenience functions
   DirectionalVariogram,
+  DirectionalTransiogram,
   PlanarVariogram,
+  PlanarTransiogram,
   EmpiricalVarioplane,
 
   # theoretical functions

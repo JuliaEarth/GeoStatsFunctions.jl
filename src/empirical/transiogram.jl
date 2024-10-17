@@ -76,48 +76,48 @@ function EmpiricalTransiogram(
 end
 
 """
-    EmpiricalTransiogram(partition, var₁, var₂=var₁; [parameters])
+    EmpiricalTransiogram(partition, var; [parameters])
 
-Compute the empirical (cross-)variogram of the geospatial `partition` for
-variables `var₁` and `var₂` as described in Hoffimann & Zadrozny 2019.
+Compute the empirical transiogram of the geospatial `partition` for
+the categorical variable `var`.
 
 Optionally, forward `parameters` for the underlying [`EmpiricalTransiogram`](@ref).
 """
-function EmpiricalTransiogram(partition::Partition, var₁, var₂=var₁; kwargs...)
+function EmpiricalTransiogram(partition::Partition, var; kwargs...)
   # retain geospatial data with at least two elements
   filtered = Iterators.filter(d -> nelements(domain(d)) > 1, partition)
   @assert !isempty(filtered) "invalid partition of geospatial data"
-  γ(d) = EmpiricalTransiogram(d, var₁, var₂; kwargs...)
+  γ(d) = EmpiricalTransiogram(d, var; kwargs...)
   tmapreduce(γ, merge, collect(filtered))
 end
 
 """
-    DirectionalTransiogram(direction, data, var₁, var₂=var₁; dtol=1e-6u"m", [parameters])
+    DirectionalTransiogram(direction, data, var; dtol=1e-6u"m", [parameters])
 
-Computes the empirical (cross-)variogram for the variables `var₁` and `var₂` stored in
+Computes the empirical transiogram for the categorical variable `var` stored in
 geospatial `data` along a given `direction` with band tolerance `dtol` in length units.
 
 Optionally, forward `parameters` for the underlying [`EmpiricalTransiogram`](@ref).
 """
-function DirectionalTransiogram(dir, data::AbstractGeoTable, var₁, var₂=var₁; dtol=1e-6u"m", kwargs...)
+function DirectionalTransiogram(dir, data::AbstractGeoTable, var; dtol=1e-6u"m", kwargs...)
   rng = MersenneTwister(123)
   Π = partition(rng, data, DirectionPartition(dir; tol=dtol))
-  EmpiricalTransiogram(Π, var₁, var₂; kwargs...)
+  EmpiricalTransiogram(Π, var; kwargs...)
 end
 
 """
-    PlanarTransiogram(normal, data, var₁, var₂=var₁; ntol=1e-6u"m", [parameters])
+    PlanarTransiogram(normal, data, var; ntol=1e-6u"m", [parameters])
 
-Computes the empirical (cross-)variogram for the variables `var₁` and `var₂` stored in
+Computes the empirical transiogram for the categorical variable `var` stored in
 geospatial `data` along a plane perpendicular to a `normal` direction with plane
 tolerance `ntol` in length units.
 
 Optionally, forward `parameters` for the underlying [`EmpiricalTransiogram`](@ref).
 """
-function PlanarTransiogram(normal, data::AbstractGeoTable, var₁, var₂=var₁; ntol=1e-6u"m", kwargs...)
+function PlanarTransiogram(normal, data::AbstractGeoTable, var; ntol=1e-6u"m", kwargs...)
   rng = MersenneTwister(123)
   Π = partition(rng, data, PlanePartition(normal; tol=ntol))
-  EmpiricalTransiogram(Π, var₁, var₂; kwargs...)
+  EmpiricalTransiogram(Π, var; kwargs...)
 end
 
 """
