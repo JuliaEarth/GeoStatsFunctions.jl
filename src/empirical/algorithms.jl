@@ -3,12 +3,12 @@
 # ------------------------------------------------------------------
 
 """
-    AccumAlgorithm
+    AccumAlgo
 
 Algorithm used for accumulating values in
 the estimation of geostatistical functions.
 """
-abstract type AccumAlgorithm end
+abstract type AccumAlgo end
 
 """
     accumulate(data, pairs, estimator, algo)
@@ -16,7 +16,7 @@ abstract type AccumAlgorithm end
 Accumulate values for `pairs` of variables stored
 in `data` with `estimator` and accumulation `algo`.
 """
-function accumulate(data, (var₁, var₂), estimator::Estimator, algo::AccumAlgorithm)
+function accumulate(data, (var₁, var₂), estimator::Estimator, algo::AccumAlgo)
   # retrieve algorithm parameters
   nlags = algo.nlags
   maxlag = algo.maxlag
@@ -108,7 +108,7 @@ function accumulate(data, (var₁, var₂), estimator::Estimator, algo::AccumAlg
   ns, xs, ys
 end
 
-function accumulate(data, pairs, estimator::CarleEstimator, algo::AccumAlgorithm)
+function accumulate(data, pairs, estimator::CarleEstimator, algo::AccumAlgo)
   # retrieve algorithm parameters
   nlags = algo.nlags
   maxlag = algo.maxlag
