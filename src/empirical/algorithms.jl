@@ -16,7 +16,7 @@ abstract type AccumAlgorithm end
 Accumulate values for `pairs` of variables stored
 in `data` with `estimator` and accumulation `algo`.
 """
-function accumulate(data, pairs::AbstractVector, estimator::Estimator, algo::AccumAlgorithm)
+function accumulate(data, pairs::AbstractArray, estimator::Estimator, algo::AccumAlgorithm)
   # retrieve algorithm parameters
   nlags = algo.nlags
   maxlag = algo.maxlag

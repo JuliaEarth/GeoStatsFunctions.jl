@@ -39,7 +39,7 @@ See also: [`DirectionalTransiogram`](@ref), [`PlanarTransiogram`](@ref).
 struct EmpiricalTransiogram{ℒ<:Len,V,D}
   counts::Vector{Int}
   abscissa::Vector{ℒ}
-  ordinate::Vector{Vector{V}}
+  ordinate::Matrix{Vector{V}}
   distance::D
 end
 
@@ -47,7 +47,7 @@ function EmpiricalTransiogram(
   data::AbstractGeoTable,
   var;
   nlags=20,
-  maxlag=_defaultmaxlag(data),
+  maxlag=defaultmaxlag(data),
   distance=Euclidean(),
   algorithm=:ball
 )
@@ -63,7 +63,7 @@ function EmpiricalTransiogram(
 
   # pairs of indicator variables
   ivars = ℐ |> values |> Tables.columns |> Tables.columnnames
-  pairs = Iterators.product(ivars, ivars) |> collect |> vec
+  pairs = Iterators.product(ivars, ivars) |> collect
 
   # retrieve estimator and algorithm
   estim, algo = estimalgo(𝒟, nlags, maxlag, distance, :carle, algorithm)
