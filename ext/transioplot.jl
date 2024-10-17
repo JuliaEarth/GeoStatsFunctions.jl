@@ -2,6 +2,54 @@
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
 
+# ----------
+# EMPIRICAL
+# ----------
+
+function transioplot(
+  t::EmpiricalTransiogram;
+  # common transiogram options
+  color=:slategray,
+  size=1.5,
+  maxlag=nothing,
+
+  # empirical transiogram options
+  pointsize=12,
+  showtext=true,
+  textsize=12,
+  showhist=true,
+  histcolor=:slategray
+)
+  # retrieve coordinates and counts
+  x = t.abscissas
+  y = t.ordinates[1]
+  n = t.counts
+
+  # discard empty bins
+  x = x[n .> 0]
+  y = y[n .> 0]
+  n = n[n .> 0]
+
+  # visualize frequencies as bars
+  if showhist
+    f = n * (maximum(y) / maximum(n)) / 10
+    Makie.barplot!(plot, x, f, color=histcolor, alpha=0.3, gap=0.0)
+  end
+
+  # visualize variogram
+  Makie.scatterlines!(plot, x, y, color=color, markersize=pointsize, linewidth=size)
+
+  # visualize text counts
+  if showtext
+    text = string.(n)
+    Makie.text!(plot, x, y, text=text, fontsize=textsize)
+  end
+end
+
+# ------------
+# THEORETICAL
+# ------------
+
 function transioplot(
   t::Transiogram;
   # common transiogram options

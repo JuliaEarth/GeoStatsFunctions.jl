@@ -118,11 +118,13 @@ function fit_impl(
   maxsill=nothing,
   maxnugget=nothing
 )
-  # values of empirical variogram
-  x, y, n = values(g)
-
   # custom ball of given radius
   ball(r) = MetricBall(r, distance(g))
+
+  # coordinates of empirical variogram
+  x = g.abscissas
+  y = g.ordinates
+  n = g.counts
 
   # discard invalid bins
   x = x[n .> 0]

@@ -35,10 +35,9 @@ function Makie.plot!(plot::VarioPlot{<:Tuple{EmpiricalVariogram}})
   γ = plot[:γ]
 
   # get the data
-  xyn = Makie.@lift values($γ)
-  x = Makie.@lift $xyn[1]
-  y = Makie.@lift $xyn[2]
-  n = Makie.@lift $xyn[3]
+  x = Makie.@lift $γ.abscissas
+  y = Makie.@lift $γ.ordinates
+  n = Makie.@lift $γ.counts
 
   # discard empty bins
   x = Makie.@lift $x[$n .> 0]
@@ -78,14 +77,14 @@ function Makie.plot!(plot::VarioPlot{<:Tuple{EmpiricalVarioplane}})
   θs = Makie.@lift $v.θs
 
   # polar radius
-  rs = Makie.@lift ustrip.(values($γs[1])[1])
+  rs = Makie.@lift ustrip.($γs[1].abscissas)
 
-  # variogram values for all variograms
+  # variogram ordinates for all variograms
   Z = Makie.@lift let
     zs = map($γs) do γ
-      zs = ustrip.(values(γ)[2])
+      zs = ustrip.(γ.ordinates)
 
-      # handle NaN values (i.e. empty bins)
+      # handle NaN ordinates (i.e. empty bins)
       isnan(zs[1]) && (zs[1] = 0)
       for i in 2:length(zs)
         isnan(zs[i]) && (zs[i] = zs[i - 1])

@@ -46,10 +46,10 @@ See also: [`DirectionalVariogram`](@ref), [`PlanarVariogram`](@ref),
 * Hoffimann, J and Zadrozny, B. 2019. [Efficient variography with partition variograms]
   (https://www.sciencedirect.com/science/article/pii/S0098300419302936)
 """
-struct EmpiricalVariogram{ℒ<:Len,V,D,E}
+struct EmpiricalVariogram{ℒ<:Len,V,D,E} <: EmpiricalFunction
   counts::Vector{Int}
-  abscissa::Vector{ℒ}
-  ordinate::Vector{V}
+  abscissas::Vector{ℒ}
+  ordinates::Vector{V}
   distance::D
   estimator::E
 end
@@ -75,9 +75,9 @@ function EmpiricalVariogram(
   estim, algo = estimalgo(𝒟, nlags, maxlag, distance, estimator, algorithm)
 
   # accumulate data with chosen algorithm
-  counts, abscissa, ordinate = accumulate(𝒮, (var₁, var₂), estim, algo)
+  counts, abscissas, ordinates = accumulate(𝒮, (var₁, var₂), estim, algo)
 
-  EmpiricalVariogram(counts, abscissa, ordinate, distance, estim)
+  EmpiricalVariogram(counts, abscissas, ordinates, distance, estim)
 end
 
 """
@@ -131,28 +131,6 @@ function PlanarVariogram(normal, data::AbstractGeoTable, var₁, var₂=var₁; 
 end
 
 """
-    values(γ)
-
-Returns the abscissa, the ordinate, and the bin counts
-of the empirical variogram `γ`.
-"""
-Base.values(γ::EmpiricalVariogram) = γ.abscissa, γ.ordinate, γ.counts
-
-"""
-    distance(γ)
-
-Return the distance used to compute the empirical variogram `γ`.
-"""
-distance(γ::EmpiricalVariogram) = γ.distance
-
-"""
-    estimator(γ)
-
-Return the estimator used to compute the empirical variogram `γ`.
-"""
-estimator(γ::EmpiricalVariogram) = γ.estimator
-
-"""
     merge(γα, γβ)
 
 Merge the empirical variogram `γα` with the empirical variogram `γβ`
@@ -162,10 +140,10 @@ and estimator.
 function merge(γα::EmpiricalVariogram{V,D,E}, γβ::EmpiricalVariogram{V,D,E}) where {V,D,E}
   nα = γα.counts
   nβ = γβ.counts
-  xα = γα.abscissa
-  xβ = γβ.abscissa
-  yα = γα.ordinate
-  yβ = γβ.ordinate
+  xα = γα.abscissas
+  xβ = γβ.abscissas
+  yα = γα.ordinates
+  yβ = γβ.ordinates
 
   # copy distance and estimator
   d = γα.distance
@@ -193,10 +171,10 @@ end
 function Base.show(io::IO, γ::EmpiricalVariogram)
   ioctx = IOContext(io, :compact => true)
   print(ioctx, "EmpiricalVariogram(")
-  print(ioctx, "abscissa: ")
-  _printvec(ioctx, γ.abscissa, 1)
-  print(ioctx, ", ordinate: ")
-  _printvec(ioctx, γ.ordinate, 1)
+  print(ioctx, "abscissas: ")
+  _printvec(ioctx, γ.abscissas, 1)
+  print(ioctx, ", ordinates: ")
+  _printvec(ioctx, γ.ordinates, 1)
   print(ioctx, ", distance: ", γ.distance)
   print(ioctx, ", estimator: ", γ.estimator)
   print(ioctx, ", npairs: ", sum(γ.counts))
@@ -206,10 +184,10 @@ end
 function Base.show(io::IO, ::MIME"text/plain", γ::EmpiricalVariogram)
   ioctx = IOContext(io, :compact => true, :limit => true)
   println(ioctx, "EmpiricalVariogram")
-  print(ioctx, "├─ abscissa: ")
-  _printlnvec(ioctx, γ.abscissa, 3)
-  print(ioctx, "├─ ordinate: ")
-  _printlnvec(ioctx, γ.ordinate, 3)
+  print(ioctx, "├─ abscissas: ")
+  _printlnvec(ioctx, γ.abscissas, 3)
+  print(ioctx, "├─ ordinates: ")
+  _printlnvec(ioctx, γ.ordinates, 3)
   println(ioctx, "├─ distance: ", γ.distance)
   println(ioctx, "├─ estimator: ", γ.estimator)
   print(ioctx, "└─ npairs: ", sum(γ.counts))

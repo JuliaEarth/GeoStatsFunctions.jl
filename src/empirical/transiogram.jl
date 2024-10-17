@@ -36,11 +36,12 @@ See also: [`DirectionalTransiogram`](@ref), [`PlanarTransiogram`](@ref).
 * Carle et al 1998. [Conditional Simulation of Hydrofacies Architecture:
   A Transition Probability/Markov Approach](https://doi.org/10.2110/sepmcheg.01.147)
 """
-struct EmpiricalTransiogram{ℒ<:Len,V,D}
+struct EmpiricalTransiogram{ℒ<:Len,V,D,E} <: EmpiricalFunction
   counts::Vector{Int}
-  abscissa::Vector{ℒ}
-  ordinate::Matrix{Vector{V}}
+  abscissas::Vector{ℒ}
+  ordinates::Matrix{Vector{V}}
   distance::D
+  estimator::E
 end
 
 function EmpiricalTransiogram(
@@ -69,7 +70,7 @@ function EmpiricalTransiogram(
   estim, algo = estimalgo(𝒟, nlags, maxlag, distance, :carle, algorithm)
 
   # accumulate data with chosen algorithm
-  counts, abscissa, ordinate = accumulate(ℐ, pairs, estim, algo)
+  counts, abscissas, ordinates = accumulate(ℐ, pairs, estim, algo)
 
-  EmpiricalTransiogram(counts, abscissa, ordinate, distance)
+  EmpiricalTransiogram(counts, abscissas, ordinates, distance, estim)
 end
