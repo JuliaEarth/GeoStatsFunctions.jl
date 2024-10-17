@@ -13,3 +13,4 @@ returntype(estim::Estimator, z₁, z₂) = typeof(formula(estim, z₁[1], z₁[2
 
 include("estimators/matheron.jl")
 include("estimators/cressie.jl")
+include("estimators/carle.jl")
