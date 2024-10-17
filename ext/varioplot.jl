@@ -35,10 +35,9 @@ function Makie.plot!(plot::VarioPlot{<:Tuple{EmpiricalVariogram}})
   γ = plot[:γ]
 
   # get the data
-  xyn = Makie.@lift values($γ)
-  x = Makie.@lift $xyn[1]
-  y = Makie.@lift $xyn[2]
-  n = Makie.@lift $xyn[3]
+  x = Makie.@lift $γ.abscissas
+  y = Makie.@lift $γ.ordinates
+  n = Makie.@lift $γ.counts
 
   # discard empty bins
   x = Makie.@lift $x[$n .> 0]
@@ -78,43 +77,44 @@ function Makie.plot!(plot::VarioPlot{<:Tuple{EmpiricalVarioplane}})
   θs = Makie.@lift $v.θs
 
   # polar radius
-  rs = Makie.@lift ustrip.(values($γs[1])[1])
+  rs = Makie.@lift ustrip.($γs[1].abscissas)
 
-  # variogram values for all variograms
-  Z = Makie.@lift let
-    zs = map($γs) do γ
-      zs = ustrip.(values(γ)[2])
+  # variogram ordinates for all variograms
+  H = Makie.@lift let
+    hs = map($γs) do γ
+      # retrieve ordinates without units
+      ys = ustrip.(γ.ordinates)
 
-      # handle NaN values (i.e. empty bins)
-      isnan(zs[1]) && (zs[1] = 0)
-      for i in 2:length(zs)
-        isnan(zs[i]) && (zs[i] = zs[i - 1])
+      # handle NaN ordinates (i.e. empty bins)
+      isnan(ys[1]) && (ys[1] = 0)
+      for i in 2:length(ys)
+        isnan(ys[i]) && (ys[i] = ys[i - 1])
       end
 
-      zs
+      ys
     end
-    reduce(hcat, zs)
+    reduce(hcat, hs)
   end
 
   # exploit symmetry
   θs = Makie.@lift range(0, 2π, length=2 * length($θs))
-  Z = Makie.@lift [$Z $Z]
+  H = Makie.@lift [$H $H]
 
   # hide hole at center
   rs = Makie.@lift [0; $rs]
-  Z = Makie.@lift [$Z[1:1, :]; $Z]
+  H = Makie.@lift [$H[1:1, :]; $H]
 
   # transpose for plotting
-  Z = Makie.@lift transpose($Z)
+  H = Makie.@lift transpose($H)
 
-  Makie.surface!(plot, θs, rs, Z, colormap=plot[:colormap], shading=Makie.NoShading)
+  Makie.surface!(plot, θs, rs, H, colormap=plot[:colormap], shading=Makie.NoShading)
 
   # show model range
   if showrange[]
     ls = Makie.@lift [ustrip(range(GeoStatsFunctions.fit($rangemodel, γ))) for γ in $γs]
     ls = Makie.@lift [$ls; $ls]
-    zs = Makie.@lift fill(maximum($Z) + 1, length($ls))
-    Makie.lines!(plot, θs, ls, zs, color=plot[:rangecolor])
+    hs = Makie.@lift fill(maximum($H) + 1, length($ls))
+    Makie.lines!(plot, θs, ls, hs, color=plot[:rangecolor])
   end
 end
 

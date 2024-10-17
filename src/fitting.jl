@@ -6,11 +6,11 @@
 fittable() = filter(isstationary, setdiff(subtypes(Variogram), (NuggetEffect, NestedVariogram)))
 
 """
-    VariogramFitAlgo
+    FitAlgo
 
 An algorithm for fitting theoretical variograms.
 """
-abstract type VariogramFitAlgo end
+abstract type FitAlgo end
 
 """
     WeightedLeastSquares()
@@ -20,7 +20,7 @@ Fit theoretical variogram using weighted least squares with weighting
 function `w` (e.g. h -> 1/h). If no weighting function is provided,
 bin counts of empirical variogram are normalized and used as weights.
 """
-struct WeightedLeastSquares <: VariogramFitAlgo
+struct WeightedLeastSquares <: FitAlgo
   weightfun::Union{Function,Nothing}
 end
 
@@ -45,7 +45,7 @@ julia> fit(ExponentialVariogram, g, maxsill=1.0)
 julia> fit(GaussianVariogram, g, WeightedLeastSquares())
 ```
 """
-fit(V::Type{<:Variogram}, g::EmpiricalVariogram, algo::VariogramFitAlgo=WeightedLeastSquares(); kwargs...) =
+fit(V::Type{<:Variogram}, g::EmpiricalVariogram, algo::FitAlgo=WeightedLeastSquares(); kwargs...) =
   fit_impl(V, g, algo; kwargs...) |> first
 
 """
@@ -60,7 +60,7 @@ using algorithm `algo` and return the one with minimum error.
 julia> fit([SphericalVariogram, ExponentialVariogram], g)
 ```
 """
-function fit(Vs, g::EmpiricalVariogram, algo::VariogramFitAlgo=WeightedLeastSquares(); kwargs...)
+function fit(Vs, g::EmpiricalVariogram, algo::FitAlgo=WeightedLeastSquares(); kwargs...)
   # fit each variogram type
   res = [fit_impl(V, g, algo; kwargs...) for V in Vs]
   γs, ϵs = first.(res), last.(res)
@@ -84,7 +84,7 @@ julia> fit(Variogram, g, WeightedLeastSquares())
 
 See also `GeoStatsFunctions.fittable()`.
 """
-fit(::Type{Variogram}, g::EmpiricalVariogram, algo::VariogramFitAlgo=WeightedLeastSquares(); kwargs...) =
+fit(::Type{Variogram}, g::EmpiricalVariogram, algo::FitAlgo=WeightedLeastSquares(); kwargs...) =
   fit(fittable(), g, algo; kwargs...)
 
 """
@@ -118,11 +118,13 @@ function fit_impl(
   maxsill=nothing,
   maxnugget=nothing
 )
-  # values of empirical variogram
-  x, y, n = values(g)
-
   # custom ball of given radius
-  ball(r) = MetricBall(r, distance(g))
+  ball(r) = MetricBall(r, g.distance)
+
+  # coordinates of empirical variogram
+  x = g.abscissas
+  y = g.ordinates
+  n = g.counts
 
   # discard invalid bins
   x = x[n .> 0]

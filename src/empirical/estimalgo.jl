@@ -12,7 +12,6 @@ function estimalgo(dom, nlags, maxlag, distance, estimator, algorithm)
   @assert nelements(dom) > 1 "variogram requires at least 2 elements"
   @assert nlags > 0 "number of lags must be positive"
   @assert maxlag > zero(maxlag) "maximum lag must be positive"
-  @assert estimator ∈ (:matheron, :cressie) "invalid empirical estimator"
   @assert algorithm ∈ (:full, :ball) "invalid accumulation algorithm"
 
   # choose empirical estimator
@@ -20,6 +19,8 @@ function estimalgo(dom, nlags, maxlag, distance, estimator, algorithm)
     MatheronEstimator()
   elseif estimator == :cressie
     CressieEstimator()
+  elseif estimator == :carle
+    CarleEstimator()
   else
     throw(ArgumentError("invalid estimator"))
   end

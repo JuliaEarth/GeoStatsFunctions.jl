@@ -15,6 +15,7 @@ using InteractiveUtils: subtypes
 using NearestNeighbors: MinkowskiMetric
 using OhMyThreads: tmapreduce
 using DataScienceTraits
+using TableTransforms
 using CategoricalArrays
 using StaticArrays
 using LinearAlgebra
@@ -26,7 +27,6 @@ using Printf
 
 import Base: merge, +, *
 import Meshes: isisotropic
-import CategoricalArrays: levels
 
 # temporary fix for ⋅ with missing values
 # https://github.com/JuliaLang/julia/issues/40743
@@ -36,10 +36,10 @@ import LinearAlgebra: ⋅
 # utilities
 include("utils.jl")
 
-# empirical estimates
+# empirical functions
 include("empirical.jl")
 
-# theoretical models
+# theoretical functions
 include("theoretical.jl")
 
 # misc operations
@@ -49,15 +49,16 @@ include("plotting.jl")
 include("precompile.jl")
 
 export
-  # empirical variograms
+  # empirical functions
   EmpiricalVariogram,
-  EmpiricalVarioplane,
+  EmpiricalTransiogram,
+
+  # convenience functions
   DirectionalVariogram,
   PlanarVariogram,
-  distance,
-  estimator,
+  EmpiricalVarioplane,
 
-  # theoretical function
+  # theoretical functions
   GeoStatsFunction,
   isisotropic,
   metricball,
@@ -96,7 +97,6 @@ export
   ExponentialTransiogram,
 
   # fitting algorithms
-  VariogramFitAlgo,
   WeightedLeastSquares,
 
   # plotting

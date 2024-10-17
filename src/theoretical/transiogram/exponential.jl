@@ -3,15 +3,14 @@
 # ------------------------------------------------------------------
 
 """
-    ExponentialTransiogram(rate; levels=l)
-    ExponentialTransiogram(ball, rate; levels=l)
+    ExponentialTransiogram(rate)
+    ExponentialTransiogram(ball, rate)
 
 An exponential transiogram with transition `rate` matrix.
-Optionally, specify a metric `ball` to model anisotropy,
-and the `levels` or categories.
+Optionally, specify a metric `ball` to model anisotropy.
 
-    ExponentialTransiogram(lengths, proportions; levels=l)
-    ExponentialTransiogram(ball, lengths, proportions; levels=l)
+    ExponentialTransiogram(lengths, proportions)
+    ExponentialTransiogram(ball, lengths, proportions)
 
 Alternatively, build transition rate matrix from mean `lengths`
 and relative `proportions`.
@@ -24,41 +23,35 @@ and relative `proportions`.
 * Carle et al 1998. [Conditional Simulation of Hydrofacies Architecture:
   A Transition Probability/Markov Approach](https://doi.org/10.2110/sepmcheg.01.147)
 """
-struct ExponentialTransiogram{R<:StaticMatrix,L<:AbstractVector,B<:MetricBall} <: Transiogram
+struct ExponentialTransiogram{R<:StaticMatrix,B<:MetricBall} <: Transiogram
   rate::R
-  levs::L
   ball::B
 
-  function ExponentialTransiogram{R,L,B}(rate, levs, ball) where {R<:StaticMatrix,L<:AbstractVector,B<:MetricBall}
+  function ExponentialTransiogram{R,B}(rate, ball) where {R<:StaticMatrix,B<:MetricBall}
     if !allequal(size(rate))
       throw(ArgumentError("transition rate matrix must be square"))
     end
-    if length(levs) != size(rate, 1)
-      throw(ArgumentError("levels do not match size of transition rate matrix"))
-    end
-    new(rate, levs, ball)
+    new(rate, ball)
   end
 end
 
-function ExponentialTransiogram(ball::MetricBall, rate::AbstractMatrix; levels=1:size(rate, 1))
+function ExponentialTransiogram(ball::MetricBall, rate::AbstractMatrix)
   srate = SMatrix{size(rate)...}(rate)
-  ExponentialTransiogram{typeof(srate),typeof(levels),typeof(ball)}(srate, levels, ball)
+  ExponentialTransiogram{typeof(srate),typeof(ball)}(srate, ball)
 end
 
-function ExponentialTransiogram(rate::AbstractMatrix; levels=1:size(rate, 1))
+function ExponentialTransiogram(rate::AbstractMatrix)
   ball = MetricBall(1 / unit(eltype(rate)))
-  ExponentialTransiogram(ball, rate; levels)
+  ExponentialTransiogram(ball, rate)
 end
 
-ExponentialTransiogram(ball::MetricBall, lens::AbstractVector, props::AbstractVector; levels=1:length(lens)) =
-  ExponentialTransiogram(ball, baseratematrix(lens, props); levels)
+ExponentialTransiogram(ball::MetricBall, props::AbstractVector) =
+  ExponentialTransiogram(ball, baseratematrix(lens, props))
 
-ExponentialTransiogram(lens::AbstractVector, props::AbstractVector; levels=1:length(lens)) =
-  ExponentialTransiogram(baseratematrix(lens, props); levels)
+ExponentialTransiogram(lens::AbstractVector, props::AbstractVector) =
+  ExponentialTransiogram(baseratematrix(lens, props))
 
 ranges(t::Transiogram) = 1 ./ -diag(t.rate)
-
-levels(t::ExponentialTransiogram) = t.levs
 
 (t::ExponentialTransiogram)(h) = exp(h * t.rate)
 
