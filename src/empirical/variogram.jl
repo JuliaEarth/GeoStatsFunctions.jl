@@ -137,7 +137,7 @@ Merge the empirical variogram `γα` with the empirical variogram `γβ`
 assuming that both variograms have the same number of lags, distance
 and estimator.
 """
-function merge(γα::EmpiricalVariogram{V,D,E}, γβ::EmpiricalVariogram{V,D,E}) where {V,D,E}
+function merge(γα::EmpiricalVariogram{ℒ,V,D,E}, γβ::EmpiricalVariogram{ℒ,V,D,E}) where {ℒ,V,D,E}
   nα = γα.counts
   nβ = γβ.counts
   xα = γα.abscissas
