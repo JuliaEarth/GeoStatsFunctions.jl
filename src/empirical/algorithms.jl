@@ -179,12 +179,10 @@ function accumulate(data, pairs, estimator::CarleEstimator, algo::AccumAlgo)
           # evaluate function estimator
           v = formula(estimator, z₁[i], z₁[j], z₂[i], z₂[j])
 
-          # accumulate if value is valid
-          if all(!ismissing, v)
-            ns[lag] += 1
-            Σx[lag] += h
-            Σy[lag] += v
-          end
+          # accumulate because value is always valid
+          ns[lag] += 1
+          Σx[lag] += h
+          Σy[lag] += v
         end
       end
     end
