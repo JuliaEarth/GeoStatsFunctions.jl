@@ -90,7 +90,7 @@ function _printvec(io, vec::AbstractArray{<:AbstractArray}, n)
       print(io, "│  ├─ ")
       _printlnvec(io, vec[i], n)
     end
-    println(io, "│  ├─ ...")
+    println(io, "│  ⋮")
     for i in (len - n + 1):(len - 1)
       print(io, "│  ├─ ")
       _printlnvec(io, vec[i], n)
