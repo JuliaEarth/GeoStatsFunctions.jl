@@ -1,4 +1,4 @@
-@testset "Transiogram" begin
+@testset "ExponentialTransiogram" begin
   # base transition rate matrix
   R = GeoStatsFunctions.baseratematrix([1.0, 2.0, 3.0]u"m", [0.2, 0.5, 0.3])
   @test R ==
