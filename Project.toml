@@ -34,7 +34,7 @@ GeoStatsFunctionsMakieExt = "Makie"
 [compat]
 Bessels = "0.2"
 CategoricalArrays = "0.10"
-DataScienceTraits = "0.4"
+DataScienceTraits = "1.0"
 Distances = "0.10"
 GeoTables = "1.21"
 InteractiveUtils = "1.9"

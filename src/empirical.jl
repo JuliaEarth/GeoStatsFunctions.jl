@@ -58,6 +58,10 @@ end
 include("empirical/variogram.jl")
 include("empirical/transiogram.jl")
 
+# ---------------------
+# HIGH-ORDER FUNCTIONS
+# ---------------------
+
 include("empirical/varioplane.jl")
 
 # -----------------
