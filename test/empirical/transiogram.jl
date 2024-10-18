@@ -1,4 +1,13 @@
 @testset "EmpiricalTransiogram" begin
+  # diagonal ordinates are non-increasing
+  csv = CSV.File(joinpath(datadir, "facies5.csv"))
+  gtb = georef(csv, ("X", "Y", "Z"))
+  t = EmpiricalTransiogram(gtb, "FACIES", nlags=20)
+  for i in 1:5
+    ys = t.ordinates[i, i]
+    @test ys[1] > ys[10] > ys[20]
+  end
+
   # print methods
   rng = StableRNG(123)
   d = georef((; z=rand(rng, 1:10, 1000)), rand(rng, Point, 1000))
