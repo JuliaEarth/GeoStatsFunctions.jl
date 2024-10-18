@@ -110,8 +110,7 @@ geospatial `data` along a given `direction` with band tolerance `dtol` in length
 Optionally, forward `parameters` for the underlying [`EmpiricalVariogram`](@ref).
 """
 function DirectionalVariogram(dir, data::AbstractGeoTable, var₁, var₂=var₁; dtol=1e-6u"m", kwargs...)
-  rng = MersenneTwister(123)
-  Π = partition(rng, data, DirectionPartition(dir; tol=dtol))
+  Π = partition(MersenneTwister(123), data, DirectionPartition(dir; tol=dtol))
   EmpiricalVariogram(Π, var₁, var₂; kwargs...)
 end
 
@@ -125,8 +124,7 @@ tolerance `ntol` in length units.
 Optionally, forward `parameters` for the underlying [`EmpiricalVariogram`](@ref).
 """
 function PlanarVariogram(normal, data::AbstractGeoTable, var₁, var₂=var₁; ntol=1e-6u"m", kwargs...)
-  rng = MersenneTwister(123)
-  Π = partition(rng, data, PlanePartition(normal; tol=ntol))
+  Π = partition(MersenneTwister(123), data, PlanePartition(normal; tol=ntol))
   EmpiricalVariogram(Π, var₁, var₂; kwargs...)
 end
 

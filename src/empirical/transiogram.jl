@@ -100,8 +100,7 @@ geospatial `data` along a given `direction` with band tolerance `dtol` in length
 Optionally, forward `parameters` for the underlying [`EmpiricalTransiogram`](@ref).
 """
 function DirectionalTransiogram(dir, data::AbstractGeoTable, var; dtol=1e-6u"m", kwargs...)
-  rng = MersenneTwister(123)
-  Π = partition(rng, data, DirectionPartition(dir; tol=dtol))
+  Π = partition(MersenneTwister(123), data, DirectionPartition(dir; tol=dtol))
   EmpiricalTransiogram(Π, var; kwargs...)
 end
 
@@ -115,8 +114,7 @@ tolerance `ntol` in length units.
 Optionally, forward `parameters` for the underlying [`EmpiricalTransiogram`](@ref).
 """
 function PlanarTransiogram(normal, data::AbstractGeoTable, var; ntol=1e-6u"m", kwargs...)
-  rng = MersenneTwister(123)
-  Π = partition(rng, data, PlanePartition(normal; tol=ntol))
+  Π = partition(MersenneTwister(123), data, PlanePartition(normal; tol=ntol))
   EmpiricalTransiogram(Π, var; kwargs...)
 end
 
