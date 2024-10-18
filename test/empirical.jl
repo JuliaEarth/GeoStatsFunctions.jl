@@ -134,8 +134,7 @@ end
   rng = StableRNG(123)
   d = georef((; z=rand(rng, 1:10, 1000)), rand(rng, Point, 1000))
   t = EmpiricalTransiogram(d, :z)
-  @test sprint(show, t) ==
-        "EmpiricalTransiogram(distance: Euclidean(0.0), estimator: CarleEstimator(), npairs: 176100)"
+  @test sprint(show, t) == "EmpiricalTransiogram(distance: Euclidean(0.0), estimator: CarleEstimator(), npairs: 176100)"
   @test sprint(show, MIME"text/plain"(), t) == """
   EmpiricalTransiogram
   ├─ abscissas: [0.00249657 m, 0.00828093 m, 0.0128198 m, ..., 0.0875733 m, 0.0925317 m, 0.0974132 m]
