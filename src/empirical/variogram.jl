@@ -12,7 +12,7 @@ geospatial `data`.
 ## Parameters
 
   * nlags     - number of lags (default to `20`)
-  * maxlag    - maximum lag in length units (default to 1/10 of minimum side of bounding box)
+  * maxlag    - maximum lag in length units (default to 1/2 of minimum side of bounding box)
   * distance  - custom distance function (default to `Euclidean` distance)
   * estimator - variogram estimator (default to `:matheron` estimator)
   * algorithm - accumulation algorithm (default to `:ball`)

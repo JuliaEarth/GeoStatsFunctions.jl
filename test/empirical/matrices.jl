@@ -1,4 +1,4 @@
-@testset "Matrices" begin
+@testset "Empirical matrices" begin
   # helper function for tests
   function testratematrix(R)
     m, n = size(R)

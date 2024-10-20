@@ -13,7 +13,7 @@ function unitless(a::Quantity, b::Quantity)
   ustrip(u, a), ustrip(u, b)
 end
 
-defaultmaxlag(data) = _minside(boundingbox(domain(data))) / 10
+defaultmaxlag(data) = _minside(boundingbox(domain(data))) / 2
 
 function _minside(box)
   s = _sides(box)

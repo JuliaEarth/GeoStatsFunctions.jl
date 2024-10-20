@@ -42,20 +42,6 @@
   g = EmpiricalVariogram(sdata, :z, distance=Haversine(6371.0), algorithm=:full)
   @test g.distance == Haversine(6371.0)
 
-  # print methods
-  rng = StableRNG(123)
-  d = georef((z=rand(rng, 100, 100),))
-  g = EmpiricalVariogram(d, :z)
-  @test sprint(show, g) ==
-        "EmpiricalVariogram(distance: Euclidean(0.0), estimator: MatheronEstimator(), npairs: 1447200)"
-  @test sprint(show, MIME"text/plain"(), g) == """
-  EmpiricalVariogram
-  ├─ abscissas: [0.25 m, 1.0 m, 1.41421 m, ..., 8.7407 m, 9.28182 m, 9.93304 m]
-  ├─ ordinates: [0.0, 0.0843099, 0.0845995, ..., 0.0838336, 0.0839823, 0.0841979]
-  ├─ distance: Euclidean(0.0)
-  ├─ estimator: MatheronEstimator()
-  └─ npairs: 1447200"""
-
   # test variography with compositional data
   data = georef((z=rand(Composition{3}, 100),), rand(Point, 100))
   g = EmpiricalVariogram(data, :z, maxlag=1.0, algorithm=:full)

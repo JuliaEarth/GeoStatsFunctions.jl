@@ -1,4 +1,4 @@
-@testset "Basic" begin
+@testset "Variogram" begin
   rng = StableRNG(123)
   h = range(0, stop=10, length=50)
   x, y = rand(rng, Point), rand(rng, Point)
@@ -278,7 +278,7 @@
   └─ distance: Euclidean"""
 end
 
-@testset "Nested" begin
+@testset "NestedVariogram" begin
   # nested variogram with nugget effect
   γ = NuggetEffect(0.2) + GaussianVariogram(nugget=0.1, sill=0.8, range=50.0)
   @test nugget(γ) ≈ 0.3
