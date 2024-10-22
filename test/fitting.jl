@@ -76,16 +76,15 @@
   γ = GeoStatsFunctions.fit(Variogram, g, nugget=0.01u"K^2")
   @test isapprox(nugget(γ), 0.01u"K^2", atol=1e-3u"K^2")
 
-  # power variogram 
-  # generating 'own' empirical variogram since there are no available data for power variogram
+  # power variograms
   sₜ = 1.00
   nₜ = 0.20
   eₜ = 1.50
   γₜ = PowerVariogram(sₜ, nₜ ,eₜ)
-  abscissas = collect(0.0:0.1:10.0)u"m"
-  ordinates = γₜ.(abscissas)
-  counts = rand(1000:5000, length(abscissas))
-  g = EmpiricalVariogram(counts, abscissas, ordinates, Euclidean(), :matheron)
+  xs = collect(0.0:0.1:10.0)u"m"
+  ys = γₜ.(xs)
+  ns = rand(1000:5000, length(xs))
+  g = EmpiricalVariogram(ns, xs, ys, Euclidean(), :matheron)
   γ = GeoStatsFunctions.fit(PowerVariogram, g)
   @test isapprox(γ.nugget, nₜ, atol=1e-3)
   @test isapprox(γ.scaling, sₜ, atol=1e-3)
@@ -96,10 +95,10 @@
   nₜ = 1.45
   eₜ = 0.64
   γₜ = PowerVariogram(sₜ, nₜ ,eₜ)
-  abscissas = collect(0.0:10.0:200.0)u"m"
-  ordinates = γₜ.(abscissas)
-  counts = rand(100:1000, length(abscissas))
-  g = EmpiricalVariogram(counts, abscissas, ordinates, Euclidean(), :matheron)
+  xs = collect(0.0:10.0:200.0)u"m"
+  ys = γₜ.(xs)
+  ns = rand(100:1000, length(xs))
+  g = EmpiricalVariogram(ns, xs, ys, Euclidean(), :matheron)
   γ = GeoStatsFunctions.fit(PowerVariogram, g)
   @test isapprox(γ.nugget, nₜ, atol=1e-3)
   @test isapprox(γ.scaling, sₜ, atol=1e-3)
