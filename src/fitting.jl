@@ -238,7 +238,7 @@ function fit_impl(
     sum(i -> w[i] * (γ(x′[i]) - y′[i])^2, eachindex(w, x′, y′))
   end
 
-  # Linear constraints
+  # linear constraints
   # 1. scaling ≥ 0
   # 2. 0 ≤ exponent ≤ 2
   L(θ) = [θ[1] ≥ 0.0 ? 0.0 : -θ[1], θ[3] ≥ 0.0 ? 0.0 : -θ[3], 2.0 ≥ θ[3] ? 0.0 : θ[3] - 2.0]
