@@ -241,10 +241,10 @@ function fit_impl(
   # linear constraints
   # 1. scaling ≥ 0
   # 2. 0 ≤ exponent ≤ 2
-  L(θ) = [θ[1] ≥ 0.0 ? 0.0 : -θ[1], θ[3] ≥ 0.0 ? 0.0 : -θ[3], 2.0 ≥ θ[3] ? 0.0 : θ[3] - 2.0]
+  L(θ) = θ[1] ≥ 0.0 ? 0.0 : -θ[1] + θ[3] ≥ 0.0 ? 0.0 : -θ[3] + 2.0 ≥ θ[3] ? 0.0 : θ[3] - 2.0
 
   # penalty for linear constraint (J + λL)
-  λ = fill(sum(yᵢ -> yᵢ^2, y′), 3)
+  λ = sum(yᵢ -> yᵢ^2, y′)
 
   # maximum scaling, nugget and exponent
   xmax = maximum(x′)
@@ -268,7 +268,7 @@ function fit_impl(
   u = [sᵤ, eᵤ, nᵤ]
 
   # solve optimization problem
-  sol = Optim.optimize(θ -> J(θ) + λ' * L(θ), l, u, θₒ)
+  sol = Optim.optimize(θ -> J(θ) + λ * L(θ), l, u, θₒ)
   ϵ = Optim.minimum(sol)
   θ = Optim.minimizer(sol)
 
