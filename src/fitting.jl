@@ -254,10 +254,10 @@ end
 
 _weights(f, x, n) = isnothing(f) ? n / sum(n) : map(xᵢ -> ustrip(f(xᵢ)), x)
 
-function _optimize(V, x, y, w, L, l, u, θₒ)
+function _optimize(gamma, x, y, w, L, l, u, θₒ)
   # objective function
   function J(θ)
-    γ = V(θ)
+    γ = gamma(θ)
     sum(i -> w[i] * (γ(x[i]) - y[i])^2, eachindex(w, x, y))
   end
 
