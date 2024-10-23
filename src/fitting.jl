@@ -146,20 +146,10 @@ function fit_impl(
   maxnugget′ = isnothing(maxnugget) ? maxnugget : ustrip(uy, maxnugget)
 
   # evaluate weights
-  f = algo.weightfun
-  w = isnothing(f) ? n / sum(n) : map(xᵢ -> ustrip(f(xᵢ)), x)
-
-  # objective function
-  function J(θ)
-    γ = V(ball(θ[1]), sill=θ[2], nugget=θ[3])
-    sum(i -> w[i] * (γ(x′[i]) - y′[i])^2, eachindex(w, x′, y′))
-  end
+  w = fit_weights(algo, x, n)
 
   # linear constraint (sill ≥ nugget)
   L(θ) = θ[2] ≥ θ[3] ? 0.0 : θ[3] - θ[2]
-
-  # penalty for linear constraint (J + λL)
-  λ = sum(yᵢ -> yᵢ^2, y′)
 
   # maximum range, sill and nugget
   xmax = maximum(x′)
@@ -183,9 +173,7 @@ function fit_impl(
   u = [rᵤ, sᵤ, nᵤ]
 
   # solve optimization problem
-  sol = Optim.optimize(θ -> J(θ) + λ * L(θ), l, u, θₒ)
-  ϵ = Optim.minimum(sol)
-  θ = Optim.minimizer(sol)
+  θ, ϵ = fit_opt(θ -> V(ball(θ[1]), sill=θ[2], nugget=θ[3]), x′, y′, w, L, l, u, θₒ)
 
   # optimal variogram (with units)
   γ = V(ball(θ[1] * ux), sill=θ[2] * uy, nugget=θ[3] * uy)
@@ -228,22 +216,12 @@ function fit_impl(
   maxexponent′ = maxexponent
 
   # evaluate weights
-  f = algo.weightfun
-  w = isnothing(f) ? n / sum(n) : map(xᵢ -> ustrip(f(xᵢ)), x)
-
-  # objective function
-  function J(θ)
-    γ = V(scaling=θ[1], nugget=θ[2], exponent=θ[3])
-    sum(i -> w[i] * (γ(x′[i]) - y′[i])^2, eachindex(w, x′, y′))
-  end
+  w = fit_weights(algo, x, n)
 
   # linear constraints
   # 1. scaling ≥ 0
   # 2. 0 ≤ exponent ≤ 2
   L(θ) = θ[1] ≥ 0.0 ? 0.0 : -θ[1] + θ[3] ≥ 0.0 ? 0.0 : -θ[3] + 2.0 ≥ θ[3] ? 0.0 : θ[3] - 2.0
-
-  # penalty for linear constraint (J + λL)
-  λ = sum(yᵢ -> yᵢ^2, y′)
 
   # maximum scaling, nugget and exponent
   ymax = maximum(y′)
@@ -266,12 +244,33 @@ function fit_impl(
   u = [sᵤ, nᵤ, eᵤ]
 
   # solve optimization problem
-  sol = Optim.optimize(θ -> J(θ) + λ * L(θ), l, u, θₒ)
-  ϵ = Optim.minimum(sol)
-  θ = Optim.minimizer(sol)
+  θ, ϵ = fit_opt(θ -> V(scaling=θ[1], nugget=θ[2], exponent=θ[3]), x′, y′, w, L, l, u, θₒ)
 
   # optimal variogram (with units)
   γ = V(scaling=θ[1] * uy, nugget=θ[2] * uy, exponent=θ[3])
 
   γ, ϵ
+end
+
+function fit_weights(algo::WeightedLeastSquares, x, n)
+  f = algo.weightfun
+  isnothing(f) ? n / sum(n) : map(xᵢ -> ustrip(f(xᵢ)), x)
+end
+
+function fit_opt(V, x, y, w, L, l, u, θₒ)
+  # objective function
+  function J(θ)
+    γ = V(θ)
+    sum(i -> w[i] * (γ(x[i]) - y[i])^2, eachindex(w, x, y))
+  end
+
+  # penalty for linear constraint (J + λL)
+  λ = sum(yᵢ -> yᵢ^2, y)
+
+  # solve optimization problem
+  sol = Optim.optimize(θ -> J(θ) + λ * L(θ), l, u, θₒ)
+  ϵ = Optim.minimum(sol)
+  θ = Optim.minimizer(sol)
+
+  θ, ϵ
 end
