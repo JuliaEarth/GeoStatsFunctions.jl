@@ -211,9 +211,10 @@
   γ = PentasphericalVariogram(sill=1, nugget=1)
   @test sill(γ) isa Float64
   @test nugget(γ) isa Float64
-  γ = PowerVariogram(scaling=1, nugget=1)
+  γ = PowerVariogram(scaling=1, nugget=1, exponent=1)
   @test γ.scaling isa Float64
   @test nugget(γ) isa Float64
+  @test γ.exponent isa Float64
   γ = SineHoleVariogram(sill=1, nugget=1)
   @test sill(γ) isa Float64
   @test nugget(γ) isa Float64
