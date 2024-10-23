@@ -146,7 +146,7 @@ function fit_impl(
   maxnugget′ = isnothing(maxnugget) ? maxnugget : ustrip(uy, maxnugget)
 
   # evaluate weights
-  w = fit_weights(algo, x, n)
+  w = _weights(algo.weightfun, x, n)
 
   # linear constraint (sill ≥ nugget)
   L(θ) = θ[2] ≥ θ[3] ? 0.0 : θ[3] - θ[2]
@@ -173,7 +173,7 @@ function fit_impl(
   u = [rᵤ, sᵤ, nᵤ]
 
   # solve optimization problem
-  θ, ϵ = fit_opt(θ -> V(ball(θ[1]), sill=θ[2], nugget=θ[3]), x′, y′, w, L, l, u, θₒ)
+  θ, ϵ = _optimize(θ -> V(ball(θ[1]), sill=θ[2], nugget=θ[3]), x′, y′, w, L, l, u, θₒ)
 
   # optimal variogram (with units)
   γ = V(ball(θ[1] * ux), sill=θ[2] * uy, nugget=θ[3] * uy)
@@ -216,7 +216,7 @@ function fit_impl(
   maxexponent′ = maxexponent
 
   # evaluate weights
-  w = fit_weights(algo, x, n)
+  w = _weights(algo.weightfun, x, n)
 
   # linear constraints
   # 1. scaling ≥ 0
@@ -244,7 +244,7 @@ function fit_impl(
   u = [sᵤ, nᵤ, eᵤ]
 
   # solve optimization problem
-  θ, ϵ = fit_opt(θ -> V(scaling=θ[1], nugget=θ[2], exponent=θ[3]), x′, y′, w, L, l, u, θₒ)
+  θ, ϵ = _optimize(θ -> V(scaling=θ[1], nugget=θ[2], exponent=θ[3]), x′, y′, w, L, l, u, θₒ)
 
   # optimal variogram (with units)
   γ = V(scaling=θ[1] * uy, nugget=θ[2] * uy, exponent=θ[3])
@@ -252,12 +252,9 @@ function fit_impl(
   γ, ϵ
 end
 
-function fit_weights(algo::WeightedLeastSquares, x, n)
-  f = algo.weightfun
-  isnothing(f) ? n / sum(n) : map(xᵢ -> ustrip(f(xᵢ)), x)
-end
+_weights(f, x, n) = isnothing(f) ? n / sum(n) : map(xᵢ -> ustrip(f(xᵢ)), x)
 
-function fit_opt(V, x, y, w, L, l, u, θₒ)
+function _optimize(V, x, y, w, L, l, u, θₒ)
   # objective function
   function J(θ)
     γ = V(θ)
