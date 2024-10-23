@@ -13,6 +13,7 @@ struct GaussianVariogram{V,B} <: Variogram
   sill::V
   nugget::V
   ball::B
+  GaussianVariogram(sill::V, nugget::V, ball::B) where {V,B} = new{float(V),B}(sill, nugget, ball)
 end
 
 GaussianVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = GaussianVariogram(sill, nugget, ball)

@@ -9,6 +9,7 @@ struct CircularVariogram{V,B} <: Variogram
   sill::V
   nugget::V
   ball::B
+  CircularVariogram(sill::V, nugget::V, ball::B) where {V,B} = new{float(V),B}(sill, nugget, ball)
 end
 
 CircularVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = CircularVariogram(sill, nugget, ball)

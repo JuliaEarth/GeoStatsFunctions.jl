@@ -13,6 +13,7 @@ struct SineHoleVariogram{V,B} <: Variogram
   sill::V
   nugget::V
   ball::B
+  SineHoleVariogram(sill::V, nugget::V, ball::B) where {V,B} = new{float(V),B}(sill, nugget, ball)
 end
 
 SineHoleVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = SineHoleVariogram(sill, nugget, ball)
