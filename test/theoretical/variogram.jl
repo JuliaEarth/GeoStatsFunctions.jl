@@ -189,6 +189,38 @@
   g = GeoStatsFunctions.scale(γ, 2)
   @test g == γ
 
+  # convert parameters to float
+  γ = CircularVariogram(sill=1, nugget=1)
+  @test sill(γ) isa Float64
+  @test nugget(γ) isa Float64
+  γ = CubicVariogram(sill=1, nugget=1)
+  @test sill(γ) isa Float64
+  @test nugget(γ) isa Float64
+  γ = ExponentialVariogram(sill=1, nugget=1)
+  @test sill(γ) isa Float64
+  @test nugget(γ) isa Float64
+  γ = GaussianVariogram(sill=1, nugget=1)
+  @test sill(γ) isa Float64
+  @test nugget(γ) isa Float64
+  γ = MaternVariogram(sill=1, nugget=1, order=1)
+  @test sill(γ) isa Float64
+  @test nugget(γ) isa Float64
+  @test γ.order isa Float64
+  γ = NuggetEffect(nugget=1)
+  @test nugget(γ) isa Float64
+  γ = PentasphericalVariogram(sill=1, nugget=1)
+  @test sill(γ) isa Float64
+  @test nugget(γ) isa Float64
+  γ = PowerVariogram(scaling=1, nugget=1)
+  @test γ.scaling isa Float64
+  @test nugget(γ) isa Float64
+  γ = SineHoleVariogram(sill=1, nugget=1)
+  @test sill(γ) isa Float64
+  @test nugget(γ) isa Float64
+  γ = SphericalVariogram(sill=1, nugget=1)
+  @test sill(γ) isa Float64
+  @test nugget(γ) isa Float64
+
   # shows
   γ = CircularVariogram()
   @test sprint(show, γ) == "CircularVariogram(sill: 1.0, nugget: 0.0, range: 1.0 m, distance: Euclidean)"
