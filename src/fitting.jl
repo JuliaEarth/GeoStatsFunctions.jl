@@ -155,8 +155,7 @@ function fit_impl(
   maxnugget′ = isnothing(maxnugget) ? maxnugget : ustrip(uy, maxnugget)
 
   # evaluate weights
-  f = algo.weightfun
-  w = isnothing(f) ? n / sum(n) : map(xᵢ -> ustrip(f(xᵢ)), x)
+  w = _weights(algo.weightfun, x, n)
 
   # objective function
   function J(θ)
@@ -192,9 +191,7 @@ function fit_impl(
   u = [rᵤ, sᵤ, nᵤ]
 
   # solve optimization problem
-  sol = Optim.optimize(θ -> J(θ) + λ * L(θ), l, u, θₒ)
-  ϵ = Optim.minimum(sol)
-  θ = Optim.minimizer(sol)
+  θ, ϵ = _optimize(J, L, λ, l, u, θₒ)
 
   # optimal variogram (with units)
   γ = V(ball(θ[1] * ux), sill=θ[2] * uy, nugget=θ[3] * uy)
@@ -206,12 +203,12 @@ function fit_impl(
   V::Type{<:PowerVariogram},
   g::EmpiricalVariogram,
   algo::WeightedLeastSquares;
-  scale=nothing,
-  exponent=nothing,
+  scaling=nothing,
   nugget=nothing,
-  maxscale=nothing,
-  maxexponent=nothing,
-  maxnugget=nothing
+  exponent=nothing,
+  maxscaling=nothing,
+  maxnugget=nothing,
+  maxexponent=nothing
 )
   # coordinates of empirical variogram
   x = g.abscissas
@@ -224,22 +221,20 @@ function fit_impl(
   n = n[n .> 0]
 
   # strip units of coordinates
-  ux = unit(eltype(x))
   uy = unit(eltype(y))
   x′ = ustrip.(x)
   y′ = ustrip.(y)
 
   # strip units of kwargs
-  scale′ = isnothing(scale) ? scale : ustrip(ux, scale)
-  exponent′ = isnothing(exponent) ? exponent : ustrip(uy, exponent)
+  scaling′ = isnothing(scaling) ? scaling : ustrip(uy, scaling)
   nugget′ = isnothing(nugget) ? nugget : ustrip(uy, nugget)
-  maxscale′ = isnothing(maxscale) ? maxscale : ustrip(ux, maxscale)
-  maxexponent′ = isnothing(maxexponent) ? maxexponent : ustrip(uy, maxexponent)
+  exponent′ = exponent
+  maxscaling′ = isnothing(maxscaling) ? maxscaling : ustrip(uy, maxscaling)
   maxnugget′ = isnothing(maxnugget) ? maxnugget : ustrip(uy, maxnugget)
+  maxexponent′ = maxexponent
 
   # evaluate weights
-  f = algo.weightfun
-  w = isnothing(f) ? n / sum(n) : map(xᵢ -> ustrip(f(xᵢ)), x)
+  w = _weights(algo.weightfun, x, n)
 
   # objective function
   function J(θ)
@@ -256,33 +251,39 @@ function fit_impl(
   λ = sum(yᵢ -> yᵢ^2, y′)
 
   # maximum scaling, nugget and exponent
-  xmax = maximum(x′)
   ymax = maximum(y′)
-  smax = isnothing(maxscale′) ? xmax : maxscale′
-  emax = isnothing(maxexponent′) ? 2.0 : maxexponent′
+  smax = isnothing(maxscaling′) ? ymax : maxscaling′
   nmax = isnothing(maxnugget′) ? ymax : maxnugget′
+  emax = isnothing(maxexponent′) ? 2.0 : maxexponent′
 
   # initial guess
-  sₒ = isnothing(scale′) ? smax / 3 : scale′
-  eₒ = isnothing(exponent′) ? 0.95 * emax : exponent′
+  sₒ = isnothing(scaling′) ? smax / 3 : scaling′
   nₒ = isnothing(nugget′) ? 0.01 * nmax : nugget′
-  θₒ = [sₒ, eₒ, nₒ]
+  eₒ = isnothing(exponent′) ? 0.95 * emax : exponent′
+  θₒ = [sₒ, nₒ, eₒ]
 
   # box constraints
   δ = 1e-8
-  sₗ, sᵤ = isnothing(scale′) ? (zero(smax), smax) : (scale′ - δ, scale′ + δ)
-  eₗ, eᵤ = isnothing(exponent′) ? (zero(emax), emax) : (exponent′ - δ, exponent′ + δ)
+  sₗ, sᵤ = isnothing(scaling′) ? (zero(smax), smax) : (scaling′ - δ, scaling′ + δ)
   nₗ, nᵤ = isnothing(nugget′) ? (zero(nmax), nmax) : (nugget′ - δ, nugget′ + δ)
-  l = [sₗ, eₗ, nₗ]
-  u = [sᵤ, eᵤ, nᵤ]
+  eₗ, eᵤ = isnothing(exponent′) ? (zero(emax), emax) : (exponent′ - δ, exponent′ + δ)
+  l = [sₗ, nₗ, eₗ]
+  u = [sᵤ, nᵤ, eᵤ]
 
   # solve optimization problem
+  θ, ϵ = _optimize(J, L, λ, l, u, θₒ)
+
+  # optimal variogram (with units)
+  γ = V(scaling=θ[1] * uy, nugget=θ[2] * uy, exponent=θ[3])
+
+  γ, ϵ
+end
+
+_weights(f, x, n) = isnothing(f) ? n / sum(n) : map(xᵢ -> ustrip(f(xᵢ)), x)
+
+function _optimize(J, L, λ, l, u, θₒ)
   sol = Optim.optimize(θ -> J(θ) + λ * L(θ), l, u, θₒ)
   ϵ = Optim.minimum(sol)
   θ = Optim.minimizer(sol)
-
-  # optimal variogram (with units)
-  γ = V(scaling=θ[1], nugget=θ[2], exponent=θ[3])
-
-  γ, ϵ
+  θ, ϵ
 end
