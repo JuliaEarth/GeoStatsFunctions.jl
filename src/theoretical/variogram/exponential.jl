@@ -13,6 +13,7 @@ struct ExponentialVariogram{V,B} <: Variogram
   sill::V
   nugget::V
   ball::B
+  ExponentialVariogram(sill::V, nugget::V, ball::B) where {V,B} = new{float(V),B}(sill, nugget, ball)
 end
 
 ExponentialVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = ExponentialVariogram(sill, nugget, ball)

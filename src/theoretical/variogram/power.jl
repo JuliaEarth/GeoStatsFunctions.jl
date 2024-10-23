@@ -11,6 +11,7 @@ struct PowerVariogram{V,E} <: Variogram
   scaling::V
   nugget::V
   exponent::E
+  PowerVariogram(scaling::V, nugget::V, exponent::E) where {V,E} = new{float(V),float(E)}(scaling, nugget, exponent)
 end
 
 PowerVariogram(; scaling=1.0, nugget=zero(typeof(scaling)), exponent=1.0) = PowerVariogram(scaling, nugget, exponent)

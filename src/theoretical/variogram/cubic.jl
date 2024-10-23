@@ -13,6 +13,7 @@ struct CubicVariogram{V,B} <: Variogram
   sill::V
   nugget::V
   ball::B
+  CubicVariogram(sill::V, nugget::V, ball::B) where {V,B} = new{float(V),B}(sill, nugget, ball)
 end
 
 CubicVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = CubicVariogram(sill, nugget, ball)

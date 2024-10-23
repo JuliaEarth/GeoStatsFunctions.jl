@@ -15,6 +15,8 @@ struct MaternVariogram{V,O,B} <: Variogram
   nugget::V
   order::O
   ball::B
+  MaternVariogram(sill::V, nugget::V, order::O, ball::B) where {V,O,B} =
+    new{float(V),float(O),B}(sill, nugget, order, ball)
 end
 
 MaternVariogram(ball; sill=1.0, nugget=zero(typeof(sill)), order=1.0) = MaternVariogram(sill, nugget, order, ball)
