@@ -11,7 +11,6 @@ using Optim
 using Tables
 using Distances
 using Bessels: gamma, besselk
-using InteractiveUtils: subtypes
 using NearestNeighbors: MinkowskiMetric
 using OhMyThreads: tmapreduce
 using DataScienceTraits

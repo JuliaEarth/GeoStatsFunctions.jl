@@ -3,7 +3,18 @@
 # ------------------------------------------------------------------
 
 # models that can be fitted currently
-fittable() = filter(isstationary, setdiff(subtypes(Variogram), (NuggetEffect, NestedVariogram)))
+# code to generate the model list:
+# filter(isstationary, setdiff(subtypes(Variogram), (NuggetEffect, NestedVariogram))) |> Tuple
+fittable() = (
+  CircularVariogram,
+  CubicVariogram,
+  ExponentialVariogram,
+  GaussianVariogram,
+  MaternVariogram,
+  PentasphericalVariogram,
+  SineHoleVariogram,
+  SphericalVariogram
+)
 
 """
     FitAlgo
@@ -81,8 +92,6 @@ using algorithm `algo` and return the one with minimum error.
 julia> fit(Variogram, g)
 julia> fit(Variogram, g, WeightedLeastSquares())
 ```
-
-See also `GeoStatsFunctions.fittable()`.
 """
 fit(::Type{Variogram}, g::EmpiricalVariogram, algo::FitAlgo=WeightedLeastSquares(); kwargs...) =
   fit(fittable(), g, algo; kwargs...)
