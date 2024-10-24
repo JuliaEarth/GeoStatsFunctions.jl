@@ -13,6 +13,7 @@ struct SphericalVariogram{V,B} <: Variogram
   sill::V
   nugget::V
   ball::B
+  SphericalVariogram(sill::V, nugget::V, ball::B) where {V,B} = new{float(V),B}(sill, nugget, ball)
 end
 
 SphericalVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = SphericalVariogram(sill, nugget, ball)

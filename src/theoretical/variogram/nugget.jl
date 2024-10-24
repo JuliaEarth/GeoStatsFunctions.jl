@@ -9,6 +9,7 @@ A pure nugget effect variogram with nugget `n`.
 """
 struct NuggetEffect{V} <: Variogram
   nugget::V
+  NuggetEffect(nugget::V) where {V} = new{float(V)}(nugget)
 end
 
 NuggetEffect(; nugget=1.0) = NuggetEffect(nugget)

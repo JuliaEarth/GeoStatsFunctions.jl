@@ -13,6 +13,7 @@ struct PentasphericalVariogram{V,B} <: Variogram
   sill::V
   nugget::V
   ball::B
+  PentasphericalVariogram(sill::V, nugget::V, ball::B) where {V,B} = new{float(V),B}(sill, nugget, ball)
 end
 
 PentasphericalVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = PentasphericalVariogram(sill, nugget, ball)
