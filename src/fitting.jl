@@ -2,10 +2,10 @@
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
 
-# models that can be fitted currently
+# stationary models with `range`, `sill` and `nugget`
 # code to generate the model list:
 # filter(isstationary, setdiff(subtypes(Variogram), (NuggetEffect, NestedVariogram))) |> Tuple
-fittable() = (
+stationarymodels() = (
   CircularVariogram,
   CubicVariogram,
   ExponentialVariogram,
@@ -83,7 +83,7 @@ end
 """
     fit(Variogram, g, algo=WeightedLeastSquares(); kwargs...)
 
-Fit all "fittable" subtypes of `Variogram` to empirical variogram `g`
+Fit all stationary `Variogram` models to empirical variogram `g`
 using algorithm `algo` and return the one with minimum error.
 
 ## Examples
@@ -94,7 +94,7 @@ julia> fit(Variogram, g, WeightedLeastSquares())
 ```
 """
 fit(::Type{Variogram}, g::EmpiricalVariogram, algo::FitAlgo=WeightedLeastSquares(); kwargs...) =
-  fit(fittable(), g, algo; kwargs...)
+  fit(stationarymodels(), g, algo; kwargs...)
 
 """
     fit(V, g, weightfun; kwargs...)
