@@ -2,98 +2,7 @@
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
 
-# code to generate list of stationary variogram models:
-# filter(isstationary, setdiff(subtypes(Variogram), (NuggetEffect, NestedVariogram))) |> Tuple
-stationaryvariograms() = (
-  CircularVariogram,
-  CubicVariogram,
-  ExponentialVariogram,
-  GaussianVariogram,
-  MaternVariogram,
-  PentasphericalVariogram,
-  SineHoleVariogram,
-  SphericalVariogram
-)
-
-"""
-    fit(G, g, algo=WeightedLeastSquares(); range=nothing, sill=nothing, nugget=nothing)
-
-Fit theoretical variogram type `G` to empirical variogram `g` using algorithm `algo`.
-
-Optionally fix `range`, `sill` or `nugget` by passing them as keyword arguments, or
-set their maximum value with `maxrange`, `maxsill` or `maxnugget`.
-
-## Examples
-
-```julia
-julia> fit(SphericalVariogram, g)
-julia> fit(ExponentialVariogram, g)
-julia> fit(ExponentialVariogram, g, sill=1.0)
-julia> fit(ExponentialVariogram, g, maxsill=1.0)
-julia> fit(GaussianVariogram, g, WeightedLeastSquares())
-```
-"""
-fit(G::Type{<:Variogram}, g::EmpiricalVariogram, algo::FitAlgo=WeightedLeastSquares(); kwargs...) =
-  fit_impl(G, g, algo; kwargs...) |> first
-
-"""
-    fit(Gs, g, algo=WeightedLeastSquares(); kwargs...)
-
-Fit theoretical variogram types `Gs` to empirical variogram `g`
-using algorithm `algo` and return the one with minimum error.
-
-## Examples
-
-```julia
-julia> fit([SphericalVariogram, ExponentialVariogram], g)
-```
-"""
-function fit(Gs, g::EmpiricalVariogram, algo::FitAlgo=WeightedLeastSquares(); kwargs...)
-  # fit each variogram type
-  res = [fit_impl(G, g, algo; kwargs...) for G in Gs]
-  γs, ϵs = first.(res), last.(res)
-
-  # return best candidate
-  γs[argmin(ϵs)]
-end
-
-"""
-    fit(Variogram, g, algo=WeightedLeastSquares(); kwargs...)
-
-Fit all stationary `Variogram` models to empirical variogram `g`
-using algorithm `algo` and return the one with minimum error.
-
-## Examples
-
-```julia
-julia> fit(Variogram, g)
-julia> fit(Variogram, g, WeightedLeastSquares())
-```
-"""
-fit(::Type{Variogram}, g::EmpiricalVariogram, algo::FitAlgo=WeightedLeastSquares(); kwargs...) =
-  fit(stationaryvariograms(), g, algo; kwargs...)
-
-"""
-    fit(G, g, weightfun; kwargs...)
-    fit(Variogram, g, weightfun; kwargs...)
-
-Convenience method that forwards the weighting function `weightfun`
-to the `WeightedLeastSquares` algorithm.
-
-## Examples
-
-```julia
-fit(SphericalVariogram, g, h -> exp(-h))
-fit(Variogram, g, h -> exp(-h/100))
-```
-"""
-fit(G, g::EmpiricalVariogram, weightfun::Function; kwargs...) = fit(G, g, WeightedLeastSquares(weightfun); kwargs...)
-
-# ---------------
-# IMPLEMENTATION
-# ---------------
-
-function fit_impl(
+function _fit(
   G::Type{<:Variogram},
   g::EmpiricalVariogram,
   algo::WeightedLeastSquares;
@@ -176,7 +85,7 @@ function fit_impl(
   γ, ϵ
 end
 
-function fit_impl(
+function _fit(
   G::Type{<:PowerVariogram},
   g::EmpiricalVariogram,
   algo::WeightedLeastSquares;
