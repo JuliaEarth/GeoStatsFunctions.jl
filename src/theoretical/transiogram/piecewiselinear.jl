@@ -36,7 +36,7 @@ function PiecewiseLinearTransiogram(abscissas::AbstractVector, ordinates::Abstra
     SMatrix{m,m}(ordinates[i, j][k] for i in 1:m, j in 1:m)
   end
 
-  # proportion matrix
+  # ordinate matrix at infinity
   p = normalize(diag(last(O)), 1)
   ∞ = SMatrix{m,m}(p[j] for i in 1:m, j in 1:m)
 
