@@ -16,9 +16,9 @@ stationaryvariograms() = (
 )
 
 """
-    fit(V, g, algo=WeightedLeastSquares(); range=nothing, sill=nothing, nugget=nothing)
+    fit(G, g, algo=WeightedLeastSquares(); range=nothing, sill=nothing, nugget=nothing)
 
-Fit theoretical variogram type `V` to empirical variogram `g` using algorithm `algo`.
+Fit theoretical variogram type `G` to empirical variogram `g` using algorithm `algo`.
 
 Optionally fix `range`, `sill` or `nugget` by passing them as keyword arguments, or
 set their maximum value with `maxrange`, `maxsill` or `maxnugget`.
@@ -33,13 +33,13 @@ julia> fit(ExponentialVariogram, g, maxsill=1.0)
 julia> fit(GaussianVariogram, g, WeightedLeastSquares())
 ```
 """
-fit(V::Type{<:Variogram}, g::EmpiricalVariogram, algo::FitAlgo=WeightedLeastSquares(); kwargs...) =
-  fit_impl(V, g, algo; kwargs...) |> first
+fit(G::Type{<:Variogram}, g::EmpiricalVariogram, algo::FitAlgo=WeightedLeastSquares(); kwargs...) =
+  fit_impl(G, g, algo; kwargs...) |> first
 
 """
-    fit(Vs, g, algo=WeightedLeastSquares(); kwargs...)
+    fit(Gs, g, algo=WeightedLeastSquares(); kwargs...)
 
-Fit theoretical variogram types `Vs` to empirical variogram `g`
+Fit theoretical variogram types `Gs` to empirical variogram `g`
 using algorithm `algo` and return the one with minimum error.
 
 ## Examples
@@ -48,9 +48,9 @@ using algorithm `algo` and return the one with minimum error.
 julia> fit([SphericalVariogram, ExponentialVariogram], g)
 ```
 """
-function fit(Vs, g::EmpiricalVariogram, algo::FitAlgo=WeightedLeastSquares(); kwargs...)
+function fit(Gs, g::EmpiricalVariogram, algo::FitAlgo=WeightedLeastSquares(); kwargs...)
   # fit each variogram type
-  res = [fit_impl(V, g, algo; kwargs...) for V in Vs]
+  res = [fit_impl(G, g, algo; kwargs...) for G in Gs]
   γs, ϵs = first.(res), last.(res)
 
   # return best candidate
@@ -74,7 +74,7 @@ fit(::Type{Variogram}, g::EmpiricalVariogram, algo::FitAlgo=WeightedLeastSquares
   fit(stationaryvariograms(), g, algo; kwargs...)
 
 """
-    fit(V, g, weightfun; kwargs...)
+    fit(G, g, weightfun; kwargs...)
     fit(Variogram, g, weightfun; kwargs...)
 
 Convenience method that forwards the weighting function `weightfun`
@@ -87,14 +87,14 @@ fit(SphericalVariogram, g, h -> exp(-h))
 fit(Variogram, g, h -> exp(-h/100))
 ```
 """
-fit(V, g::EmpiricalVariogram, weightfun::Function; kwargs...) = fit(V, g, WeightedLeastSquares(weightfun); kwargs...)
+fit(G, g::EmpiricalVariogram, weightfun::Function; kwargs...) = fit(G, g, WeightedLeastSquares(weightfun); kwargs...)
 
 # ---------------
 # IMPLEMENTATION
 # ---------------
 
 function fit_impl(
-  V::Type{<:Variogram},
+  G::Type{<:Variogram},
   g::EmpiricalVariogram,
   algo::WeightedLeastSquares;
   range=nothing,
@@ -136,7 +136,7 @@ function fit_impl(
 
   # objective function
   function J(θ)
-    γ = V(ball(θ[1]), sill=θ[2], nugget=θ[3])
+    γ = G(ball(θ[1]), sill=θ[2], nugget=θ[3])
     sum(i -> w[i] * (γ(x′[i]) - y′[i])^2, eachindex(w, x′, y′))
   end
 
@@ -171,13 +171,13 @@ function fit_impl(
   θ, ϵ = _optimize(J, L, λ, l, u, θₒ)
 
   # optimal variogram (with units)
-  γ = V(ball(θ[1] * ux), sill=θ[2] * uy, nugget=θ[3] * uy)
+  γ = G(ball(θ[1] * ux), sill=θ[2] * uy, nugget=θ[3] * uy)
 
   γ, ϵ
 end
 
 function fit_impl(
-  V::Type{<:PowerVariogram},
+  G::Type{<:PowerVariogram},
   g::EmpiricalVariogram,
   algo::WeightedLeastSquares;
   scaling=nothing,
@@ -215,7 +215,7 @@ function fit_impl(
 
   # objective function
   function J(θ)
-    γ = V(scaling=θ[1], nugget=θ[2], exponent=θ[3])
+    γ = G(scaling=θ[1], nugget=θ[2], exponent=θ[3])
     sum(i -> w[i] * (γ(x′[i]) - y′[i])^2, eachindex(w, x′, y′))
   end
 
@@ -251,7 +251,7 @@ function fit_impl(
   θ, ϵ = _optimize(J, L, λ, l, u, θₒ)
 
   # optimal variogram (with units)
-  γ = V(scaling=θ[1] * uy, nugget=θ[2] * uy, exponent=θ[3])
+  γ = G(scaling=θ[1] * uy, nugget=θ[2] * uy, exponent=θ[3])
 
   γ, ϵ
 end
