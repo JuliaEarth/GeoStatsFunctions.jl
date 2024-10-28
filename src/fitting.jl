@@ -4,3 +4,4 @@
 
 include("fitting/algorithms.jl")
 include("fitting/variograms.jl")
+include("fitting/transiograms.jl")
