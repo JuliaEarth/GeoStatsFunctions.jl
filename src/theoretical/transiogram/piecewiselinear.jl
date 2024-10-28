@@ -3,9 +3,10 @@
 # ------------------------------------------------------------------
 
 """
-    PiecewiseLinear(abscissas, ordinates)
+    PiecewiseLinearTransiogram(abscissas, ordinates)
 
-A piecewise-linear transiogram model from `abscissas` and matrix `ordinates`.
+A piecewise-linear transiogram model with `abscissas` and matrix `ordinates`
+obtained from an [`EmpiricalTransiogram`](@ref).
 
 ## References
 
