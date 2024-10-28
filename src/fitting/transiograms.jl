@@ -5,7 +5,8 @@
 function _fit(
   T::Type{<:PiecewiseLinearTransiogram},
   t::EmpiricalTransiogram,
-  ::FitAlgo;
+  ::FitAlgo
 )
+  # direct construction
   T(t.abscissas, t.ordinates)
 end
