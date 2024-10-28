@@ -96,6 +96,7 @@ export
   # theoretical transiogram
   Transiogram,
   ExponentialTransiogram,
+  PiecewiseLinearTransiogram,
 
   # fitting algorithms
   WeightedLeastSquares,
