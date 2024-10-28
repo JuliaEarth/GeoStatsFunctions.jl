@@ -86,7 +86,7 @@ function transioplot(
   ts = t.(hs)
 
   # categorical labels
-  L = size(first(ts), 1)
+  L = Base.size(first(ts), 1)
   l = isnothing(levels) ? (1:L) : levels
 
   # effective ranges
