@@ -24,5 +24,5 @@ Base.range(t::Transiogram) = maximum(ranges(t))
 # IMPLEMENTATIONS
 # ----------------
 
-include("transiogram/exponential.jl")
+include("transiogram/matrixexponential.jl")
 include("transiogram/piecewiselinear.jl")

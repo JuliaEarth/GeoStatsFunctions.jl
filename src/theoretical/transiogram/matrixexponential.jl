@@ -3,14 +3,14 @@
 # ------------------------------------------------------------------
 
 """
-    ExponentialTransiogram(rate)
-    ExponentialTransiogram(ball, rate)
+    MatrixExponentialTransiogram(rate)
+    MatrixExponentialTransiogram(ball, rate)
 
 An exponential transiogram with transition `rate` matrix.
 Optionally, specify a metric `ball` to model anisotropy.
 
-    ExponentialTransiogram(lengths, proportions)
-    ExponentialTransiogram(ball, lengths, proportions)
+    MatrixExponentialTransiogram(lengths, proportions)
+    MatrixExponentialTransiogram(ball, lengths, proportions)
 
 Alternatively, build transition rate matrix from mean `lengths`
 and relative `proportions`.
@@ -23,11 +23,11 @@ and relative `proportions`.
 * Carle et al 1998. [Conditional Simulation of Hydrofacies Architecture:
   A Transition Probability/Markov Approach](https://doi.org/10.2110/sepmcheg.01.147)
 """
-struct ExponentialTransiogram{R<:StaticMatrix,B<:MetricBall} <: Transiogram
+struct MatrixExponentialTransiogram{R<:StaticMatrix,B<:MetricBall} <: Transiogram
   rate::R
   ball::B
 
-  function ExponentialTransiogram{R,B}(rate, ball) where {R<:StaticMatrix,B<:MetricBall}
+  function MatrixExponentialTransiogram{R,B}(rate, ball) where {R<:StaticMatrix,B<:MetricBall}
     if !allequal(size(rate))
       throw(ArgumentError("transition rate matrix must be square"))
     end
@@ -35,25 +35,25 @@ struct ExponentialTransiogram{R<:StaticMatrix,B<:MetricBall} <: Transiogram
   end
 end
 
-function ExponentialTransiogram(ball::MetricBall, rate::AbstractMatrix)
+function MatrixExponentialTransiogram(ball::MetricBall, rate::AbstractMatrix)
   srate = SMatrix{size(rate)...}(rate)
-  ExponentialTransiogram{typeof(srate),typeof(ball)}(srate, ball)
+  MatrixExponentialTransiogram{typeof(srate),typeof(ball)}(srate, ball)
 end
 
-function ExponentialTransiogram(rate::AbstractMatrix)
+function MatrixExponentialTransiogram(rate::AbstractMatrix)
   ball = MetricBall(1 / unit(eltype(rate)))
-  ExponentialTransiogram(ball, rate)
+  MatrixExponentialTransiogram(ball, rate)
 end
 
-ExponentialTransiogram(ball::MetricBall, props::AbstractVector) =
-  ExponentialTransiogram(ball, baseratematrix(lens, props))
+MatrixExponentialTransiogram(ball::MetricBall, props::AbstractVector) =
+  MatrixExponentialTransiogram(ball, baseratematrix(lens, props))
 
-ExponentialTransiogram(lens::AbstractVector, props::AbstractVector) =
-  ExponentialTransiogram(baseratematrix(lens, props))
+MatrixExponentialTransiogram(lens::AbstractVector, props::AbstractVector) =
+  MatrixExponentialTransiogram(baseratematrix(lens, props))
 
 ranges(t::Transiogram) = 1 ./ -diag(t.rate)
 
-(t::ExponentialTransiogram)(h) = exp(h * t.rate)
+(t::MatrixExponentialTransiogram)(h) = exp(h * t.rate)
 
 # -----------------
 # HELPER FUNCTIONS

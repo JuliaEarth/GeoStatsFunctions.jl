@@ -95,7 +95,7 @@ export
 
   # theoretical transiogram
   Transiogram,
-  ExponentialTransiogram,
+  MatrixExponentialTransiogram,
   PiecewiseLinearTransiogram,
 
   # fitting algorithms

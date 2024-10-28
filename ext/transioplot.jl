@@ -96,7 +96,7 @@ function transioplot(
   p = normalize(diag(t(100H)), 1)
 
   # base transiogram model
-  t̂ = ExponentialTransiogram(r, p)
+  t̂ = MatrixExponentialTransiogram(r, p)
   t̂s = t̂.(hs)
 
   fig = Makie.Figure()

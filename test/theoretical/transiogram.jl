@@ -1,4 +1,4 @@
-@testset "ExponentialTransiogram" begin
+@testset "MatrixExponentialTransiogram" begin
   # base transition rate matrix
   R = GeoStatsFunctions.baseratematrix([1.0, 2.0, 3.0]u"m", [0.2, 0.5, 0.3])
   @test R ==
@@ -9,20 +9,20 @@
   ] * u"m^-1"
 
   # corresponding exponential transiogram
-  t = ExponentialTransiogram([1.0, 2.0, 3.0]u"m", [0.2, 0.5, 0.3])
-  @test t isa ExponentialTransiogram
+  t = MatrixExponentialTransiogram([1.0, 2.0, 3.0]u"m", [0.2, 0.5, 0.3])
+  @test t isa MatrixExponentialTransiogram
   @test GeoStatsFunctions.ranges(t) == [1.0, 2.0, 3.0]u"m"
   @test range(t) == 3.0u"m"
 
   # random transition rate matrix
   A = rand(3, 3)
   R = A ./ sum(A, dims=2)
-  t = ExponentialTransiogram(R)
-  @test t isa ExponentialTransiogram
+  t = MatrixExponentialTransiogram(R)
+  @test t isa MatrixExponentialTransiogram
   @test range(t) == maximum(1 ./ -diag(R))
 
   # invalid transition rate matrix
   A = rand(3, 2)
   R = A ./ sum(A, dims=2)
-  t = @test_throws ArgumentError ExponentialTransiogram(R)
+  t = @test_throws ArgumentError MatrixExponentialTransiogram(R)
 end
