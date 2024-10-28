@@ -89,6 +89,39 @@ function transioplot(
   L = Base.size(first(ts), 1)
   l = isnothing(levels) ? (1:L) : levels
 
+  fig = Makie.Figure()
+  for i in 1:L, j in 1:L
+    lᵢ, lⱼ = l[i], l[j]
+    ax = Makie.Axis(fig[i, j])
+    Makie.lines!(ax, hs, getindex.(ts, i, j), color=color, linewidth=size, label="$lᵢ → $lⱼ")
+    Makie.axislegend(position=i == j ? :rt : :rb)
+  end
+  fig
+end
+
+function transioplot(
+  t::MatrixExponentialTransiogram;
+  # common transiogram options
+  color=:slategray,
+  size=1.5,
+  maxlag=nothing,
+  levels=nothing
+)
+  # retrieve maximum lag
+  H = if isnothing(maxlag)
+    _maxlag(t)
+  else
+    _addunit(maxlag, u"m")
+  end
+
+  # transiogram up to maximum lag
+  hs = range(zero(H), stop=H, length=100)
+  ts = t.(hs)
+
+  # categorical labels
+  L = Base.size(first(ts), 1)
+  l = isnothing(levels) ? (1:L) : levels
+
   # effective ranges
   r = GeoStatsFunctions.ranges(t)
 

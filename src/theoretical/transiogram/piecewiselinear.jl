@@ -50,7 +50,7 @@ function (t::PiecewiseLinearTransiogram)(h)
   elseif h > last(hs) # right extrapolation
     t.ordinfinity
   else # middle interpolation
-    k = findfirst(≥(h), hs)
+    k = findlast(<(h), hs)
     ((hs[k + 1] - h) * t.ordinates[k] + (h - hs[k]) * t.ordinates[k + 1]) / (hs[k + 1] - hs[k])
   end
 end
