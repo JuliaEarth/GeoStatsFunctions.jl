@@ -1,4 +1,4 @@
-@testset "Fitting" begin
+@testset "Fitting variograms" begin
   img = readdlm(joinpath(datadir, "WalkerLake.txt"))
   d = georef((; Z=img))
   g = EmpiricalVariogram(d, :Z, maxlag=15.0)
@@ -103,4 +103,8 @@
   @test isapprox(γ.nugget, nₜ, atol=1e-3)
   @test isapprox(γ.scaling, sₜ, atol=1e-3)
   @test isapprox(γ.exponent, eₜ, atol=1e-3)
+end
+
+@testset "Fitting transiograms" begin
+  # TODO
 end

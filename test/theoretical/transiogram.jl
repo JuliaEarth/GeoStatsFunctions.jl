@@ -26,3 +26,7 @@
   R = A ./ sum(A, dims=2)
   t = @test_throws ArgumentError MatrixExponentialTransiogram(R)
 end
+
+@testset "PiecewiseLinearTransiogram" begin
+  # TODO
+end
