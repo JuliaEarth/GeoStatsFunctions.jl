@@ -21,7 +21,7 @@ obtained from an [`EmpiricalTransiogram`](@ref).
 struct PiecewiseLinearTransiogram{ℒ<:Len,M} <: Transiogram
   abscissas::Vector{ℒ}
   ordinates::Vector{M}
-  proportion::M
+  ordinfinity::M
 end
 
 function PiecewiseLinearTransiogram(abscissas::AbstractVector, ordinates::AbstractMatrix)
@@ -38,9 +38,9 @@ function PiecewiseLinearTransiogram(abscissas::AbstractVector, ordinates::Abstra
 
   # proportion matrix
   p = normalize(diag(last(O)), 1)
-  P = SMatrix{m, m}(p[j] for i in 1:m, j in 1:m)
+  ∞ = SMatrix{m, m}(p[j] for i in 1:m, j in 1:m)
 
-  PiecewiseLinearTransiogram(a, O, P)
+  PiecewiseLinearTransiogram(a, O, ∞)
 end
 
 function (t::PiecewiseLinearTransiogram)(h)
@@ -48,7 +48,7 @@ function (t::PiecewiseLinearTransiogram)(h)
   if h < first(hs) # left extrapolation
     ((first(hs) - h) * I + h * first(t.ordinates)) / first(hs)
   elseif h > last(hs) # right extrapolation
-    t.proportion
+    t.ordinfinity
   else # middle interpolation
     k = findfirst(≥(h), hs)
     ((hs[k + 1] - h) * t.ordinates[k] + (h - hs[k]) * t.ordinates[k + 1]) / (hs[k + 1] - hs[k])
