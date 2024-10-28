@@ -13,5 +13,4 @@ Fit theoretical transiogram type `T` to empirical transiogram `t` using algorith
 julia> fit(PiecewiseLinearTransiogram, t)
 ```
 """
-fit(::Type{PiecewiseLinearTransiogram}, t::EmpiricalTransiogram) =
-  PiecewiseLinearTransiogram(t.abscissas, t.ordinates)
+fit(::Type{PiecewiseLinearTransiogram}, t::EmpiricalTransiogram) = PiecewiseLinearTransiogram(t.abscissas, t.ordinates)
