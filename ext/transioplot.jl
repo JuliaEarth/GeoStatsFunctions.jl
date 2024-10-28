@@ -74,13 +74,6 @@ function transioplot(
   maxlag=nothing,
   levels=nothing
 )
-  # effective ranges and labels
-  r = GeoStatsFunctions.ranges(t)
-  l = isnothing(levels) ? (1:length(r)) : levels
-
-  # number of labels
-  L = length(l)
-
   # retrieve maximum lag
   H = if isnothing(maxlag)
     _maxlag(t)
@@ -91,6 +84,13 @@ function transioplot(
   # transiogram up to maximum lag
   hs = range(zero(H), stop=H, length=100)
   ts = t.(hs)
+
+  # categorical labels
+  L = size(first(ts), 1)
+  l = isnothing(levels) ? (1:L) : levels
+
+  # effective ranges
+  r = GeoStatsFunctions.ranges(t)
 
   # relative proportions at h → ∞
   p = normalize(diag(t(100H)), 1)
