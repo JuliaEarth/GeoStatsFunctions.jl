@@ -20,15 +20,26 @@ A piecewise-linear transiogram model from `abscissas` and matrix `ordinates`.
 struct PiecewiseLinearTransiogram{ℒ<:Len,M} <: Transiogram
   abscissas::Vector{ℒ}
   ordinates::Vector{M}
+  proportion::M
 end
 
 function PiecewiseLinearTransiogram(abscissas::AbstractVector, ordinates::AbstractMatrix)
   n = length(abscissas)
   m = size(ordinates, 1)
-  ordinates′ = map(1:n) do k
-    SMatrix{m, m}([ordinates[i, j][k] for i in 1:m, j in 1:m])
+
+  # abscissa vector
+  a = abscissas
+
+  # ordinate matrices
+  O = map(1:n) do k
+    SMatrix{m, m}(ordinates[i, j][k] for i in 1:m, j in 1:m)
   end
-  PiecewiseLinearTransiogram(abscissas, ordinates′)
+
+  # proportion matrix
+  p = normalize(diag(last(O)), 1)
+  P = SMatrix{m, m}(p[j] for i in 1:m, j in 1:m)
+
+  PiecewiseLinearTransiogram(a, O, P)
 end
 
 function (t::PiecewiseLinearTransiogram)(h)
@@ -36,10 +47,7 @@ function (t::PiecewiseLinearTransiogram)(h)
   if h < first(hs) # left extrapolation
     ((first(hs) - h) * I + h * first(t.ordinates)) / first(hs)
   elseif h > last(hs) # right extrapolation
-    T = last(t.ordinates)
-    m = size(T, 1)
-    p = normalize(SVector{m}(T[j, j] for j in 1:m), 1)
-    SMatrix{m, m}(p[j] for i in 1:m, j in 1:m)
+    t.proportion
   else # middle interpolation
     k = findfirst(≥(h), hs)
     ((hs[k + 1] - h) * t.ordinates[k] + (h - hs[k]) * t.ordinates[k + 1]) / (hs[k + 1] - hs[k])
