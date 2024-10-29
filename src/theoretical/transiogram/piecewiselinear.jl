@@ -32,7 +32,7 @@ function PiecewiseLinearTransiogram(ball::MetricBall, abscissas::AbstractVector,
   m = size(ordinates, 1)
 
   # abscissa vector
-  x = abscissas
+  x = float(aslen.(abscissas))
 
   # ordinate matrices
   Y = map(1:n) do k
