@@ -3,7 +3,7 @@
 # ------------------------------------------------------------------
 
 const Len{T} = Quantity{T,u"𝐋"}
-const InvLen{T} = Quantity{T,u"𝐋^-1"} 
+const InvLen{T} = Quantity{T,u"𝐋^-1"}
 
 asinvlen(x::Number) = x * u"m^-1"
 asinvlen(x::InvLen) = x
