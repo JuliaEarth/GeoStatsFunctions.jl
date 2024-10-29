@@ -47,7 +47,7 @@ function EmpiricalTransioplane(
     planes = collect(subset)
     u, v = householderbasis(normal)
   else
-    @error "transioplane only supported in 2D or 3D"
+    throw(ArgumentError("transioplane only supported in 2D or 3D"))
   end
 
   # loop over all angles of the plane
