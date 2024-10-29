@@ -54,8 +54,8 @@ function EmpiricalTransioplane(
   θs = collect(range(0, stop=2π, length=nangs))
   ts = map(θs) do θ
     dir = DirectionPartition(cos(θ) * u + sin(θ) * v, tol=dtol)
-    γ(plane) = EmpiricalTransiogram(partition(rng, plane, dir), var₁, var₂; kwargs...)
-    tmapreduce(γ, merge, planes)
+    t(plane) = EmpiricalTransiogram(partition(rng, plane, dir), var₁, var₂; kwargs...)
+    tmapreduce(t, merge, planes)
   end
 
   EmpiricalTransioplane(θs, ts)
