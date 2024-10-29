@@ -32,21 +32,21 @@ function PiecewiseLinearTransiogram(ball::MetricBall, abscissas::AbstractVector,
   m = size(ordinates, 1)
 
   # abscissa vector
-  a = abscissas
+  x = abscissas
 
   # ordinate matrices
-  O = map(1:n) do k
+  Y = map(1:n) do k
     SMatrix{m,m}(ordinates[i, j][k] for i in 1:m, j in 1:m)
   end
 
   # ordinate matrix at infinity
-  p = normalize(diag(last(O)), 1)
-  ∞ = SMatrix{m,m}(p[j] for i in 1:m, j in 1:m)
+  p = normalize(diag(last(Y)), 1)
+  Y∞ = SMatrix{m,m}(p[j] for i in 1:m, j in 1:m)
 
   # metric ball
   b = ball
 
-  PiecewiseLinearTransiogram(a, O, ∞, b)
+  PiecewiseLinearTransiogram(x, Y, Y∞, b)
 end
 
 function PiecewiseLinearTransiogram(abscissas::AbstractVector, ordinates::AbstractMatrix)
