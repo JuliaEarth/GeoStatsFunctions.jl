@@ -16,9 +16,10 @@ the tolerance `dtol` in length units for the direction partition, the number of
 angles `nangs` in the plane, and forward the `parameters` to the underlying
 [`EmpiricalTransiogram`](@ref).
 """
-struct EmpiricalTransioplane{T,V}
+struct EmpiricalTransioplane{T,R,H}
   θs::Vector{T}
-  ts::Vector{V}
+  rs::Vector{R}
+  hs::Vector{H}
 end
 
 function EmpiricalTransioplane(
@@ -50,15 +51,23 @@ function EmpiricalTransioplane(
     throw(ArgumentError("transioplane only supported in 2D or 3D"))
   end
 
-  # loop over all angles of the plane
-  θs = collect(range(0, stop=2π, length=nangs))
+  # polar angles for half plane (variogram is symmetric)
+  θs = collect(range(0, stop=π, length=nangs))
+
+  # estimate directional transiograms across planes
   ts = map(θs) do θ
     dir = DirectionPartition(cos(θ) * u + sin(θ) * v, tol=dtol)
-    t(plane) = EmpiricalTransiogram(partition(rng, plane, dir), var; kwargs...)
+    t(plane) = EmpiricalVariogram(partition(rng, plane, dir), var₁, var₂; kwargs...)
     tmapreduce(t, merge, planes)
   end
 
-  EmpiricalTransioplane(θs, ts)
+  # polar radii
+  rs = first(ts).abscissas
+
+  # transioplane values
+  hs = [t.ordinates for t in ts]
+
+  EmpiricalTransioplane(θs, rs, hs)
 end
 
 # -----------
