@@ -23,10 +23,7 @@ Plot the variogram or varioplane `γ` with given `options`.
 
 ## Empirical varioplane options:
 
-* `colormap`   - color map of varioplane
-* `showrange`  - show varioplane range
-* `rangecolor` - color of varioplane range
-* `rangemodel` - range model (e.g. `SphericalVariogram`)
+* `colormap` - color map of varioplane
 
 ### Notes
 

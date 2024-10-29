@@ -66,10 +66,6 @@ function Makie.plot!(plot::VarioPlot{<:Tuple{EmpiricalVarioplane}})
   # retrieve varioplane object
   v = plot[:γ]
 
-  # retrieve range model
-  showrange = plot[:showrange]
-  rangemodel = plot[:rangemodel]
-
   # underyling variograms
   γs = Makie.@lift $v.γs
 
@@ -108,14 +104,6 @@ function Makie.plot!(plot::VarioPlot{<:Tuple{EmpiricalVarioplane}})
   H = Makie.@lift transpose($H)
 
   Makie.surface!(plot, θs, rs, H, colormap=plot[:colormap], shading=Makie.NoShading)
-
-  # show model range
-  if showrange[]
-    ls = Makie.@lift [ustrip(range(GeoStatsFunctions.fit($rangemodel, γ))) for γ in $γs]
-    ls = Makie.@lift [$ls; $ls]
-    hs = Makie.@lift fill(maximum($H) + 1, length($ls))
-    Makie.lines!(plot, θs, ls, hs, color=plot[:rangecolor])
-  end
 end
 
 # ------------
