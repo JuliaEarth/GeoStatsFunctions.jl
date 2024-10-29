@@ -19,7 +19,7 @@
   R = A ./ sum(A, dims=2)
   t = MatrixExponentialTransiogram(R)
   @test t isa MatrixExponentialTransiogram
-  @test range(t) == maximum(1 ./ -diag(R))
+  @test range(t) == maximum(1 ./ -diag(R)) * u"m"
 
   # invalid transition rate matrix
   A = rand(3, 2)

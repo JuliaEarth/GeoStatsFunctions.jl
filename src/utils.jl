@@ -3,6 +3,11 @@
 # ------------------------------------------------------------------
 
 const Len{T} = Quantity{T,u"𝐋"}
+const InvLen{T} = Quantity{T,u"𝐋^-1"} 
+
+asinvlen(x::Number) = x * u"m^-1"
+asinvlen(x::InvLen) = x
+asinvlen(::Quantity) = throw(ArgumentError("invalid units, please check the documentation"))
 
 addunit(x::Number, u) = x * u
 addunit(::Quantity, _) = throw(ArgumentError("invalid units, please check the documentation"))

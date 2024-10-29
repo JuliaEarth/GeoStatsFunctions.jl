@@ -36,7 +36,7 @@ struct MatrixExponentialTransiogram{R<:StaticMatrix,B<:MetricBall} <: Transiogra
 end
 
 function MatrixExponentialTransiogram(ball::MetricBall, rate::AbstractMatrix)
-  srate = SMatrix{size(rate)...}(rate)
+  srate = SMatrix{size(rate)...}(float(asinvlen.(rate)))
   MatrixExponentialTransiogram{typeof(srate),typeof(ball)}(srate, ball)
 end
 
