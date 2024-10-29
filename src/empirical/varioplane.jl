@@ -66,15 +66,7 @@ function EmpiricalVarioplane(
   rs = first(γs).abscissas
 
   # varioplane values
-  hs = map(γs) do γ
-    h = γ.ordinates
-    # handle NaN ordinates (i.e. empty bins)
-    isnan(h[1]) && (h[1] = zero(eltype(h)))
-    for i in 2:length(h)
-      isnan(h[i]) && (h[i] = h[i - 1])
-    end
-    h
-  end
+  hs = [γ.ordinates for γ in γs]
 
   EmpiricalVarioplane(θs, rs, hs)
 end
