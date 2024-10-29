@@ -106,5 +106,11 @@
 end
 
 @testset "Fitting transiograms" begin
-  # TODO
+  csv = CSV.File(joinpath(datadir, "facies5.csv"))
+  gtb = georef(csv, ("X", "Y", "Z"))
+  t = EmpiricalTransiogram(gtb, "FACIES", maxlag=20, nlags=20)
+  τ = GeoStatsFunctions.fit(PiecewiseLinearTransiogram, t)
+  @test τ(0.0u"m") == I(5)
+  @test all(x -> 0 < x < 1, τ(5.0u"m"))
+  @test all(allequal, eachcol(τ(100.0u"m")))
 end
