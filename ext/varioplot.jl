@@ -66,38 +66,24 @@ function Makie.plot!(plot::VarioPlot{<:Tuple{EmpiricalVarioplane}})
   # retrieve varioplane object
   v = plot[:γ]
 
-  # underyling variograms
-  γs = Makie.@lift $v.γs
-
   # polar angle
   θs = Makie.@lift $v.θs
 
   # polar radius
-  rs = Makie.@lift ustrip.($γs[1].abscissas)
+  rs = Makie.@lift $v.rs
 
-  # variogram ordinates for all variograms
-  H = Makie.@lift let
-    hs = map($γs) do γ
-      # retrieve ordinates without units
-      ys = ustrip.(γ.ordinates)
+  # varioplane values
+  hs = Makie.@lift $v.hs
 
-      # handle NaN ordinates (i.e. empty bins)
-      isnan(ys[1]) && (ys[1] = 0)
-      for i in 2:length(ys)
-        isnan(ys[i]) && (ys[i] = ys[i - 1])
-      end
-
-      ys
-    end
-    reduce(hcat, hs)
-  end
+  # values in matrix form
+  H = Makie.@lift reduce(hcat, $hs)
 
   # exploit symmetry
   θs = Makie.@lift range(0, 2π, length=2 * length($θs))
   H = Makie.@lift [$H $H]
 
   # hide hole at center
-  rs = Makie.@lift [0; $rs]
+  rs = Makie.@lift [zero(eltype($rs)); $rs]
   H = Makie.@lift [$H[1:1, :]; $H]
 
   # transpose for plotting

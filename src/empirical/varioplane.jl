@@ -16,9 +16,10 @@ the tolerance `dtol` in length units for the direction partition, the number of
 angles `nangs` in the plane, and forward the `parameters` to the underlying
 [`EmpiricalVariogram`](@ref).
 """
-struct EmpiricalVarioplane{T,V}
+struct EmpiricalVarioplane{T,R,V}
   θs::Vector{T}
-  γs::Vector{V}
+  rs::Vector{R}
+  hs::Vector{V}
 end
 
 function EmpiricalVarioplane(
@@ -48,18 +49,34 @@ function EmpiricalVarioplane(
     planes = collect(subset)
     u, v = householderbasis(normal)
   else
-    @error "varioplane only supported in 2D or 3D"
+    throw(ArgumentError("varioplane only supported in 2D or 3D"))
   end
 
-  # loop over half of the plane
+  # polar angles for half plane (variogram is symmetric)
   θs = collect(range(0, stop=π, length=nangs))
+
+  # estimate directional variograms across planes
   γs = map(θs) do θ
     dir = DirectionPartition(cos(θ) * u + sin(θ) * v, tol=dtol)
     γ(plane) = EmpiricalVariogram(partition(rng, plane, dir), var₁, var₂; kwargs...)
     tmapreduce(γ, merge, planes)
   end
 
-  EmpiricalVarioplane(θs, γs)
+  # polar radii
+  rs = first(γs).abscissas
+
+  # varioplane values
+  hs = map(γs) do γ
+    h = γ.ordinates
+    # handle NaN ordinates (i.e. empty bins)
+    isnan(h[1]) && (h[1] = zero(eltype(h)))
+    for i in 2:length(h)
+      isnan(h[i]) && (h[i] = h[i - 1])
+    end
+    h
+  end
+
+  EmpiricalVarioplane(θs, rs, hs)
 end
 
 # -----------
