@@ -63,6 +63,7 @@ include("empirical/transiogram.jl")
 # ---------------------
 
 include("empirical/varioplane.jl")
+include("empirical/transioplane.jl")
 
 # -----------------
 # HELPER FUNCTIONS

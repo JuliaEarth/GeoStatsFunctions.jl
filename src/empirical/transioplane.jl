@@ -3,28 +3,27 @@
 # ------------------------------------------------------------------
 
 """
-    EmpiricalVarioplane(data, var₁, var₂=var₁;
-                        normal=Vec(0,0,1), nangs=50,
-                        ptol=0.5u"m", dtol=0.5u"m",
-                        [parameters])
+    EmpiricalTransioplane(data, var;
+                          normal=Vec(0,0,1), nangs=50,
+                          ptol=0.5u"m", dtol=0.5u"m",
+                          [parameters])
 
-Given a `normal` direction, estimate the (cross-)variogram of variables
-`var₁` and `var₂` along all directions in the corresponding plane of variation.
+Given a `normal` direction, estimate the transiogram of variable `var`
+along all directions in the corresponding plane of variation.
 
 Optionally, specify the tolerance `ptol` in length units for the plane partition,
 the tolerance `dtol` in length units for the direction partition, the number of
 angles `nangs` in the plane, and forward the `parameters` to the underlying
-[`EmpiricalVariogram`](@ref).
+[`EmpiricalTransiogram`](@ref).
 """
-struct EmpiricalVarioplane{T,V}
+struct EmpiricalTransioplane{T,V}
   θs::Vector{T}
-  γs::Vector{V}
+  ts::Vector{V}
 end
 
-function EmpiricalVarioplane(
+function EmpiricalTransioplane(
   data::AbstractGeoTable,
-  var₁,
-  var₂=var₁;
+  var;
   normal=Vec(0, 0, 1),
   nangs=50,
   ptol=0.5u"m",
@@ -39,7 +38,7 @@ function EmpiricalVarioplane(
 
   Dim = embeddim(domain(data))
 
-  # basis for varioplane
+  # basis for transioplane
   if Dim == 2
     planes = [data]
     u, v = Vec(1.0, 0.0), Vec(0.0, 1.0)
@@ -48,29 +47,29 @@ function EmpiricalVarioplane(
     planes = collect(subset)
     u, v = householderbasis(normal)
   else
-    @error "varioplane only supported in 2D or 3D"
+    @error "transioplane only supported in 2D or 3D"
   end
 
-  # loop over half of the plane
-  θs = collect(range(0, stop=π, length=nangs))
-  γs = map(θs) do θ
+  # loop over all angles of the plane
+  θs = collect(range(0, stop=2π, length=nangs))
+  ts = map(θs) do θ
     dir = DirectionPartition(cos(θ) * u + sin(θ) * v, tol=dtol)
-    γ(plane) = EmpiricalVariogram(partition(rng, plane, dir), var₁, var₂; kwargs...)
+    γ(plane) = EmpiricalTransiogram(partition(rng, plane, dir), var₁, var₂; kwargs...)
     tmapreduce(γ, merge, planes)
   end
 
-  EmpiricalVarioplane(θs, γs)
+  EmpiricalTransioplane(θs, ts)
 end
 
 # -----------
 # IO METHODS
 # -----------
 
-function Base.show(io::IO, ::EmpiricalVarioplane)
-  print(io, "EmpiricalVarioplane")
+function Base.show(io::IO, ::EmpiricalTransioplane)
+  print(io, "EmpiricalTransioplane")
 end
 
-function Base.show(io::IO, ::MIME"text/plain", γ::EmpiricalVarioplane)
+function Base.show(io::IO, ::MIME"text/plain", γ::EmpiricalTransioplane)
   θs = [@sprintf "%.2f" rad2deg(θ) for θ in γ.θs]
   nθ = length(θs)
   lines = ["  └─$(θ)°" for θ in θs]

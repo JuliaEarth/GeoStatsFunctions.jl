@@ -58,6 +58,7 @@ export
   PlanarVariogram,
   PlanarTransiogram,
   EmpiricalVarioplane,
+  EmpiricalTransioplane,
 
   # theoretical functions
   GeoStatsFunction,
