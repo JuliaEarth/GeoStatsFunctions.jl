@@ -4,9 +4,11 @@
 
 """
     PiecewiseLinearTransiogram(abscissas, ordinates)
+    PiecewiseLinearTransiogram(ball, abscissas, ordinates)
 
-A piecewise-linear transiogram model with `abscissas` and matrix `ordinates`
-obtained from an [`EmpiricalTransiogram`](@ref).
+A piecewise-linear transiogram model with `abscissas` and
+matrix `ordinates` obtained from an [`EmpiricalTransiogram`](@ref).
+Optionally, specify a metric `ball` to model anisotropy.
 
 ## References
 
@@ -18,13 +20,14 @@ obtained from an [`EmpiricalTransiogram`](@ref).
   of experimental transiograms for Markov chain simulation of categorical
   spatial variables](https://www.tandfonline.com/doi/abs/10.1080/13658810903127991)
 """
-struct PiecewiseLinearTransiogram{ℒ<:Len,M} <: Transiogram
+struct PiecewiseLinearTransiogram{ℒ<:Len,M,B<:MetricBall} <: Transiogram
   abscissas::Vector{ℒ}
   ordinates::Vector{M}
   ordinfinity::M
+  ball::B
 end
 
-function PiecewiseLinearTransiogram(abscissas::AbstractVector, ordinates::AbstractMatrix)
+function PiecewiseLinearTransiogram(ball::MetricBall, abscissas::AbstractVector, ordinates::AbstractMatrix)
   n = length(abscissas)
   m = size(ordinates, 1)
 
@@ -40,7 +43,15 @@ function PiecewiseLinearTransiogram(abscissas::AbstractVector, ordinates::Abstra
   p = normalize(diag(last(O)), 1)
   ∞ = SMatrix{m,m}(p[j] for i in 1:m, j in 1:m)
 
-  PiecewiseLinearTransiogram(a, O, ∞)
+  # metric ball
+  b = ball
+
+  PiecewiseLinearTransiogram(a, O, ∞, b)
+end
+
+function PiecewiseLinearTransiogram(abscissas::AbstractVector, ordinates::AbstractMatrix)
+  ball = MetricBall(oneunit(eltype(abscissas)))
+  PiecewiseLinearTransiogram(ball, abscissas, ordinates)
 end
 
 function (t::PiecewiseLinearTransiogram)(h)
