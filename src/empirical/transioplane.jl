@@ -26,7 +26,7 @@ function EmpiricalTransioplane(
   data::AbstractGeoTable,
   var;
   normal=Vec(0, 0, 1),
-  nangs=50,
+  nangs=100,
   ptol=0.5u"m",
   dtol=0.5u"m",
   kwargs...
@@ -57,7 +57,7 @@ function EmpiricalTransioplane(
   # estimate directional transiograms across planes
   ts = map(θs) do θ
     dir = DirectionPartition(cos(θ) * u + sin(θ) * v, tol=dtol)
-    t(plane) = EmpiricalVariogram(partition(rng, plane, dir), var₁, var₂; kwargs...)
+    t(plane) = EmpiricalTransiogram(partition(rng, plane, dir), :c; kwargs...)
     tmapreduce(t, merge, planes)
   end
 

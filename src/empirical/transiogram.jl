@@ -87,8 +87,8 @@ function EmpiricalTransiogram(partition::Partition, var; kwargs...)
   # retain geospatial data with at least two elements
   filtered = Iterators.filter(d -> nelements(domain(d)) > 1, partition)
   @assert !isempty(filtered) "invalid partition of geospatial data"
-  γ(d) = EmpiricalTransiogram(d, var; kwargs...)
-  tmapreduce(γ, merge, collect(filtered))
+  t(d) = EmpiricalTransiogram(d, var; kwargs...)
+  tmapreduce(t, merge, collect(filtered))
 end
 
 """
