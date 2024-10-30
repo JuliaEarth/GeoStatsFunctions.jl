@@ -64,16 +64,16 @@ Makie.plottype(::EmpiricalVarioplane) = VarioPlot{<:Tuple{EmpiricalVarioplane}}
 
 function Makie.plot!(plot::VarioPlot{<:Tuple{EmpiricalVarioplane}})
   # retrieve varioplane object
-  v = plot[:γ]
+  γ = plot[:γ]
 
   # polar angle
-  θs = Makie.@lift $v.θs
+  θs = Makie.@lift $γ.θs
 
   # polar radius
-  rs = Makie.@lift $v.rs
+  rs = Makie.@lift $γ.rs
 
   # varioplane values
-  hs = Makie.@lift $v.hs
+  hs = Makie.@lift $γ.hs
 
   # values in matrix form
   H = Makie.@lift reduce(hcat, $hs)
