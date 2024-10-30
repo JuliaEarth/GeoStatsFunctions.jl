@@ -2,10 +2,6 @@
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
 
-# ----------
-# EMPIRICAL
-# ----------
-
 function transioplot(
   t::EmpiricalTransiogram;
   # common transiogram options
@@ -61,10 +57,6 @@ function transioplot(
   end
   fig
 end
-
-# ------------
-# THEORETICAL
-# ------------
 
 function transioplot(
   t::Transiogram;

@@ -18,10 +18,6 @@ Makie.@recipe(VarioPlot, γ) do scene
   )
 end
 
-# ----------
-# EMPIRICAL
-# ----------
-
 Makie.plottype(::EmpiricalVariogram) = VarioPlot{<:Tuple{EmpiricalVariogram}}
 
 function Makie.plot!(plot::VarioPlot{<:Tuple{EmpiricalVariogram}})
@@ -53,10 +49,6 @@ function Makie.plot!(plot::VarioPlot{<:Tuple{EmpiricalVariogram}})
     Makie.text!(plot, x, y, text=text, fontsize=plot[:textsize])
   end
 end
-
-# ------------
-# THEORETICAL
-# ------------
 
 Makie.plottype(::Variogram) = VarioPlot{<:Tuple{Variogram}}
 
