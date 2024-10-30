@@ -57,7 +57,7 @@ function EmpiricalTransioplane(
   # estimate directional transiograms across planes
   ts = map(θs) do θ
     dir = DirectionPartition(cos(θ) * u + sin(θ) * v, tol=dtol)
-    t(plane) = EmpiricalTransiogram(partition(rng, plane, dir), :c; kwargs...)
+    t(plane) = EmpiricalTransiogram(partition(rng, plane, dir), var; kwargs...)
     tmapreduce(t, merge, planes)
   end
 
