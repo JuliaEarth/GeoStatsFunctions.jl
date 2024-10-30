@@ -75,6 +75,9 @@ function transioplot(
   # polar radius
   rs = t.rs
 
+  # hide hole at center
+  rs = [zero(eltype(rs)); rs]
+
   # transioplane values
   hs = t.hs
 
@@ -94,7 +97,6 @@ function transioplot(
     H = reduce(hcat, h)
 
     # hide hole at center
-    rs = [zero(eltype(rs)); rs]
     H = [H[1:1, :]; H]
 
     # transpose for plotting
