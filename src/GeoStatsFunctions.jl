@@ -83,7 +83,7 @@ export
   nugget,
   structures,
 
-  # theoretical covariance
+  # theoretical covariances
   Covariance,
   CircularCovariance,
   CubicCovariance,
@@ -94,7 +94,7 @@ export
   SineHoleCovariance,
   SphericalCovariance,
 
-  # theoretical transiogram
+  # theoretical transiograms
   Transiogram,
   MatrixExponentialTransiogram,
   PiecewiseLinearTransiogram,
@@ -102,7 +102,7 @@ export
   # fitting algorithms
   WeightedLeastSquares,
 
-  # plotting
+  # plotting functions
   varioplot,
   varioplot!,
   transioplot,
