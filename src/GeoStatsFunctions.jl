@@ -106,6 +106,8 @@ export
   varioplot,
   varioplot!,
   transioplot,
-  transioplot!
+  transioplot!,
+  planeplot,
+  planeplot!
 
 end

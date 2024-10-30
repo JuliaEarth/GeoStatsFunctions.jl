@@ -62,52 +62,6 @@ function transioplot(
   fig
 end
 
-function transioplot(
-  t::EmpiricalTransioplane;
-  # common transiogram options
-  levels=nothing,
-  # empirical transioplane options
-  colormap=:viridis
-)
-  # polar angle
-  θs = t.θs
-
-  # polar radius
-  rs = t.rs
-
-  # hide hole at center
-  rs = [zero(eltype(rs)); rs]
-
-  # transioplane values
-  hs = t.hs
-
-  # number of labels
-  L = size(first(hs), 1)
-
-  # retrieve labels
-  l = isnothing(levels) ? (1:L) : levels
-
-  fig = Makie.Figure()
-  for i in 1:L, j in 1:L
-    lᵢ, lⱼ = l[i], l[j]
-    ax = Makie.PolarAxis(fig[i, j], title="$lᵢ → $lⱼ")
-
-    # values in matrix form
-    h = getindex.(hs, i, j)
-    H = reduce(hcat, h)
-
-    # hide hole at center
-    H = [H[1:1, :]; H]
-
-    # transpose for plotting
-    H = transpose(H)
-
-    Makie.surface!(ax, θs, rs, H, colormap=colormap, shading=Makie.NoShading)
-  end
-
-  fig
-end
-
 # ------------
 # THEORETICAL
 # ------------

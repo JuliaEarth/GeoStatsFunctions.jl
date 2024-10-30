@@ -5,7 +5,7 @@
 """
     varioplot(γ; [options])
 
-Plot the variogram or varioplane `γ` with given `options`.
+Plot the variogram `γ` with given `options`.
 
 ## Common variogram options:
 
@@ -20,10 +20,6 @@ Plot the variogram or varioplane `γ` with given `options`.
 * `textsize`    - size of text counts
 * `showhist`    - show histogram
 * `histcolor`   - color of histogram
-
-## Empirical varioplane options:
-
-* `colormap` - color map of varioplane
 
 ### Notes
 
@@ -54,3 +50,21 @@ Plot the transiogram `t` with given `options`.
 """
 function transioplot end
 function transioplot! end
+
+"""
+    planeplot(f; [options])
+
+Plot the varioplane or transioplane `f` with given `options`.
+
+## Available options
+
+* `colormap` - Color map of plane plot.
+
+### Notes
+
+* This function will only work in the presence of
+  a Makie.jl backend via package extensions in
+  Julia v1.9 or later versions of the language.
+"""
+function planeplot end
+function planeplot! end

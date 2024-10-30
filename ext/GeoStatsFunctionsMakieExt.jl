@@ -12,9 +12,11 @@ import Makie
 
 import GeoStatsFunctions: varioplot, varioplot!
 import GeoStatsFunctions: transioplot, transioplot!
+import GeoStatsFunctions: planeplot, planeplot!
 
 include("varioplot.jl")
 include("transioplot.jl")
+include("planeplot.jl")
 include("utils.jl")
 
 end
