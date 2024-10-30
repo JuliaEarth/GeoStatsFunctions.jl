@@ -26,7 +26,7 @@ function EmpiricalTransioplane(
   data::AbstractGeoTable,
   var;
   normal=Vec(0, 0, 1),
-  nangs=100,
+  nangs=50,
   ptol=0.5u"m",
   dtol=0.5u"m",
   kwargs...
@@ -51,8 +51,8 @@ function EmpiricalTransioplane(
     throw(ArgumentError("transioplane only supported in 2D or 3D"))
   end
 
-  # polar angles for half plane (variogram is symmetric)
-  θs = collect(range(0, stop=π, length=nangs))
+  # polar angles for full plane (transiogram is asymmetric)
+  θs = collect(range(0, stop=2π, length=2nangs))
 
   # estimate directional transiograms across planes
   ts = map(θs) do θ
