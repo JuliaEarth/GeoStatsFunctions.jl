@@ -84,10 +84,12 @@ the categorical variable `var`.
 Optionally, forward `parameters` for the underlying [`EmpiricalTransiogram`](@ref).
 """
 function EmpiricalTransiogram(partition::Partition, var; kwargs...)
+  # retain categorical levels across subsets
+  levs = levels(parent(partition)[:, var])
   # retain geospatial data with at least two elements
   filtered = Iterators.filter(d -> nelements(domain(d)) > 1, partition)
   @assert !isempty(filtered) "invalid partition of geospatial data"
-  t(d) = EmpiricalTransiogram(d, var; kwargs...)
+  t(d) = EmpiricalTransiogram(d |> Levels(var => levs), var; kwargs...)
   tmapreduce(t, merge, collect(filtered))
 end
 
