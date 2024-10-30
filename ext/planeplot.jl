@@ -2,10 +2,7 @@
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
 
-function planeplot(
-  g::EmpiricalVarioplane;
-  colormap=:viridis
-)
+function planeplot(g::EmpiricalVarioplane; colormap=:viridis)
   # polar angle
   θs = g.θs
 
@@ -35,11 +32,7 @@ function planeplot(
   fig
 end
 
-function planeplot(
-  t::EmpiricalTransioplane;
-  colormap=:viridis,
-  levels=nothing
-)
+function planeplot(t::EmpiricalTransioplane; colormap=:viridis, levels=nothing)
   # polar angle
   θs = t.θs
 
