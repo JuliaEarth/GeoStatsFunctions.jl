@@ -16,10 +16,10 @@ the tolerance `dtol` in length units for the direction partition, the number of
 angles `nangs` in the plane, and forward the `parameters` to the underlying
 [`EmpiricalTransiogram`](@ref).
 """
-struct EmpiricalTransioplane{T,R,H}
+struct EmpiricalTransioplane{T,R,Z}
   θs::Vector{T}
   rs::Vector{R}
-  hs::Vector{H}
+  zs::Vector{Z}
 end
 
 function EmpiricalTransioplane(
@@ -65,9 +65,9 @@ function EmpiricalTransioplane(
   rs = first(ts).abscissas
 
   # transioplane values
-  hs = [t.ordinates for t in ts]
+  zs = [t.ordinates for t in ts]
 
-  EmpiricalTransioplane(θs, rs, hs)
+  EmpiricalTransioplane(θs, rs, zs)
 end
 
 # -----------

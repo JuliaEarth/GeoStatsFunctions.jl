@@ -10,25 +10,25 @@ function planeplot(g::EmpiricalVarioplane; colormap=:viridis)
   rs = g.rs
 
   # varioplane values
-  hs = g.hs
+  zs = g.zs
 
   # values in matrix form
-  H = reduce(hcat, hs)
+  Z = reduce(hcat, zs)
 
   # exploit symmetry
   θs = range(0, 2π, length=2 * length(θs))
-  H = [H H]
+  Z = [Z Z]
 
   # hide hole at center
   rs = [zero(eltype(rs)); rs]
-  H = [H[1:1, :]; H]
+  Z = [Z[1:1, :]; Z]
 
   # transpose for plotting
-  H = transpose(H)
+  Z = transpose(Z)
 
   fig = Makie.Figure()
   ax = Makie.PolarAxis(fig[1, 1])
-  Makie.surface!(ax, θs, rs, H, colormap=colormap, shading=Makie.NoShading)
+  Makie.surface!(ax, θs, rs, Z, colormap=colormap, shading=Makie.NoShading)
   fig
 end
 
@@ -43,10 +43,10 @@ function planeplot(t::EmpiricalTransioplane; colormap=:viridis, levels=nothing)
   rs = [zero(eltype(rs)); rs]
 
   # transioplane values
-  hs = t.hs
+  zs = t.zs
 
   # number of labels
-  L = size(first(hs), 1)
+  L = size(first(zs), 1)
 
   # retrieve labels
   l = isnothing(levels) ? (1:L) : levels
@@ -57,17 +57,60 @@ function planeplot(t::EmpiricalTransioplane; colormap=:viridis, levels=nothing)
     ax = Makie.PolarAxis(fig[i, j], title="$lᵢ → $lⱼ")
 
     # values in matrix form
-    h = getindex.(hs, i, j)
-    H = reduce(hcat, h)
+    Z = reduce(hcat, getindex.(zs, i, j))
 
     # hide hole at center
-    H = [H[1:1, :]; H]
+    Z = [Z[1:1, :]; Z]
 
     # transpose for plotting
-    H = transpose(H)
+    Z = transpose(Z)
 
-    Makie.surface!(ax, θs, rs, H, colormap=colormap, shading=Makie.NoShading)
+    Makie.surface!(ax, θs, rs, Z, colormap=colormap, shading=Makie.NoShading)
   end
 
+  fig
+end
+
+function planeplot(γ::Variogram;
+  # geometric options
+  normal=Vec(0, 0, 1),
+  nlags=20, nangs=50,
+  maxlag=nothing,
+  # austhetic options
+  colormap=:viridis
+)
+  # basis for varioplane
+  u, v = householderbasis(normal)
+
+  # maximum lag
+  H = if isnothing(maxlag)
+    _maxlag(γ)
+  else
+    _addunit(maxlag, u"m")
+  end
+
+  # polar angles
+  θs = range(0, stop=π, length=nangs)
+
+  # polar radius
+  rs = range(1e-6, stop=ustrip(H), length=nlags)
+
+  # direction vector as a function of polar angle
+  dir(θ) = cos(θ) * u + sin(θ) * v
+
+  O = Point(0, 0, 0)
+  G = [γ(O, O + r * dir(θ)) for θ in θs, r in rs]
+
+  # exploit symmetry
+  θs = range(0, 2π, length=2 * length(θs))
+  G = [G; G]
+
+  # hide hole at center
+  rs = [zero(eltype(rs)); rs]
+  G = [G[:, 1:1] G]
+
+  fig = Makie.Figure()
+  ax = Makie.PolarAxis(fig[1, 1])
+  Makie.surface!(ax, θs, rs, G, colormap=colormap, shading=Makie.NoShading)
   fig
 end

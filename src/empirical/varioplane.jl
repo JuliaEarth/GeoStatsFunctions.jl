@@ -16,10 +16,10 @@ the tolerance `dtol` in length units for the direction partition, the number of
 angles `nangs` in the plane, and forward the `parameters` to the underlying
 [`EmpiricalVariogram`](@ref).
 """
-struct EmpiricalVarioplane{T,R,H}
+struct EmpiricalVarioplane{T,R,Z}
   θs::Vector{T}
   rs::Vector{R}
-  hs::Vector{H}
+  zs::Vector{Z}
 end
 
 function EmpiricalVarioplane(
@@ -66,9 +66,9 @@ function EmpiricalVarioplane(
   rs = first(γs).abscissas
 
   # varioplane values
-  hs = [γ.ordinates for γ in γs]
+  zs = [γ.ordinates for γ in γs]
 
-  EmpiricalVarioplane(θs, rs, hs)
+  EmpiricalVarioplane(θs, rs, zs)
 end
 
 # -----------

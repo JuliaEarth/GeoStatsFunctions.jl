@@ -5,8 +5,9 @@
 module GeoStatsFunctionsMakieExt
 
 using GeoStatsFunctions
-using LinearAlgebra
+using Meshes
 using Unitful
+using LinearAlgebra
 
 import Makie
 
