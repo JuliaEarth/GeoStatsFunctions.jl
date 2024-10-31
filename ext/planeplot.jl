@@ -71,10 +71,12 @@ function planeplot(t::EmpiricalTransioplane; colormap=:viridis, levels=nothing)
   fig
 end
 
-function planeplot(γ::Variogram;
+function planeplot(
+  γ::Variogram;
   # geometric options
   normal=Vec(0, 0, 1),
-  nlags=20, nangs=50,
+  nlags=20,
+  nangs=50,
   maxlag=nothing,
   # austhetic options
   colormap=:viridis
