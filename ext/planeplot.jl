@@ -95,13 +95,13 @@ function planeplot(
   θs = range(0, stop=π, length=nangs)
 
   # polar radius
-  rs = range(1e-6, stop=ustrip(H), length=nlags)
+  rs = range(1e-6 * oneunit(H), stop=H, length=nlags)
 
   # direction vector as a function of polar angle
   dir(θ) = cos(θ) * u + sin(θ) * v
 
   O = Point(0, 0, 0)
-  G = [γ(O, O + r * dir(θ)) for θ in θs, r in rs]
+  G = [γ(O, O + ustrip(r) * dir(θ)) for θ in θs, r in rs]
 
   # exploit symmetry
   θs = range(0, 2π, length=2 * length(θs))
