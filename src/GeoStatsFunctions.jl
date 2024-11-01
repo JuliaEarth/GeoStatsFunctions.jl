@@ -96,6 +96,7 @@ export
 
   # theoretical transiograms
   Transiogram,
+  LinearTransiogram,
   MatrixExponentialTransiogram,
   PiecewiseLinearTransiogram,
 
