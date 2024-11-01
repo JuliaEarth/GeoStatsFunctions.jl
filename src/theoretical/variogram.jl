@@ -129,13 +129,13 @@ end
 # ----------------
 
 include("variogram/gaussian.jl")
-include("variogram/exponential.jl")
 include("variogram/spherical.jl")
+include("variogram/exponential.jl")
 include("variogram/matern.jl")
 include("variogram/cubic.jl")
 include("variogram/pentaspherical.jl")
 include("variogram/sinehole.jl")
+include("variogram/circular.jl")
 include("variogram/power.jl")
 include("variogram/nugget.jl")
-include("variogram/circular.jl")
 include("variogram/nested.jl")

@@ -69,16 +69,16 @@ export
 
   # theoretical variograms
   Variogram,
-  NuggetEffect,
   GaussianVariogram,
+  SphericalVariogram,
   ExponentialVariogram,
   MaternVariogram,
-  SphericalVariogram,
   CubicVariogram,
   PentasphericalVariogram,
-  PowerVariogram,
   SineHoleVariogram,
   CircularVariogram,
+  PowerVariogram,
+  NuggetEffect,
   NestedVariogram,
   sill,
   nugget,
@@ -86,19 +86,20 @@ export
 
   # theoretical covariances
   Covariance,
-  CircularCovariance,
-  CubicCovariance,
-  ExponentialCovariance,
   GaussianCovariance,
+  SphericalCovariance,
+  ExponentialCovariance,
   MaternCovariance,
+  CubicCovariance,
   PentasphericalCovariance,
   SineHoleCovariance,
-  SphericalCovariance,
+  CircularCovariance,
 
   # theoretical transiograms
   Transiogram,
   LinearTransiogram,
   SphericalTransiogram,
+  ExponentialTransiogram,
   MatrixExponentialTransiogram,
   PiecewiseLinearTransiogram,
 
