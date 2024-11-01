@@ -65,3 +65,42 @@ function (t::PiecewiseLinearTransiogram)(h)
     ((hs[k + 1] - h) * t.ordinates[k] + (h - hs[k]) * t.ordinates[k + 1]) / (hs[k + 1] - hs[k])
   end
 end
+
+# -----------
+# IO METHODS
+# -----------
+
+function Base.show(io::IO, t::PiecewiseLinearTransiogram)
+  ioctx = IOContext(io, :compact => true)
+  summary(ioctx, t)
+  print(ioctx, "(")
+  print(ioctx, "ordinfinity: ")
+  _printvec(ioctx, t.ordinfinity, 1)
+  if isisotropic(t.ball)
+    print(ioctx, ", range: ", first(radii(t.ball)))
+  else
+    print(ioctx, ", ranges: ", radii(t.ball))
+  end
+  m = nameof(typeof(metric(t.ball)))
+  print(ioctx, ", distance: ", m)
+  print(ioctx, ")")
+end
+
+function Base.show(io::IO, ::MIME"text/plain", t::PiecewiseLinearTransiogram)
+  ioctx = IOContext(io, :compact => true, :limit => true)
+  summary(ioctx, t)
+  println(ioctx)
+  print(ioctx, "├─ abscissas: ")
+  _printlnvec(ioctx, t.abscissas, 3)
+  print(ioctx, "├─ ordinates: ")
+  _printlnvec(ioctx, t.ordinates, 3)
+  print(ioctx, "├─ ordinfinity: ")
+  _printlnvec(ioctx, t.ordinfinity, 3)
+  if isisotropic(t.ball)
+    println(ioctx, "├─ range: ", first(radii(t.ball)))
+  else
+    println(ioctx, "├─ ranges: ", radii(t.ball))
+  end
+  m = nameof(typeof(metric(t.ball)))
+  print(ioctx, "└─ distance: ", m)
+end
