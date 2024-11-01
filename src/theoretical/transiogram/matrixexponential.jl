@@ -45,7 +45,7 @@ function MatrixExponentialTransiogram(rate::AbstractMatrix)
   MatrixExponentialTransiogram(ball, rate)
 end
 
-MatrixExponentialTransiogram(ball::MetricBall, props::AbstractVector) =
+MatrixExponentialTransiogram(ball::MetricBall, lens::AbstractVector, props::AbstractVector) =
   MatrixExponentialTransiogram(ball, baseratematrix(lens, props))
 
 MatrixExponentialTransiogram(lens::AbstractVector, props::AbstractVector) =
