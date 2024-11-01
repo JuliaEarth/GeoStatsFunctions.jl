@@ -27,7 +27,7 @@ function (t::LinearTransiogram)(h)
   L = length(p)
   h′, r′ = unitless(h, r)
   SMatrix{L,L}(
-    i == j ? (h′ < p[j]) * (1 - (1 - p[j]) * (h′ / r′)) + (h′ ≥ p[j]) * p[j] :
-    (h′ < p[j]) * (p[j] * (h′ / r′)) + (h′ ≥ p[j]) * p[j] for i in 1:L, j in 1:L
+    i == j ? (h′ < r′) * (1 - (1 - p[j]) * (h′ / r′)) + (h′ ≥ r′) * p[j] :
+    (h′ < r′) * (p[j] * (h′ / r′)) + (h′ ≥ r′) * p[j] for i in 1:L, j in 1:L
   )
 end
