@@ -20,8 +20,6 @@ abstract type Transiogram <: GeoStatsFunction end
 
 isstationary(::Type{<:Transiogram}) = true
 
-Base.range(t::Transiogram) = maximum(ranges(t))
-
 # ----------------
 # IMPLEMENTATIONS
 # ----------------
