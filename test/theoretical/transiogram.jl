@@ -1,6 +1,6 @@
 @testset "MatrixExponentialTransiogram" begin
   # base transition rate matrix
-  R = GeoStatsFunctions.baseratematrix([1.0, 2.0, 3.0]u"m", [0.2, 0.5, 0.3])
+  R = GeoStatsFunctions.baseratematrix((1.0u"m", 2.0u"m", 3.0u"m"), (0.2, 0.5, 0.3))
   @test R ==
         [
     -1/1.0 0.5 / (1 - 0.2)/1.0 0.3 / (1 - 0.2)/1.0
@@ -9,9 +9,9 @@
   ] * u"m^-1"
 
   # corresponding exponential transiogram
-  t = MatrixExponentialTransiogram([1.0, 2.0, 3.0]u"m", [0.2, 0.5, 0.3])
+  t = MatrixExponentialTransiogram((1.0u"m", 2.0u"m", 3.0u"m"), (0.2, 0.5, 0.3))
   @test t isa MatrixExponentialTransiogram
-  @test GeoStatsFunctions.lengths(t) == [1.0, 2.0, 3.0]u"m"
+  @test GeoStatsFunctions.lengths(t) == (1.0u"m", 2.0u"m", 3.0u"m")
 
   # random transition rate matrix
   A = rand(3, 3)

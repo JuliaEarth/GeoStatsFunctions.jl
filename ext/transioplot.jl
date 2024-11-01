@@ -118,7 +118,7 @@ function transioplot(
   λ = GeoStatsFunctions.lengths(t)
 
   # relative proportions at h → ∞
-  p = normalize(diag(t(100H)), 1)
+  p = Tuple(normalize(diag(t(100H)), 1))
 
   # base transiogram model
   t̂ = MatrixExponentialTransiogram(λ, p)
