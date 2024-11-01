@@ -3,10 +3,10 @@
 # ------------------------------------------------------------------
 
 """
-    SineHoleVariogram(range=r, sill=s, nugget=n)
-    SineHoleVariogram(ball; sill=s, nugget=n)
+    SineHoleVariogram(; range, sill, nugget)
+    SineHoleVariogram(ball; sill, nugget)
 
-A sine hole variogram with range `r`, sill `s` and nugget `n`.
+A sine hole variogram with `range`, `sill` and `nugget`.
 Optionally, use a custom metric `ball`.
 """
 struct SineHoleVariogram{V,B} <: Variogram

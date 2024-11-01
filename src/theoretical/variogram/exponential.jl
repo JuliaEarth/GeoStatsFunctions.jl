@@ -3,10 +3,10 @@
 # ------------------------------------------------------------------
 
 """
-    ExponentialVariogram(range=r, sill=s, nugget=n)
-    ExponentialVariogram(ball; sill=s, nugget=n)
+    ExponentialVariogram(; range, sill, nugget)
+    ExponentialVariogram(ball; sill, nugget)
 
-An exponential variogram with range `r`, sill `s` and nugget `n`.
+A exponential variogram with `range`, `sill` and `nugget`.
 Optionally, use a custom metric `ball`.
 """
 struct ExponentialVariogram{V,B} <: Variogram

@@ -3,10 +3,10 @@
 # ------------------------------------------------------------------
 
 """
-    GaussianVariogram(range=r, sill=s, nugget=n)
-    GaussianVariogram(ball; sill=s, nugget=n)
+    GaussianVariogram(; range, sill, nugget)
+    GaussianVariogram(ball; sill, nugget)
 
-A Gaussian variogram with range `r`, sill `s` and nugget `n`.
+A Gaussian variogram with `range`, `sill` and `nugget`.
 Optionally, use a custom metric `ball`.
 """
 struct GaussianVariogram{V,B} <: Variogram

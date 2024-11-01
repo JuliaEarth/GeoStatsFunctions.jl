@@ -3,10 +3,10 @@
 # ------------------------------------------------------------------
 
 """
-    PentasphericalVariogram(range=r, sill=s, nugget=n)
-    PentasphericalVariogram(ball; sill=s, nugget=n)
+    PentasphericalVariogram(; range, sill, nugget)
+    PentasphericalVariogram(ball; sill, nugget)
 
-A pentaspherical variogram with range `r`, sill `s` and nugget `n`.
+A pentaspherical variogram with `range`, `sill` and `nugget`.
 Optionally, use a custom metric `ball`.
 """
 struct PentasphericalVariogram{V,B} <: Variogram

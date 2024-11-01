@@ -1,8 +1,8 @@
 """
-    CircularVariogram(; range=r, sill=s, nugget=n)
-    CircularVariogram(ball; sill=s, nugget=n)
+    CircularVariogram(; range, sill, nugget)
+    CircularVariogram(ball; sill, nugget)
 
-A circular variogram with range `r`, sill `s` and nugget `n`.
+A circular variogram with `range`, `sill` and `nugget`.
 Optionally, use a custom metric `ball`.
 """
 struct CircularVariogram{V,B} <: Variogram

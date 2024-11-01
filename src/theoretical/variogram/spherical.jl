@@ -3,10 +3,10 @@
 # ------------------------------------------------------------------
 
 """
-    SphericalVariogram(range=r, sill=s, nugget=n)
-    SphericalVariogram(ball; sill=s, nugget=n)
+    SphericalVariogram(; range, sill, nugget)
+    SphericalVariogram(ball; sill, nugget)
 
-A spherical variogram with range `r`, sill `s` and nugget `n`.
+A spherical variogram with `range`, `sill` and `nugget`.
 Optionally, use a custom metric `ball`.
 """
 struct SphericalVariogram{V,B} <: Variogram

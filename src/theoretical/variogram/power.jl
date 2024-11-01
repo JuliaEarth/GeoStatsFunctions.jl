@@ -3,9 +3,9 @@
 # ------------------------------------------------------------------
 
 """
-    PowerVariogram(scaling=s, exponent=a, nugget=n)
+    PowerVariogram(; scaling, exponent, nugget)
 
-A power variogram with scaling `s`, exponent `a` and nugget `n`.
+A power variogram with `scaling`, `exponent` and `nugget`.
 """
 struct PowerVariogram{V,E} <: Variogram
   scaling::V

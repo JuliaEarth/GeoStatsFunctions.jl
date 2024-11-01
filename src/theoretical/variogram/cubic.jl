@@ -3,10 +3,10 @@
 # ------------------------------------------------------------------
 
 """
-    CubicVariogram(range=r, sill=s, nugget=n)
-    CubicVariogram(ball; sill=s, nugget=n)
+    CubicVariogram(; range, sill, nugget)
+    CubicVariogram(ball; sill, nugget)
 
-A cubic variogram with range `r`, sill `s` and nugget `n`.
+A cubic variogram with `range`, `sill` and `nugget`.
 Optionally, use a custom metric `ball`.
 """
 struct CubicVariogram{V,B} <: Variogram
