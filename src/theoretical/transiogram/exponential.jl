@@ -6,7 +6,7 @@
     ExponentialTransiogram(; ranges, proportions)
     ExponentialTransiogram(ball; proportions)
 
-A spherical transiogram with `ranges`, and `proportions`.
+A exponential transiogram with `ranges`, and `proportions`.
 Optionally, use a custom metric `ball`.
 """
 struct ExponentialTransiogram{P,B} <: Transiogram

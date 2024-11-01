@@ -98,6 +98,7 @@ export
   # theoretical transiograms
   Transiogram,
   LinearTransiogram,
+  GaussianTransiogram,
   SphericalTransiogram,
   ExponentialTransiogram,
   MatrixExponentialTransiogram,

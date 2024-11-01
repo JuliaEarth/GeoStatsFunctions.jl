@@ -25,6 +25,7 @@ isstationary(::Type{<:Transiogram}) = true
 # ----------------
 
 include("transiogram/linear.jl")
+include("transiogram/gaussian.jl")
 include("transiogram/spherical.jl")
 include("transiogram/exponential.jl")
 include("transiogram/matrixexponential.jl")
