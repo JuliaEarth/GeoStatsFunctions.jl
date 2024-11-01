@@ -74,11 +74,5 @@ function baseratematrix(l, p)
   end
 
   # Eq. 17 and 18 of Carle et al 1998.
-  map(Iterators.product(1:nₗ, 1:nₗ)) do (i, j)
-    if i == j
-      -1 / l[i]
-    else
-      (p[j] / (1 - p[i])) / l[i]
-    end
-  end
+  SMatrix{nₗ,nₗ}(i == j ? -1 / l[i] : (p[j] / (1 - p[i])) / l[i] for i in 1:nₗ, j in 1:nₗ)
 end
