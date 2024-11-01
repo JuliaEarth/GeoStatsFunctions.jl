@@ -114,14 +114,14 @@ function transioplot(
   L = Base.size(first(ts), 1)
   l = isnothing(levels) ? (1:L) : levels
 
-  # effective ranges
-  r = GeoStatsFunctions.ranges(t)
+  # mean lengths
+  λ = GeoStatsFunctions.lengths(t)
 
   # relative proportions at h → ∞
   p = normalize(diag(t(100H)), 1)
 
   # base transiogram model
-  t̂ = MatrixExponentialTransiogram(r, p)
+  t̂ = MatrixExponentialTransiogram(λ, p)
   t̂s = t̂.(hs)
 
   fig = Makie.Figure()
@@ -131,7 +131,7 @@ function transioplot(
     Makie.lines!(ax, hs, getindex.(ts, i, j), color=color, linewidth=size, label="$lᵢ → $lⱼ")
     if i == j
       # show mean length
-      Makie.lines!(ax, [zero(H), r[i]], [1.0, 0.0], color=color, linewidth=size, linestyle=:dash)
+      Makie.lines!(ax, [zero(H), λ[i]], [1.0, 0.0], color=color, linewidth=size, linestyle=:dash)
       # show proportion
       Makie.hlines!(ax, p[i], color=color, linewidth=size, linestyle=:dash)
     else

@@ -51,7 +51,7 @@ MatrixExponentialTransiogram(ball::MetricBall, lens::AbstractVector, props::Abst
 MatrixExponentialTransiogram(lens::AbstractVector, props::AbstractVector) =
   MatrixExponentialTransiogram(baseratematrix(lens, props))
 
-ranges(t::Transiogram) = 1 ./ -diag(t.rate)
+lengths(t::MatrixExponentialTransiogram) = 1 ./ -diag(t.rate)
 
 (t::MatrixExponentialTransiogram)(h) = exp(h * t.rate)
 

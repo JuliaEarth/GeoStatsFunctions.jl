@@ -11,8 +11,7 @@
   # corresponding exponential transiogram
   t = MatrixExponentialTransiogram([1.0, 2.0, 3.0]u"m", [0.2, 0.5, 0.3])
   @test t isa MatrixExponentialTransiogram
-  @test GeoStatsFunctions.ranges(t) == [1.0, 2.0, 3.0]u"m"
-  @test range(t) == 3.0u"m"
+  @test GeoStatsFunctions.lengths(t) == [1.0, 2.0, 3.0]u"m"
 
   # random transition rate matrix
   A = rand(3, 3)
