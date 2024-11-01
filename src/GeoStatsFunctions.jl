@@ -65,6 +65,7 @@ export
   isstationary,
   isisotropic,
   metricball,
+  meanlengths,
 
   # theoretical variograms
   Variogram,

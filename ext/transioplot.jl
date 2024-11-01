@@ -115,7 +115,7 @@ function transioplot(
   l = isnothing(levels) ? (1:L) : levels
 
   # mean lengths
-  λ = GeoStatsFunctions.lengths(t)
+  λ = meanlengths(t)
 
   # relative proportions at h → ∞
   p = Tuple(normalize(diag(t(100H)), 1))

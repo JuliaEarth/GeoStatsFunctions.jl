@@ -11,14 +11,14 @@
   # corresponding exponential transiogram
   t = MatrixExponentialTransiogram((1.0u"m", 2.0u"m", 3.0u"m"), (0.2, 0.5, 0.3))
   @test t isa MatrixExponentialTransiogram
-  @test GeoStatsFunctions.lengths(t) == (1.0u"m", 2.0u"m", 3.0u"m")
+  @test meanlengths(t) == (1.0u"m", 2.0u"m", 3.0u"m")
 
   # random transition rate matrix
   A = rand(3, 3)
   R = A ./ sum(A, dims=2)
   t = MatrixExponentialTransiogram(R)
   @test t isa MatrixExponentialTransiogram
-  @test range(t) == maximum(1 ./ -diag(R)) * u"m"
+  @test meanlengths(t) == Tuple((1 ./ -diag(R)) * u"m")
 
   # invalid transition rate matrix
   A = rand(3, 2)

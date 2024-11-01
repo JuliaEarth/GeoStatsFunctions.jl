@@ -51,7 +51,7 @@ MatrixExponentialTransiogram(ball::MetricBall, lens::Tuple, props::Tuple) =
 MatrixExponentialTransiogram(lens::Tuple, props::Tuple) =
   MatrixExponentialTransiogram(baseratematrix(lens, props))
 
-lengths(t::MatrixExponentialTransiogram) = Tuple(1 ./ -diag(t.rate))
+meanlengths(t::MatrixExponentialTransiogram) = Tuple(1 ./ -diag(t.rate))
 
 (t::MatrixExponentialTransiogram)(h) = exp(h * t.rate)
 
