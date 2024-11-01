@@ -62,6 +62,7 @@ export
 
   # theoretical functions
   GeoStatsFunction,
+  isstationary,
   isisotropic,
   metricball,
 
@@ -78,7 +79,6 @@ export
   SineHoleVariogram,
   CircularVariogram,
   NestedVariogram,
-  isstationary,
   sill,
   nugget,
   structures,
