@@ -18,11 +18,14 @@ abstract type Transiogram <: GeoStatsFunction end
 # GEOSTATSFUNCTION API
 # ---------------------
 
+isstationary(::Type{<:Transiogram}) = true
+
 Base.range(t::Transiogram) = maximum(ranges(t))
 
 # ----------------
 # IMPLEMENTATIONS
 # ----------------
 
+include("transiogram/linear.jl")
 include("transiogram/matrixexponential.jl")
 include("transiogram/piecewiselinear.jl")

@@ -10,13 +10,6 @@ A theoretical variogram function (e.g. Gaussian variogram).
 abstract type Variogram <: GeoStatsFunction end
 
 """
-    isstationary(γ)
-
-Check if variogram `γ` possesses the 2nd-order stationary property.
-"""
-isstationary(γ::Variogram) = isstationary(typeof(γ))
-
-"""
     sill(γ)
 
 Return the sill of the variogram `γ`.

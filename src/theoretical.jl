@@ -17,6 +17,13 @@ Return the type constructor of the geostatistical function `f`.
 function constructor end
 
 """
+    isstationary(f)
+
+Check if geostatistical function `f` possesses the 2nd-order stationary property.
+"""
+isstationary(f::GeoStatsFunction) = isstationary(typeof(f))
+
+"""
     isisotropic(f)
 
 Tells whether or not the geostatistical function `f` is isotropic.
