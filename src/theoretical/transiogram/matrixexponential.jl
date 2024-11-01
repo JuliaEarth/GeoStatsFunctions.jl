@@ -45,13 +45,13 @@ function MatrixExponentialTransiogram(rate::AbstractMatrix)
   MatrixExponentialTransiogram(ball, rate)
 end
 
-MatrixExponentialTransiogram(ball::MetricBall, lens::AbstractVector, props::AbstractVector) =
+MatrixExponentialTransiogram(ball::MetricBall, lens::Tuple, props::Tuple) =
   MatrixExponentialTransiogram(ball, baseratematrix(lens, props))
 
-MatrixExponentialTransiogram(lens::AbstractVector, props::AbstractVector) =
+MatrixExponentialTransiogram(lens::Tuple, props::Tuple) =
   MatrixExponentialTransiogram(baseratematrix(lens, props))
 
-lengths(t::MatrixExponentialTransiogram) = 1 ./ -diag(t.rate)
+lengths(t::MatrixExponentialTransiogram) = Tuple(1 ./ -diag(t.rate))
 
 (t::MatrixExponentialTransiogram)(h) = exp(h * t.rate)
 
