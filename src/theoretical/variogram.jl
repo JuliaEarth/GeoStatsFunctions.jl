@@ -63,67 +63,6 @@ function structures(γ::Variogram)
   cₒ, (c,), (γ,)
 end
 
-# -----------
-# IO METHODS
-# -----------
-
-function Base.show(io::IO, γ::T) where {T<:Variogram}
-  name = string(nameof(T))
-  _showcompact(io, name, γ)
-end
-
-function Base.show(io::IO, ::MIME"text/plain", γ::T) where {T<:Variogram}
-  name = string(nameof(T))
-  _showfull(io, name, γ)
-end
-
-function _showcompact(io, name, γ::T) where {T<:Variogram}
-  params = String[]
-  for fn in fieldnames(T)
-    val = getfield(γ, fn)
-    if val isa MetricBall
-      if isisotropic(val)
-        r = first(radii(val))
-        push!(params, "range: $r")
-      else
-        r = Tuple(radii(val))
-        push!(params, "ranges: $r")
-      end
-      d = nameof(typeof(metric(val)))
-      push!(params, "distance: $d")
-    else
-      push!(params, "$fn: $val")
-    end
-  end
-  print(io, name, "(", join(params, ", "), ")")
-end
-
-function _showfull(io, name, γ::T) where {T<:Variogram}
-  header = isisotropic(γ) ? name : name * " (anisotropic)"
-  params = String[]
-  fnames = fieldnames(T)
-  len = length(fnames)
-  for (i, fn) in enumerate(fnames)
-    div = i == len ? "└─" : "├─"
-    val = getfield(γ, fn)
-    if val isa MetricBall
-      if isisotropic(val)
-        r = first(radii(val))
-        push!(params, "├─ range: $r")
-      else
-        r = Tuple(radii(val))
-        push!(params, "└─ ranges: $r")
-      end
-      m = nameof(typeof(metric(val)))
-      push!(params, "$div distance: $m")
-    else
-      push!(params, "$div $(fn): $val")
-    end
-  end
-  println(io, header)
-  print(io, join(params, "\n"))
-end
-
 # ----------------
 # IMPLEMENTATIONS
 # ----------------

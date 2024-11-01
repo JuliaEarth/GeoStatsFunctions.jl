@@ -39,3 +39,44 @@ function _sides(box::Box{<:🌐})
   s4 = length(Segment(r[4], r[1]))
   (s1, s2, s3, s4)
 end
+
+function _printlnvec(io, vec, n)
+  _printvec(io, vec, n)
+  println(io)
+end
+
+function _printvec(io, vec::AbstractArray, n)
+  print(io, "[")
+  if length(vec) > 2n
+    k = n - 1
+    join(io, vec[begin:(begin + k)], ", ")
+    print(io, ", ..., ")
+    join(io, vec[(end - k):end], ", ")
+  else
+    join(io, vec, ", ")
+  end
+  print(io, "]")
+end
+
+function _printvec(io, vec::AbstractArray{<:AbstractArray}, n)
+  len = length(vec)
+  println(io)
+  if len > 2n
+    for i in 1:n
+      print(io, "│  ├─ ")
+      _printlnvec(io, vec[i], n)
+    end
+    println(io, "│  ⋮")
+    for i in (len - n + 1):(len - 1)
+      print(io, "│  ├─ ")
+      _printlnvec(io, vec[i], n)
+    end
+  else
+    for i in 1:(len - 1)
+      print(io, "│  ├─ ")
+      _printlnvec(io, vec[i], n)
+    end
+  end
+  print(io, "│  └─ ")
+  _printvec(io, vec[len], n)
+end

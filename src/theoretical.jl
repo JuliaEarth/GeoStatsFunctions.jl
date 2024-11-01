@@ -161,6 +161,27 @@ function pairwise!(F, f::GeoStatsFunction, domain₁, domain₂)
   F
 end
 
+# -----------
+# IO METHODS
+# -----------
+
+Base.summary(io::IO, f::GeoStatsFunction) = print(io, nameof(typeof(f)))
+
+function Base.show(io::IO, f::GeoStatsFunction)
+  ioctx = IOContext(io, :compact => true)
+  summary(ioctx, f)
+  print(ioctx, "(")
+  _printfields(ioctx, f, singleline=true)
+  print(ioctx, ")")
+end
+
+function Base.show(io::IO, ::MIME"text/plain", f::GeoStatsFunction)
+  ioctx = IOContext(io, :compact => true, :limit => true)
+  summary(ioctx, f)
+  println(ioctx)
+  _printfields(ioctx, f)
+end
+
 # ----------------
 # IMPLEMENTATIONS
 # ----------------
@@ -172,6 +193,35 @@ include("theoretical/transiogram.jl")
 # -----------------
 # HELPER FUNCTIONS
 # -----------------
+
+function _printfields(io, f; singleline=false)
+  fields = fieldnames(typeof(f))
+  len = length(fields)
+  precommon, prelast = singleline ? ("", "") : ("├─ ", "└─ ")
+  poscommon, poslast = singleline ? (", ", "") : ("\n", "")
+  for (i, field) in enumerate(fields)
+    pre = i == len ? prelast : precommon
+    pos = i == len ? poslast : poscommon
+    value = getfield(f, i)
+    if value isa MetricBall
+      print(io, precommon)
+      if isisotropic(value)
+        print(io, "range: ", first(radii(value)))
+      else
+        print(io, "ranges: ", radii(value))
+      end
+      print(io, poscommon)
+      m = nameof(typeof(metric(value)))
+      print(io, pre)
+      print(io, "distance: ", m)
+      print(io, pos)
+    else
+      print(io, pre)
+      print(io, field, ": ", value)
+      print(io, pos)
+    end
+  end
+end
 
 _sample(::GeoStatsFunction, p::Point) = [p]
 

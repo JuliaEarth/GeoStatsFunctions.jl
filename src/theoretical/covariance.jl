@@ -50,14 +50,19 @@ scale(c::C, s::Real) where {C<:Covariance} = C(scale(c.γ, s))
 # IO METHODS
 # -----------
 
-function Base.show(io::IO, c::T) where {T<:Covariance}
-  name = string(nameof(T))
-  _showcompact(io, name, c.γ)
+function Base.show(io::IO, c::Covariance)
+  ioctx = IOContext(io, :compact => true)
+  summary(ioctx, c)
+  print(ioctx, "(")
+  _printfields(ioctx, c.γ, singleline=true)
+  print(ioctx, ")")
 end
 
-function Base.show(io::IO, ::MIME"text/plain", c::T) where {T<:Covariance}
-  name = string(nameof(T))
-  _showfull(io, name, c.γ)
+function Base.show(io::IO, ::MIME"text/plain", c::Covariance)
+  ioctx = IOContext(io, :compact => true, :limit => true)
+  summary(ioctx, c)
+  println(ioctx)
+  _printfields(ioctx, c.γ)
 end
 
 # heper macro to define covariances
