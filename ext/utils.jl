@@ -7,7 +7,7 @@ const Len{T} = Quantity{T,u"𝐋"}
 _maxlag(f::GeoStatsFunction) = 3range(f)
 _maxlag(::PowerVariogram) = 3.0u"m"
 _maxlag(::NuggetEffect) = 3.0u"m"
-_maxlag(t::MatrixExponentialTransiogram) = maximum(meanlengths(t))
+_maxlag(t::MatrixExponentialTransiogram) = 3maximum(meanlengths(t))
 _maxlag(t::PiecewiseLinearTransiogram) = last(t.abscissas)
 
 _addunit(x::Number, u) = x * u
