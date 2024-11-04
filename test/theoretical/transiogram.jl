@@ -4,12 +4,7 @@
   x, y = rand(rng, Point), rand(rng, Point)
 
   # simple transiogram models
-  ts = [
-    LinearTransiogram(),
-    GaussianTransiogram(),
-    SphericalTransiogram(),
-    ExponentialTransiogram()
-  ]
+  ts = [LinearTransiogram(), GaussianTransiogram(), SphericalTransiogram(), ExponentialTransiogram()]
 
   # check stationarity
   @test all(isstationary, ts)
