@@ -69,7 +69,7 @@
     @test !isnan(γ(0.0)) && !isinf(γ(0.0))
   end
 
-  # practical ranges
+  # effective ranges
   for γ in γs
     if !(γ isa NuggetEffect)
       @test isapprox(γ(range(γ)), sill(γ), atol=0.05)

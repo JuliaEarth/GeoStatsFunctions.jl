@@ -1,3 +1,33 @@
+@testset "Transiogram" begin
+  rng = StableRNG(123)
+  h = range(0, stop=10, length=50)
+  x, y = rand(rng, Point), rand(rng, Point)
+
+  # simple transiogram models
+  ts = [
+    LinearTransiogram(),
+    GaussianTransiogram(),
+    SphericalTransiogram(),
+    ExponentialTransiogram()
+  ]
+
+  # check stationarity
+  @test all(isstationary, ts)
+
+  # check anisotropy
+  @test all(isisotropic, ts)
+
+  # identity matrix at lag zero
+  for t in ts
+    @test t(0.0) == I(2)
+  end
+
+  # converge to proportions
+  for t in ts
+    @test t(1000.0) ≈ [0.5 0.5; 0.5 0.5]
+  end
+end
+
 @testset "MatrixExponentialTransiogram" begin
   # base transition rate matrix
   R = GeoStatsFunctions.baseratematrix((1.0u"m", 2.0u"m", 3.0u"m"), (0.2, 0.5, 0.3))
