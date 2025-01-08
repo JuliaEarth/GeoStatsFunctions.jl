@@ -1,7 +1,7 @@
 name = "GeoStatsFunctions"
 uuid = "6771c435-bc22-4842-b0c3-41852a255103"
 authors = ["Júlio Hoffimann <julio.hoffimann@gmail.com> and contributors"]
-version = "0.6.2"
+version = "0.6.3"
 
 [deps]
 Bessels = "0e736298-9ec6-45e8-9647-e4fc86a2fe38"
