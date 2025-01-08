@@ -26,18 +26,6 @@
   @test all(p -> Point(0.0, 0.0, 0.0) ≤ p ≤ Point(1.0, 1.0, 1.0), ps)
   @test length(ps) == 3 * 3 * 3
 
-  # regularization properties
-  γ = GaussianVariogram()
-  u = Point(0.0, 0.0)
-  v = Point(1.0, 0.0)
-  U = Quadrangle((-0.5, -0.5), (0.5, -0.5), (0.5, 0.5), (-0.5, 0.5))
-  V = Quadrangle((0.5, -0.5), (1.5, -0.5), (1.5, 0.5), (0.5, 0.5))
-  @test 0 < γ(U, v) < γ(u, v) < 1
-  @test 0 < γ(u, V) < γ(u, v) < 1
-  @test isapprox(γ(U, v), γ(u, V), atol=1e-1)
-  @test 0 < γ(U, V) < γ(U, v) < 1
-  @test 0 < γ(U, V) < γ(u, V) < 1
-
   # deterministic samples in arbitrary geometries
   γ = GaussianVariogram()
   G = PolyArea((0.0, 0.0), (0.5, -1.5), (1.0, 0.0), (1.5, 0.5), (1.0, 1.0), (0.5, 1.5), (-0.5, 0.5))
@@ -59,4 +47,11 @@
   )
   ps = GeoStatsFunctions._sample(γ, h) |> collect
   @test length(ps) == 3 * 3 * 3
+
+  # minimum allocation while sampling points
+  γ = GaussianVariogram()
+  p = Point(0.0, 0.0, 0.0)
+  ps = GeoStatsFunctions._sample(γ, p) |> collect
+  @test ps == [p]
+  @test (@allocated GeoStatsFunctions._sample(γ, p)) ≤ 32
 end

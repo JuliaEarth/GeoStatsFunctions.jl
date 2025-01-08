@@ -223,11 +223,11 @@ function _printfields(io, f; singleline=false)
   end
 end
 
-_sample(::GeoStatsFunction, p::Point) = [p]
+_sample(::GeoStatsFunction, p::Point) = (p,)
 
 function _sample(f::GeoStatsFunction, g::Geometry)
-  α = _spacing(f, g)
   rng = MersenneTwister(123)
+  α = _spacing(f, g)
   sample(rng, g, MinDistanceSampling(α))
 end
 
