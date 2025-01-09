@@ -82,7 +82,7 @@ function pairwise!(Γ, γ::Variogram, domain)
   end
 
   # upper triangular entries
-  @inbounds for j in 1:n*k
+  @inbounds for j in 1:(n * k)
     for i in 1:(j - 1)
       Γ[i, j] = Γ[j, i]
     end
