@@ -63,6 +63,34 @@ function structures(γ::Variogram)
   cₒ, (c,), (γ,)
 end
 
+# leverage symmetry of variograms
+function pairwise!(G, γ::Variogram, domain)
+  _, (_, n, k) = matrixparams(γ, domain, domain)
+  @inbounds for j in 1:n
+    gⱼ = domain[j]
+    sⱼ = _sample(γ, gⱼ)
+    # lower triangular entries
+    for i in (j + 1):n
+      gᵢ = domain[i]
+      sᵢ = _sample(γ, gᵢ)
+      M = mean(γ(pᵢ, pⱼ) for pᵢ in sᵢ, pⱼ in sⱼ)
+      G[((i - 1) * k + 1):(i * k), ((j - 1) * k + 1):(j * k)] .= M
+    end
+    # diagonal entries
+    M = mean(γ(pⱼ, pⱼ) for pⱼ in sⱼ, pⱼ in sⱼ)
+    G[((j - 1) * k + 1):(j * k), ((j - 1) * k + 1):(j * k)] .= M
+  end
+
+  # upper triangular entries
+  @inbounds for j in 1:n*k
+    for i in 1:(j - 1)
+      G[i, j] = G[j, i]
+    end
+  end
+
+  G
+end
+
 # ----------------
 # IMPLEMENTATIONS
 # ----------------

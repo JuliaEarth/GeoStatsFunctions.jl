@@ -86,44 +86,12 @@ end
 """
     pairwise(f, domain)
 
-Evaluate geostatistical function `f` between all elements in the `domain`.
+Evaluate geostatistical function `f` between all elements of the `domain`.
 """
 function pairwise(f::GeoStatsFunction, domain)
   T, (m, n, k) = matrixparams(f, domain)
   F = Matrix{T}(undef, (m * k, n * k))
   pairwise!(F, f, domain)
-end
-
-"""
-    pairwise!(F, f, domain)
-
-Evaluates geostatistical function `f` between all elements in the `domain` in-place, filling the matrix `F`.
-"""
-function pairwise!(F, f::GeoStatsFunction, domain)
-  _, (_, n, k) = matrixparams(f, domain, domain)
-  @inbounds for j in 1:n
-    gⱼ = domain[j]
-    sⱼ = _sample(f, gⱼ)
-    # lower triangular entries
-    for i in (j + 1):n
-      gᵢ = domain[i]
-      sᵢ = _sample(f, gᵢ)
-      M = mean(f(pᵢ, pⱼ) for pᵢ in sᵢ, pⱼ in sⱼ)
-      F[((i - 1) * k + 1):(i * k), ((j - 1) * k + 1):(j * k)] .= M
-    end
-    # diagonal entries
-    M = mean(f(pⱼ, pⱼ) for pⱼ in sⱼ, pⱼ in sⱼ)
-    F[((j - 1) * k + 1):(j * k), ((j - 1) * k + 1):(j * k)] .= M
-  end
-
-  # upper triangular entries
-  @inbounds for j in 1:n*k
-    for i in 1:(j - 1)
-      F[i, j] = F[j, i]
-    end
-  end
-
-  F
 end
 
 """
@@ -136,6 +104,13 @@ function pairwise(f::GeoStatsFunction, domain₁, domain₂)
   F = Matrix{T}(undef, (m * k, n * k))
   pairwise!(F, f, domain₁, domain₂)
 end
+
+"""
+    pairwise!(F, f, domain)
+
+Evaluates geostatistical function `f` between all elements in the `domain` in-place, filling the matrix `F`.
+"""
+pairwise!(F, f::GeoStatsFunction, domain) = pairwise!(F, f, domain, domain)
 
 """
     pairwise!(F, f, domain₁, domain₂)
