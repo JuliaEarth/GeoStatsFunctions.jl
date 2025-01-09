@@ -104,18 +104,25 @@ function pairwise!(F, f::GeoStatsFunction, domain)
   @inbounds for j in 1:n
     gⱼ = domain[j]
     sⱼ = _sample(f, gⱼ)
+    # lower triangular entries
     for i in (j + 1):n
       gᵢ = domain[i]
       sᵢ = _sample(f, gᵢ)
       M = mean(f(pᵢ, pⱼ) for pᵢ in sᵢ, pⱼ in sⱼ)
       F[((i - 1) * k + 1):(i * k), ((j - 1) * k + 1):(j * k)] .= M
     end
+    # diagonal entries
     M = mean(f(pⱼ, pⱼ) for pⱼ in sⱼ, pⱼ in sⱼ)
     F[((j - 1) * k + 1):(j * k), ((j - 1) * k + 1):(j * k)] .= M
+  end
+
+  # upper triangular entries
+  @inbounds for j in 1:n*k
     for i in 1:(j - 1)
-      F[((i - 1) * k + 1):(i * k), ((j - 1) * k + 1):(j * k)] .= F[((j - 1) * k + 1):(j * k), ((i - 1) * k + 1):(i * k)] # leverage the symmetry
+      F[i, j] = F[j, i]
     end
   end
+
   F
 end
 
