@@ -31,14 +31,14 @@
   end
 
   𝒟 = PointSet([(1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0)])
-  Γ = GeoStatsFunctions.pairwise(GaussianCovariance(), 𝒟)
-  @test eltype(Γ) == Float64
-  @test issymmetric(Γ)
+  C = GeoStatsFunctions.pairwise(GaussianCovariance(), 𝒟)
+  @test eltype(C) == Float64
+  @test issymmetric(C)
 
   𝒟 = PointSet([(1.0f0, 0.0f0, 0.0f0), (0.0f0, 1.0f0, 0.0f0), (0.0f0, 0.0f0, 1.0f0)])
-  Γ_f = GeoStatsFunctions.pairwise(GaussianCovariance(range=1.0f0, sill=1.0f0, nugget=0.0f0), 𝒟)
-  @test eltype(Γ_f) == Float32
-  @test issymmetric(Γ_f)
+  C_f = GeoStatsFunctions.pairwise(GaussianCovariance(range=1.0f0, sill=1.0f0, nugget=0.0f0), 𝒟)
+  @test eltype(C_f) == Float32
+  @test issymmetric(C_f)
 
   cov = GaussianCovariance(range=1.0, sill=1.0, nugget=0.0)
   @test isstationary(cov)
