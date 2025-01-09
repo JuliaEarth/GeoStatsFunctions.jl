@@ -169,6 +169,14 @@
   @test size(Γ) == (3, 4)
   @test all(Γ .> 0)
 
+  # non-allocating pairwise!
+  Γ = rand(100, 100)
+  γ = GaussianVariogram()
+  𝒫 = rand(Point, 100)
+  GeoStatsFunctions.pairwise!(Γ, γ, 𝒫)
+  @test (@allocated GeoStatsFunctions.pairwise!(Γ, γ, 𝒫)) == 0
+  @test issymmetric(Γ)
+
   # constructor
   for γ in [
     CircularVariogram(),
