@@ -21,6 +21,13 @@
   for t in ts
     @test t(1000.0) ≈ [0.5 0.5; 0.5 0.5]
   end
+
+  # pairwise evaluation
+  ps = [Point(0, 0), Point(1, 1), Point(2, 2)]
+  for t in ts
+    T = GeoStatsFunctions.pairwise(t, ps)
+    @test size(T) == (6, 6)
+  end
 end
 
 @testset "MatrixExponentialTransiogram" begin
@@ -49,9 +56,18 @@ end
   A = rand(3, 2)
   R = A ./ sum(A, dims=2)
   t = @test_throws ArgumentError MatrixExponentialTransiogram(R)
+
+  # pairwise evaluation
+  ps = [Point(0, 0), Point(1, 1), Point(2, 2)]
+  A = rand(3, 3)
+  R = A ./ sum(A, dims=2)
+  t = MatrixExponentialTransiogram(R)
+  T = GeoStatsFunctions.pairwise(t, ps)
+  @test size(T) == (9, 9)
 end
 
 @testset "PiecewiseLinearTransiogram" begin
+  # basic tests
   csv = CSV.File(joinpath(datadir, "facies5.csv"))
   gtb = georef(csv, ("X", "Y", "Z"))
   t = EmpiricalTransiogram(gtb, "FACIES", maxlag=20, nlags=20)
@@ -59,4 +75,9 @@ end
   @test τ(0.0u"m") == I(5)
   @test all(x -> 0 < x < 1, τ(5.0u"m"))
   @test all(allequal, eachcol(τ(100.0u"m")))
+
+  # pairwise evaluation
+  ps = [Point(0, 0, 0), Point(1, 1, 1), Point(2, 2, 2)]
+  T = GeoStatsFunctions.pairwise(τ, ps)
+  @test size(T) == (15, 15)
 end

@@ -169,6 +169,14 @@
   @test size(Γ) == (3, 4)
   @test all(Γ .> 0)
 
+  # non-allocating pairwise!
+  Γ = rand(100, 100)
+  γ = GaussianVariogram()
+  𝒫 = rand(Point, 100)
+  GeoStatsFunctions.pairwise!(Γ, γ, 𝒫)
+  @test (@allocated GeoStatsFunctions.pairwise!(Γ, γ, 𝒫)) == 0
+  @test issymmetric(Γ)
+
   # constructor
   for γ in [
     CircularVariogram(),
@@ -368,9 +376,9 @@ end
   # result type is defined for nested models
   # see https://github.com/JuliaEarth/GeoStats.jl/issues/121 
   γ = GaussianVariogram() + ExponentialVariogram()
-  @test GeoStatsFunctions.returntype(γ, Point(0.0, 0.0, 0.0), Point(0.0, 0.0, 0.0)) == Float64
+  @test typeof(γ(Point(0.0, 0.0, 0.0), Point(0.0, 0.0, 0.0))) == Float64
   γ = GaussianVariogram(sill=1.0f0, range=1.0f0, nugget=0.1f0)
-  @test GeoStatsFunctions.returntype(γ, Point(0.0f0, 0.0f0, 0.0f0), Point(0.0f0, 0.0f0, 0.0f0)) == Float32
+  @test typeof(γ(Point(0.0f0, 0.0f0, 0.0f0), Point(0.0f0, 0.0f0, 0.0f0))) == Float32
 
   # nested model with matrix coefficients
   C₁ = [1.0 0.5; 0.5 2.0]
