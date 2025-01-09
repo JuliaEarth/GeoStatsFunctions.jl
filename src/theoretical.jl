@@ -84,22 +84,13 @@ function (f::GeoStatsFunction)(g₁::Geometry, g₂::Geometry)
 end
 
 """
-    returntype(f, g₁, g₂)
-
-Return type of f(g₁, g₂).
-"""
-returntype(f::GeoStatsFunction, g₁, g₂) = typeof(f(g₁, g₂))
-
-"""
     pairwise(f, domain)
 
 Evaluate geostatistical function `f` between all elements in the `domain`.
 """
 function pairwise(f::GeoStatsFunction, domain)
-  g = first(domain)
-  n = length(domain)
-  T = returntype(f, g, g)
-  F = Matrix{T}(undef, n, n)
+  T, (m, n, k) = matrixparams(f, domain)
+  F = Matrix{T}(undef, (m * k, n * k))
   pairwise!(F, f, domain)
 end
 
@@ -109,18 +100,20 @@ end
 Evaluates geostatistical function `f` between all elements in the `domain` in-place, filling the matrix `F`.
 """
 function pairwise!(F, f::GeoStatsFunction, domain)
-  n = length(domain)
+  _, (_, n, k) = matrixparams(f, domain, domain)
   @inbounds for j in 1:n
     gⱼ = domain[j]
     sⱼ = _sample(f, gⱼ)
     for i in (j + 1):n
       gᵢ = domain[i]
       sᵢ = _sample(f, gᵢ)
-      F[i, j] = mean(f(pᵢ, pⱼ) for pᵢ in sᵢ, pⱼ in sⱼ)
+      M = mean(f(pᵢ, pⱼ) for pᵢ in sᵢ, pⱼ in sⱼ)
+      F[((i - 1) * k + 1):(i * k), ((j - 1) * k + 1):(j * k)] .= M
     end
-    F[j, j] = mean(f(pⱼ, pⱼ) for pⱼ in sⱼ, pⱼ in sⱼ)
+    M = mean(f(pⱼ, pⱼ) for pⱼ in sⱼ, pⱼ in sⱼ)
+    F[((j - 1) * k + 1):(j * k), ((j - 1) * k + 1):(j * k)] .= M
     for i in 1:(j - 1)
-      F[i, j] = F[j, i] # leverage the symmetry
+      F[((i - 1) * k + 1):(i * k), ((j - 1) * k + 1):(j * k)] .= F[((j - 1) * k + 1):(j * k), ((i - 1) * k + 1):(i * k)] # leverage the symmetry
     end
   end
   F
@@ -132,12 +125,8 @@ end
 Evaluate geostatistical function `f` between all elements of `domain₁` and `domain₂`.
 """
 function pairwise(f::GeoStatsFunction, domain₁, domain₂)
-  g₁ = first(domain₁)
-  g₂ = first(domain₂)
-  m = length(domain₁)
-  n = length(domain₂)
-  T = returntype(f, g₁, g₂)
-  F = Matrix{T}(undef, m, n)
+  T, (m, n, k) = matrixparams(f, domain₁, domain₂)
+  F = Matrix{T}(undef, (m * k, n * k))
   pairwise!(F, f, domain₁, domain₂)
 end
 
@@ -147,18 +136,44 @@ end
 Evaluates geostatistical function `f` between all elements of `domain₁` and `domain₂` in-place, filling the matrix `F`.
 """
 function pairwise!(F, f::GeoStatsFunction, domain₁, domain₂)
-  m = length(domain₁)
-  n = length(domain₂)
+  _, (m, n, k) = matrixparams(f, domain₁, domain₂)
   @inbounds for j in 1:n
     gⱼ = domain₂[j]
     sⱼ = _sample(f, gⱼ)
     for i in 1:m
       gᵢ = domain₁[i]
       sᵢ = _sample(f, gᵢ)
-      F[i, j] = mean(f(pᵢ, pⱼ) for pᵢ in sᵢ, pⱼ in sⱼ)
+      M = mean(f(pᵢ, pⱼ) for pᵢ in sᵢ, pⱼ in sⱼ)
+      F[((i - 1) * k + 1):(i * k), ((j - 1) * k + 1):(j * k)] .= M
     end
   end
   F
+end
+
+"""
+    matrixparams(f, domain)
+
+Return the parameters used to assemble the matrix for the
+geostatistical function `f` between all elements in the `domain`.
+"""
+matrixparams(f::GeoStatsFunction, domain) = matrixparams(f, domain, domain)
+
+"""
+    matrixparams(f, domain₁, domain₂)
+
+Return the parameters used to assemble the matrix for the
+geostatistical function `f` between all elements in `domain₁`
+and `domain₂`.
+"""
+function matrixparams(f::GeoStatsFunction, domain₁, domain₂)
+  m = length(domain₁)
+  n = length(domain₂)
+  g₁ = first(domain₁)
+  g₂ = first(domain₂)
+  R = f(g₁, g₂)
+  k = size(R, 1)
+  T = eltype(R)
+  T, (m, n, k)
 end
 
 # -----------
