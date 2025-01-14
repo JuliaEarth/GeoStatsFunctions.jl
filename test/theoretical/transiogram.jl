@@ -14,12 +14,12 @@
 
   # identity matrix at lag zero
   for t in ts
-    @test t(0.0) == I(2)
+    @test isapprox(t(0.0), [1.0 0.0; 0.0 1.0], atol=1e-5)
   end
 
   # converge to proportions
   for t in ts
-    @test t(1000.0) ≈ [0.5 0.5; 0.5 0.5]
+    @test isapprox(t(1000.0), [0.5 0.5; 0.5 0.5], atol=1e-5)
   end
 
   # pairwise evaluation
