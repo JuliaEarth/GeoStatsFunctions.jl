@@ -28,5 +28,6 @@ function (t::GaussianTransiogram)(h)
   h′, r′ = unitless(h, r)
   v = 1 - exp(-3(h′ / r′)^2)
   T = typeof(p[1] * v)
-  SMatrix{L,L}(i == j ? T(1 - (1 - p[j]) * v) : T((p[j] * v)) for i in 1:L, j in 1:L)
+  ϵ = T(1e-6) # add small eps for numerical stability
+  SMatrix{L,L}(i == j ? T(1 - (1 - p[j]) * v) - ϵ * (L - 1) : T(p[j] * v) + ϵ for i in 1:L, j in 1:L)
 end

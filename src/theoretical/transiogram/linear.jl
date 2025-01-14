@@ -26,8 +26,11 @@ function (t::LinearTransiogram)(h)
   p = t.prop
   L = length(p)
   h′, r′ = unitless(h, r)
+  v = h′ / r′
+  T = typeof(p[1] * v)
+  ϵ = T(1e-6) # add small eps for numerical stability
   SMatrix{L,L}(
-    i == j ? (h′ < r′) * (1 - (1 - p[j]) * (h′ / r′)) + (h′ ≥ r′) * p[j] :
-    (h′ < r′) * (p[j] * (h′ / r′)) + (h′ ≥ r′) * p[j] for i in 1:L, j in 1:L
+    i == j ? (h′ < r′) * T(1 - (1 - p[j]) * v) + (h′ ≥ r′) * T(p[j]) - ϵ * (L - 1) :
+    (h′ < r′) * T(p[j] * v) + (h′ ≥ r′) * T(p[j]) + ϵ for i in 1:L, j in 1:L
   )
 end
