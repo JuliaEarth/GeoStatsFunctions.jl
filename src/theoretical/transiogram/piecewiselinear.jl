@@ -55,14 +55,15 @@ function PiecewiseLinearTransiogram(abscissas::AbstractVector, ordinates::Abstra
 end
 
 function (t::PiecewiseLinearTransiogram)(h)
+  h′ = aslen(h)
   hs = t.abscissas
-  if h < first(hs) # left extrapolation
-    ((first(hs) - h) * I + h * first(t.ordinates)) / first(hs)
-  elseif h > last(hs) # right extrapolation
+  if h′ < first(hs) # left extrapolation
+    ((first(hs) - h′) * I + h′ * first(t.ordinates)) / first(hs)
+  elseif h′ > last(hs) # right extrapolation
     t.ordinfinity
   else # middle interpolation
-    k = findlast(<(h), hs)
-    ((hs[k + 1] - h) * t.ordinates[k] + (h - hs[k]) * t.ordinates[k + 1]) / (hs[k + 1] - hs[k])
+    k = findlast(<(h′), hs)
+    ((hs[k + 1] - h′) * t.ordinates[k] + (h′ - hs[k]) * t.ordinates[k + 1]) / (hs[k + 1] - hs[k])
   end
 end
 
