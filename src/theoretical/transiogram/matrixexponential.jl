@@ -54,7 +54,7 @@ MatrixExponentialTransiogram() = MatrixExponentialTransiogram((1.0u"m", 1.0u"m")
 
 meanlengths(t::MatrixExponentialTransiogram) = Tuple(1 ./ -diag(t.rate))
 
-(t::MatrixExponentialTransiogram)(h) = exp(h * t.rate)
+(t::MatrixExponentialTransiogram)(h) = exp(aslen(h) * t.rate)
 
 # -----------
 # IO METHODS
