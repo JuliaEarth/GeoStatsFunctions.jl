@@ -86,7 +86,8 @@ end
 """
     pairwise(f, domain)
 
-Evaluate geostatistical function `f` between all elements of the `domain`.
+Evaluate geostatistical function `f` between all elements in the `domain`,
+filling a matrix with unitless values for use in linear systems.
 """
 function pairwise(f::GeoStatsFunction, domain)
   T, (m, n, k) = matrixparams(f, domain)
@@ -97,7 +98,8 @@ end
 """
     pairwise(f, domain₁, domain₂)
 
-Evaluate geostatistical function `f` between all elements of `domain₁` and `domain₂`.
+Evaluate geostatistical function `f` between all elements in `domain₁` and `domain₂`
+filling a matrix with unitless values for use in linear systems.
 """
 function pairwise(f::GeoStatsFunction, domain₁, domain₂)
   T, (m, n, k) = matrixparams(f, domain₁, domain₂)
@@ -108,14 +110,16 @@ end
 """
     pairwise!(F, f, domain)
 
-Evaluates geostatistical function `f` between all elements in the `domain` in-place, filling the matrix `F`.
+Evaluates geostatistical function `f` between all elements in the `domain` in-place,
+filling the matrix `F` with unitless values for use in linear systems.
 """
 pairwise!(F, f::GeoStatsFunction, domain) = pairwise!(F, f, domain, domain)
 
 """
     pairwise!(F, f, domain₁, domain₂)
 
-Evaluates geostatistical function `f` between all elements of `domain₁` and `domain₂` in-place, filling the matrix `F`.
+Evaluates geostatistical function `f` between all elements of `domain₁` and `domain₂` in-place,
+filling the matrix `F` with unitless values for use in linear systems.
 """
 function pairwise!(F, f::GeoStatsFunction, domain₁, domain₂)
   _, (m, n, k) = matrixparams(f, domain₁, domain₂)
@@ -125,8 +129,8 @@ function pairwise!(F, f::GeoStatsFunction, domain₁, domain₂)
     for i in 1:m
       gᵢ = domain₁[i]
       sᵢ = _sample(f, gᵢ)
-      M = mean(f(pᵢ, pⱼ) for pᵢ in sᵢ, pⱼ in sⱼ)
-      F[((i - 1) * k + 1):(i * k), ((j - 1) * k + 1):(j * k)] .= M
+      Fᵢⱼ = ustrip.(mean(f(pᵢ, pⱼ) for pᵢ in sᵢ, pⱼ in sⱼ))
+      F[((i - 1) * k + 1):(i * k), ((j - 1) * k + 1):(j * k)] .= Fᵢⱼ
     end
   end
   F
@@ -152,10 +156,10 @@ function matrixparams(f::GeoStatsFunction, domain₁, domain₂)
   n = length(domain₂)
   g₁ = first(domain₁)
   g₂ = first(domain₂)
-  R = f(g₁, g₂)
-  k = size(R, 1)
-  T = eltype(R)
-  T, (m, n, k)
+  F = ustrip.(f(g₁, g₂))
+  k = size(F, 1)
+  V = eltype(F)
+  V, (m, n, k)
 end
 
 # -----------

@@ -73,12 +73,12 @@ function pairwise!(Γ, γ::Variogram, domain)
     for i in (j + 1):n
       gᵢ = domain[i]
       sᵢ = _sample(γ, gᵢ)
-      M = mean(γ(pᵢ, pⱼ) for pᵢ in sᵢ, pⱼ in sⱼ)
-      Γ[((i - 1) * k + 1):(i * k), ((j - 1) * k + 1):(j * k)] .= M
+      Γᵢⱼ = ustrip.(mean(γ(pᵢ, pⱼ) for pᵢ in sᵢ, pⱼ in sⱼ))
+      Γ[((i - 1) * k + 1):(i * k), ((j - 1) * k + 1):(j * k)] .= Γᵢⱼ
     end
     # diagonal entries
-    M = mean(γ(pⱼ, pⱼ) for pⱼ in sⱼ, pⱼ in sⱼ)
-    Γ[((j - 1) * k + 1):(j * k), ((j - 1) * k + 1):(j * k)] .= M
+    Γᵢⱼ = ustrip.(mean(γ(pⱼ, pⱼ) for pⱼ in sⱼ, pⱼ in sⱼ))
+    Γ[((j - 1) * k + 1):(j * k), ((j - 1) * k + 1):(j * k)] .= Γᵢⱼ
   end
 
   # upper triangular entries
