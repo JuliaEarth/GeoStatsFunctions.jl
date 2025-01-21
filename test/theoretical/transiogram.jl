@@ -12,6 +12,16 @@
   # check anisotropy
   @test all(isisotropic, ts)
 
+  # mean lengths
+  for t in ts
+    @test meanlengths(t) == (1.0u"m", 1.0u"m")
+  end
+
+  # proportions
+  for t in ts
+    @test proportions(t) == (0.5, 0.5)
+  end
+
   # identity matrix at lag zero
   for t in ts
     @test isapprox(t(0.0), [1.0 0.0; 0.0 1.0], atol=1e-5)

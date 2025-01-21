@@ -66,6 +66,7 @@ export
   isisotropic,
   metricball,
   meanlengths,
+  proportions,
 
   # theoretical variograms
   Variogram,

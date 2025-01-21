@@ -21,6 +21,14 @@ abstract type Transiogram <: GeoStatsFunction end
 isstationary(::Type{<:Transiogram}) = true
 
 # ----------------
+# TRANSIOGRAM API
+# ----------------
+
+meanlengths(t::Transiogram) = radii(metricball(t))
+
+proportions(t::Transiogram) = Tuple(normalize(diag(t(100range(t))), 1))
+
+# ----------------
 # IMPLEMENTATIONS
 # ----------------
 
