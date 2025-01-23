@@ -4,22 +4,24 @@
 
 """
     ExponentialVariogram(; range, sill, nugget)
-    ExponentialVariogram(ball; sill, nugget)
 
 A exponential variogram with `range`, `sill` and `nugget`.
-Optionally, use a custom metric `ball`.
+
+    ExponentialVariogram(ball; sill, nugget)
+
+Alternatively, use a custom metric `ball`.
 """
-struct ExponentialVariogram{V,B} <: Variogram
+struct ExponentialVariogram{B,V} <: Variogram
+  ball::B
   sill::V
   nugget::V
-  ball::B
-  ExponentialVariogram(sill::V, nugget::V, ball::B) where {V,B} = new{float(V),B}(sill, nugget, ball)
+  ExponentialVariogram(ball::B, sill::V, nugget::V) where {B,V} = new{B,float(V)}(ball, sill, nugget)
 end
 
-ExponentialVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = ExponentialVariogram(sill, nugget, ball)
+ExponentialVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = ExponentialVariogram(ball, sill, nugget)
 
 ExponentialVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill))) =
-  ExponentialVariogram(sill, nugget, MetricBall(range))
+  ExponentialVariogram(MetricBall(range), sill, nugget)
 
 constructor(::ExponentialVariogram) = ExponentialVariogram
 

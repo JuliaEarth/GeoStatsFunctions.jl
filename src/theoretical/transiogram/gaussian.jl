@@ -4,20 +4,22 @@
 
 """
     GaussianTransiogram(; ranges, proportions)
-    GaussianTransiogram(ball; proportions)
 
 A Gaussian transiogram with `ranges`, and `proportions`.
-Optionally, use a custom metric `ball`.
+
+    GaussianTransiogram(ball; proportions)
+
+Alternatively, use a custom metric `ball`.
 """
-struct GaussianTransiogram{P,B} <: Transiogram
-  prop::P
+struct GaussianTransiogram{B,P} <: Transiogram
   ball::B
+  prop::P
 end
 
-GaussianTransiogram(ball; proportions=(0.5, 0.5)) = GaussianTransiogram(proportions, ball)
+GaussianTransiogram(ball; proportions=(0.5, 0.5)) = GaussianTransiogram(ball, proportions)
 
 GaussianTransiogram(; ranges=(1.0u"m", 1.0u"m"), proportions=(0.5, 0.5)) =
-  GaussianTransiogram(proportions, MetricBall(ranges))
+  GaussianTransiogram(MetricBall(ranges), proportions)
 
 constructor(::GaussianTransiogram) = GaussianTransiogram
 

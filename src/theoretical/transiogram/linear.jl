@@ -4,20 +4,22 @@
 
 """
     LinearTransiogram(; ranges, proportions)
-    LinearTransiogram(ball; proportions)
 
 A linear transiogram with `ranges`, and `proportions`.
-Optionally, use a custom metric `ball`.
+
+    LinearTransiogram(ball; proportions)
+
+Alternatively, use a custom metric `ball`.
 """
-struct LinearTransiogram{P,B} <: Transiogram
-  prop::P
+struct LinearTransiogram{B,P} <: Transiogram
   ball::B
+  prop::P
 end
 
-LinearTransiogram(ball; proportions=(0.5, 0.5)) = LinearTransiogram(proportions, ball)
+LinearTransiogram(ball; proportions=(0.5, 0.5)) = LinearTransiogram(ball, proportions)
 
 LinearTransiogram(; ranges=(1.0u"m", 1.0u"m"), proportions=(0.5, 0.5)) =
-  LinearTransiogram(proportions, MetricBall(ranges))
+  LinearTransiogram(MetricBall(ranges), proportions)
 
 constructor(::LinearTransiogram) = LinearTransiogram
 

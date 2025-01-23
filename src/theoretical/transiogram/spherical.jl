@@ -4,20 +4,22 @@
 
 """
     SphericalTransiogram(; ranges, proportions)
-    SphericalTransiogram(ball; proportions)
 
 A spherical transiogram with `ranges`, and `proportions`.
-Optionally, use a custom metric `ball`.
+
+    SphericalTransiogram(ball; proportions)
+
+Alternatively, use a custom metric `ball`.
 """
-struct SphericalTransiogram{P,B} <: Transiogram
-  prop::P
+struct SphericalTransiogram{B,P} <: Transiogram
   ball::B
+  prop::P
 end
 
-SphericalTransiogram(ball; proportions=(0.5, 0.5)) = SphericalTransiogram(proportions, ball)
+SphericalTransiogram(ball; proportions=(0.5, 0.5)) = SphericalTransiogram(ball, proportions)
 
 SphericalTransiogram(; ranges=(1.0u"m", 1.0u"m"), proportions=(0.5, 0.5)) =
-  SphericalTransiogram(proportions, MetricBall(ranges))
+  SphericalTransiogram(MetricBall(ranges), proportions)
 
 constructor(::SphericalTransiogram) = SphericalTransiogram
 

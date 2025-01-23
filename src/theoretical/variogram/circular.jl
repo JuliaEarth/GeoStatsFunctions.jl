@@ -1,20 +1,22 @@
 """
     CircularVariogram(; range, sill, nugget)
-    CircularVariogram(ball; sill, nugget)
 
 A circular variogram with `range`, `sill` and `nugget`.
-Optionally, use a custom metric `ball`.
+
+    CircularVariogram(ball; sill, nugget)
+
+Alternatively, use a custom metric `ball`.
 """
-struct CircularVariogram{V,B} <: Variogram
+struct CircularVariogram{B,V} <: Variogram
+  ball::B
   sill::V
   nugget::V
-  ball::B
-  CircularVariogram(sill::V, nugget::V, ball::B) where {V,B} = new{float(V),B}(sill, nugget, ball)
+  CircularVariogram(ball::B, sill::V, nugget::V) where {B,V} = new{B,float(V)}(ball, sill, nugget)
 end
 
-CircularVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = CircularVariogram(sill, nugget, ball)
+CircularVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = CircularVariogram(ball, sill, nugget)
 
-CircularVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill))) = CircularVariogram(sill, nugget, MetricBall(range))
+CircularVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill))) = CircularVariogram(MetricBall(range), sill, nugget)
 
 constructor(::CircularVariogram) = CircularVariogram
 

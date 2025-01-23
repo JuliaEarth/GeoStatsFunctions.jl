@@ -51,75 +51,67 @@
 
   # shows
   cov = CircularCovariance()
-  @test sprint(show, cov) == "CircularCovariance(sill: 1.0, nugget: 0.0, range: 1.0 m, distance: Euclidean)"
+  @test sprint(show, cov) == "CircularCovariance(range: 1.0 m, sill: 1.0, nugget: 0.0)"
   @test sprint(show, MIME"text/plain"(), cov) == """
   CircularCovariance
-  ├─ sill: 1.0
-  ├─ nugget: 0.0
   ├─ range: 1.0 m
-  └─ distance: Euclidean"""
+  ├─ sill: 1.0
+  └─ nugget: 0.0"""
 
   cov = CubicCovariance()
-  @test sprint(show, cov) == "CubicCovariance(sill: 1.0, nugget: 0.0, range: 1.0 m, distance: Euclidean)"
+  @test sprint(show, cov) == "CubicCovariance(range: 1.0 m, sill: 1.0, nugget: 0.0)"
   @test sprint(show, MIME"text/plain"(), cov) == """
   CubicCovariance
-  ├─ sill: 1.0
-  ├─ nugget: 0.0
   ├─ range: 1.0 m
-  └─ distance: Euclidean"""
+  ├─ sill: 1.0
+  └─ nugget: 0.0"""
 
   cov = ExponentialCovariance()
-  @test sprint(show, cov) == "ExponentialCovariance(sill: 1.0, nugget: 0.0, range: 1.0 m, distance: Euclidean)"
+  @test sprint(show, cov) == "ExponentialCovariance(range: 1.0 m, sill: 1.0, nugget: 0.0)"
   @test sprint(show, MIME"text/plain"(), cov) == """
   ExponentialCovariance
-  ├─ sill: 1.0
-  ├─ nugget: 0.0
   ├─ range: 1.0 m
-  └─ distance: Euclidean"""
+  ├─ sill: 1.0
+  └─ nugget: 0.0"""
 
   cov = GaussianCovariance()
-  @test sprint(show, cov) == "GaussianCovariance(sill: 1.0, nugget: 0.0, range: 1.0 m, distance: Euclidean)"
+  @test sprint(show, cov) == "GaussianCovariance(range: 1.0 m, sill: 1.0, nugget: 0.0)"
   @test sprint(show, MIME"text/plain"(), cov) == """
   GaussianCovariance
-  ├─ sill: 1.0
-  ├─ nugget: 0.0
   ├─ range: 1.0 m
-  └─ distance: Euclidean"""
+  ├─ sill: 1.0
+  └─ nugget: 0.0"""
 
   cov = MaternCovariance()
-  @test sprint(show, cov) == "MaternCovariance(sill: 1.0, nugget: 0.0, order: 1.0, range: 1.0 m, distance: Euclidean)"
+  @test sprint(show, cov) == "MaternCovariance(range: 1.0 m, sill: 1.0, nugget: 0.0, order: 1.0)"
   @test sprint(show, MIME"text/plain"(), cov) == """
   MaternCovariance
+  ├─ range: 1.0 m
   ├─ sill: 1.0
   ├─ nugget: 0.0
-  ├─ order: 1.0
-  ├─ range: 1.0 m
-  └─ distance: Euclidean"""
+  └─ order: 1.0"""
 
   cov = PentasphericalCovariance()
-  @test sprint(show, cov) == "PentasphericalCovariance(sill: 1.0, nugget: 0.0, range: 1.0 m, distance: Euclidean)"
+  @test sprint(show, cov) == "PentasphericalCovariance(range: 1.0 m, sill: 1.0, nugget: 0.0)"
   @test sprint(show, MIME"text/plain"(), cov) == """
   PentasphericalCovariance
-  ├─ sill: 1.0
-  ├─ nugget: 0.0
   ├─ range: 1.0 m
-  └─ distance: Euclidean"""
+  ├─ sill: 1.0
+  └─ nugget: 0.0"""
 
   cov = SineHoleCovariance()
-  @test sprint(show, cov) == "SineHoleCovariance(sill: 1.0, nugget: 0.0, range: 1.0 m, distance: Euclidean)"
+  @test sprint(show, cov) == "SineHoleCovariance(range: 1.0 m, sill: 1.0, nugget: 0.0)"
   @test sprint(show, MIME"text/plain"(), cov) == """
   SineHoleCovariance
-  ├─ sill: 1.0
-  ├─ nugget: 0.0
   ├─ range: 1.0 m
-  └─ distance: Euclidean"""
+  ├─ sill: 1.0
+  └─ nugget: 0.0"""
 
   cov = SphericalCovariance()
-  @test sprint(show, cov) == "SphericalCovariance(sill: 1.0, nugget: 0.0, range: 1.0 m, distance: Euclidean)"
+  @test sprint(show, cov) == "SphericalCovariance(range: 1.0 m, sill: 1.0, nugget: 0.0)"
   @test sprint(show, MIME"text/plain"(), cov) == """
   SphericalCovariance
-  ├─ sill: 1.0
-  ├─ nugget: 0.0
   ├─ range: 1.0 m
-  └─ distance: Euclidean"""
+  ├─ sill: 1.0
+  └─ nugget: 0.0"""
 end

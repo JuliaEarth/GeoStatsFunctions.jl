@@ -4,21 +4,23 @@
 
 """
     GaussianVariogram(; range, sill, nugget)
-    GaussianVariogram(ball; sill, nugget)
 
 A Gaussian variogram with `range`, `sill` and `nugget`.
-Optionally, use a custom metric `ball`.
+
+    GaussianVariogram(ball; sill, nugget)
+
+Alternatively, use a custom metric `ball`.
 """
-struct GaussianVariogram{V,B} <: Variogram
+struct GaussianVariogram{B,V} <: Variogram
+  ball::B
   sill::V
   nugget::V
-  ball::B
-  GaussianVariogram(sill::V, nugget::V, ball::B) where {V,B} = new{float(V),B}(sill, nugget, ball)
+  GaussianVariogram(ball::B, sill::V, nugget::V) where {B,V} = new{B,float(V)}(ball, sill, nugget)
 end
 
-GaussianVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = GaussianVariogram(sill, nugget, ball)
+GaussianVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = GaussianVariogram(ball, sill, nugget)
 
-GaussianVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill))) = GaussianVariogram(sill, nugget, MetricBall(range))
+GaussianVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill))) = GaussianVariogram(MetricBall(range), sill, nugget)
 
 constructor(::GaussianVariogram) = GaussianVariogram
 

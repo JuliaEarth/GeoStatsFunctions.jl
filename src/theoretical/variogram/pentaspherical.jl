@@ -4,22 +4,24 @@
 
 """
     PentasphericalVariogram(; range, sill, nugget)
-    PentasphericalVariogram(ball; sill, nugget)
 
 A pentaspherical variogram with `range`, `sill` and `nugget`.
-Optionally, use a custom metric `ball`.
+
+    PentasphericalVariogram(ball; sill, nugget)
+
+Alternatively, use a custom metric `ball`.
 """
-struct PentasphericalVariogram{V,B} <: Variogram
+struct PentasphericalVariogram{B,V} <: Variogram
+  ball::B
   sill::V
   nugget::V
-  ball::B
-  PentasphericalVariogram(sill::V, nugget::V, ball::B) where {V,B} = new{float(V),B}(sill, nugget, ball)
+  PentasphericalVariogram(ball::B, sill::V, nugget::V) where {B,V} = new{B,float(V)}(ball, sill, nugget)
 end
 
-PentasphericalVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = PentasphericalVariogram(sill, nugget, ball)
+PentasphericalVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = PentasphericalVariogram(ball, sill, nugget)
 
 PentasphericalVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill))) =
-  PentasphericalVariogram(sill, nugget, MetricBall(range))
+  PentasphericalVariogram(MetricBall(range), sill, nugget)
 
 constructor(::PentasphericalVariogram) = PentasphericalVariogram
 

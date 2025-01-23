@@ -4,16 +4,17 @@
 
 """
     MatrixExponentialTransiogram(rate)
-    MatrixExponentialTransiogram(ball, rate)
 
 An exponential transiogram with transition `rate` matrix.
-Optionally, specify a metric `ball` to model anisotropy.
 
     MatrixExponentialTransiogram(lengths, proportions)
-    MatrixExponentialTransiogram(ball, lengths, proportions)
 
 Alternatively, build transition rate matrix from mean `lengths`
 and relative `proportions`.
+
+    MatrixExponentialTransiogram(ball, rate)
+
+Alternatively, use a custom metric `ball`.
 
 ## References
 
@@ -23,21 +24,21 @@ and relative `proportions`.
 * Carle et al 1998. [Conditional Simulation of Hydrofacies Architecture:
   A Transition Probability/Markov Approach](https://doi.org/10.2110/sepmcheg.01.147)
 """
-struct MatrixExponentialTransiogram{R<:StaticMatrix,B<:MetricBall} <: Transiogram
-  rate::R
+struct MatrixExponentialTransiogram{B<:MetricBall,R<:StaticMatrix} <: Transiogram
   ball::B
+  rate::R
 
-  function MatrixExponentialTransiogram{R,B}(rate, ball) where {R<:StaticMatrix,B<:MetricBall}
+  function MatrixExponentialTransiogram{B,R}(ball, rate) where {B<:MetricBall,R<:StaticMatrix}
     if !allequal(size(rate))
       throw(ArgumentError("transition rate matrix must be square"))
     end
-    new(rate, ball)
+    new(ball, rate)
   end
 end
 
 function MatrixExponentialTransiogram(ball::MetricBall, rate::AbstractMatrix)
   srate = SMatrix{size(rate)...}(float(asinvlen.(rate)))
-  MatrixExponentialTransiogram{typeof(srate),typeof(ball)}(srate, ball)
+  MatrixExponentialTransiogram{typeof(ball),typeof(srate)}(ball, srate)
 end
 
 function MatrixExponentialTransiogram(rate::AbstractMatrix)

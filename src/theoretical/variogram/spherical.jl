@@ -4,22 +4,24 @@
 
 """
     SphericalVariogram(; range, sill, nugget)
-    SphericalVariogram(ball; sill, nugget)
 
 A spherical variogram with `range`, `sill` and `nugget`.
-Optionally, use a custom metric `ball`.
+
+    SphericalVariogram(ball; sill, nugget)
+
+Alternatively, use a custom metric `ball`.
 """
-struct SphericalVariogram{V,B} <: Variogram
+struct SphericalVariogram{B,V} <: Variogram
+  ball::B
   sill::V
   nugget::V
-  ball::B
-  SphericalVariogram(sill::V, nugget::V, ball::B) where {V,B} = new{float(V),B}(sill, nugget, ball)
+  SphericalVariogram(ball::B, sill::V, nugget::V) where {B,V} = new{B,float(V)}(ball, sill, nugget)
 end
 
-SphericalVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = SphericalVariogram(sill, nugget, ball)
+SphericalVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = SphericalVariogram(ball, sill, nugget)
 
 SphericalVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill))) =
-  SphericalVariogram(sill, nugget, MetricBall(range))
+  SphericalVariogram(MetricBall(range), sill, nugget)
 
 constructor(::SphericalVariogram) = SphericalVariogram
 

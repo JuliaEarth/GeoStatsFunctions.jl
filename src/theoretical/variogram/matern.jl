@@ -4,25 +4,27 @@
 
 """
     MaternVariogram(; range, sill, nugget, order)
+
+A Matérn variogram with `range`, `sill`, `nugget`
+and `order` of the Bessel function.
+
     MaternVariogram(ball; sill, nugget, order)
 
-A Matérn variogram with `range`, `sill` and `nugget`.
-Optionally, use a custom metric `ball` and `order` of
-the Bessel function.
+Alternatively, use a custom metric `ball`.
 """
-struct MaternVariogram{V,O,B} <: Variogram
+struct MaternVariogram{B,V,O} <: Variogram
+  ball::B
   sill::V
   nugget::V
   order::O
-  ball::B
-  MaternVariogram(sill::V, nugget::V, order::O, ball::B) where {V,O,B} =
-    new{float(V),float(O),B}(sill, nugget, order, ball)
+  MaternVariogram(ball::B, sill::V, nugget::V, order::O) where {B,V,O} =
+    new{B,float(V),float(O)}(ball, sill, nugget, order)
 end
 
-MaternVariogram(ball; sill=1.0, nugget=zero(typeof(sill)), order=1.0) = MaternVariogram(sill, nugget, order, ball)
+MaternVariogram(ball; sill=1.0, nugget=zero(typeof(sill)), order=1.0) = MaternVariogram(ball, sill, nugget, order)
 
 MaternVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill)), order=1.0) =
-  MaternVariogram(sill, nugget, order, MetricBall(range))
+  MaternVariogram(MetricBall(range), sill, nugget, order)
 
 constructor(::MaternVariogram) = MaternVariogram
 

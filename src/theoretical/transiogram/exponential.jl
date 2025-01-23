@@ -4,20 +4,22 @@
 
 """
     ExponentialTransiogram(; ranges, proportions)
-    ExponentialTransiogram(ball; proportions)
 
 A exponential transiogram with `ranges`, and `proportions`.
-Optionally, use a custom metric `ball`.
+
+    ExponentialTransiogram(ball; proportions)
+
+Alternatively, use a custom metric `ball`.
 """
-struct ExponentialTransiogram{P,B} <: Transiogram
-  prop::P
+struct ExponentialTransiogram{B,P} <: Transiogram
   ball::B
+  prop::P
 end
 
-ExponentialTransiogram(ball; proportions=(0.5, 0.5)) = ExponentialTransiogram(proportions, ball)
+ExponentialTransiogram(ball; proportions=(0.5, 0.5)) = ExponentialTransiogram(ball, proportions)
 
 ExponentialTransiogram(; ranges=(1.0u"m", 1.0u"m"), proportions=(0.5, 0.5)) =
-  ExponentialTransiogram(proportions, MetricBall(ranges))
+  ExponentialTransiogram(MetricBall(ranges), proportions)
 
 constructor(::ExponentialTransiogram) = ExponentialTransiogram
 

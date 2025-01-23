@@ -4,21 +4,23 @@
 
 """
     CubicVariogram(; range, sill, nugget)
-    CubicVariogram(ball; sill, nugget)
 
 A cubic variogram with `range`, `sill` and `nugget`.
-Optionally, use a custom metric `ball`.
+
+    CubicVariogram(ball; sill, nugget)
+
+Alternatively, use a custom metric `ball`.
 """
-struct CubicVariogram{V,B} <: Variogram
+struct CubicVariogram{B,V} <: Variogram
+  ball::B
   sill::V
   nugget::V
-  ball::B
-  CubicVariogram(sill::V, nugget::V, ball::B) where {V,B} = new{float(V),B}(sill, nugget, ball)
+  CubicVariogram(ball::B, sill::V, nugget::V) where {B,V} = new{B,float(V)}(ball, sill, nugget)
 end
 
-CubicVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = CubicVariogram(sill, nugget, ball)
+CubicVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = CubicVariogram(ball, sill, nugget)
 
-CubicVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill))) = CubicVariogram(sill, nugget, MetricBall(range))
+CubicVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill))) = CubicVariogram(MetricBall(range), sill, nugget)
 
 constructor(::CubicVariogram) = CubicVariogram
 

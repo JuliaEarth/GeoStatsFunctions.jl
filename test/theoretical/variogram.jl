@@ -244,50 +244,45 @@
 
   # shows
   γ = CircularVariogram()
-  @test sprint(show, γ) == "CircularVariogram(sill: 1.0, nugget: 0.0, range: 1.0 m, distance: Euclidean)"
+  @test sprint(show, γ) == "CircularVariogram(range: 1.0 m, sill: 1.0, nugget: 0.0)"
   @test sprint(show, MIME"text/plain"(), γ) == """
   CircularVariogram
-  ├─ sill: 1.0
-  ├─ nugget: 0.0
   ├─ range: 1.0 m
-  └─ distance: Euclidean"""
+  ├─ sill: 1.0
+  └─ nugget: 0.0"""
 
   γ = CubicVariogram()
-  @test sprint(show, γ) == "CubicVariogram(sill: 1.0, nugget: 0.0, range: 1.0 m, distance: Euclidean)"
+  @test sprint(show, γ) == "CubicVariogram(range: 1.0 m, sill: 1.0, nugget: 0.0)"
   @test sprint(show, MIME"text/plain"(), γ) == """
   CubicVariogram
-  ├─ sill: 1.0
-  ├─ nugget: 0.0
   ├─ range: 1.0 m
-  └─ distance: Euclidean"""
+  ├─ sill: 1.0
+  └─ nugget: 0.0"""
 
   γ = ExponentialVariogram()
-  @test sprint(show, γ) == "ExponentialVariogram(sill: 1.0, nugget: 0.0, range: 1.0 m, distance: Euclidean)"
+  @test sprint(show, γ) == "ExponentialVariogram(range: 1.0 m, sill: 1.0, nugget: 0.0)"
   @test sprint(show, MIME"text/plain"(), γ) == """
   ExponentialVariogram
-  ├─ sill: 1.0
-  ├─ nugget: 0.0
   ├─ range: 1.0 m
-  └─ distance: Euclidean"""
+  ├─ sill: 1.0
+  └─ nugget: 0.0"""
 
   γ = GaussianVariogram()
-  @test sprint(show, γ) == "GaussianVariogram(sill: 1.0, nugget: 0.0, range: 1.0 m, distance: Euclidean)"
+  @test sprint(show, γ) == "GaussianVariogram(range: 1.0 m, sill: 1.0, nugget: 0.0)"
   @test sprint(show, MIME"text/plain"(), γ) == """
   GaussianVariogram
-  ├─ sill: 1.0
-  ├─ nugget: 0.0
   ├─ range: 1.0 m
-  └─ distance: Euclidean"""
+  ├─ sill: 1.0
+  └─ nugget: 0.0"""
 
   γ = MaternVariogram()
-  @test sprint(show, γ) == "MaternVariogram(sill: 1.0, nugget: 0.0, order: 1.0, range: 1.0 m, distance: Euclidean)"
+  @test sprint(show, γ) == "MaternVariogram(range: 1.0 m, sill: 1.0, nugget: 0.0, order: 1.0)"
   @test sprint(show, MIME"text/plain"(), γ) == """
   MaternVariogram
+  ├─ range: 1.0 m
   ├─ sill: 1.0
   ├─ nugget: 0.0
-  ├─ order: 1.0
-  ├─ range: 1.0 m
-  └─ distance: Euclidean"""
+  └─ order: 1.0"""
 
   γ = NuggetEffect()
   @test sprint(show, γ) == "NuggetEffect(nugget: 1.0)"
@@ -296,13 +291,12 @@
   └─ nugget: 1.0"""
 
   γ = PentasphericalVariogram()
-  @test sprint(show, γ) == "PentasphericalVariogram(sill: 1.0, nugget: 0.0, range: 1.0 m, distance: Euclidean)"
+  @test sprint(show, γ) == "PentasphericalVariogram(range: 1.0 m, sill: 1.0, nugget: 0.0)"
   @test sprint(show, MIME"text/plain"(), γ) == """
   PentasphericalVariogram
-  ├─ sill: 1.0
-  ├─ nugget: 0.0
   ├─ range: 1.0 m
-  └─ distance: Euclidean"""
+  ├─ sill: 1.0
+  └─ nugget: 0.0"""
 
   γ = PowerVariogram()
   @test sprint(show, γ) == "PowerVariogram(scaling: 1.0, nugget: 0.0, exponent: 1.0)"
@@ -313,22 +307,20 @@
   └─ exponent: 1.0"""
 
   γ = SineHoleVariogram()
-  @test sprint(show, γ) == "SineHoleVariogram(sill: 1.0, nugget: 0.0, range: 1.0 m, distance: Euclidean)"
+  @test sprint(show, γ) == "SineHoleVariogram(range: 1.0 m, sill: 1.0, nugget: 0.0)"
   @test sprint(show, MIME"text/plain"(), γ) == """
   SineHoleVariogram
-  ├─ sill: 1.0
-  ├─ nugget: 0.0
   ├─ range: 1.0 m
-  └─ distance: Euclidean"""
+  ├─ sill: 1.0
+  └─ nugget: 0.0"""
 
   γ = SphericalVariogram()
-  @test sprint(show, γ) == "SphericalVariogram(sill: 1.0, nugget: 0.0, range: 1.0 m, distance: Euclidean)"
+  @test sprint(show, γ) == "SphericalVariogram(range: 1.0 m, sill: 1.0, nugget: 0.0)"
   @test sprint(show, MIME"text/plain"(), γ) == """
   SphericalVariogram
-  ├─ sill: 1.0
-  ├─ nugget: 0.0
   ├─ range: 1.0 m
-  └─ distance: Euclidean"""
+  ├─ sill: 1.0
+  └─ nugget: 0.0"""
 end
 
 @testset "NestedVariogram" begin

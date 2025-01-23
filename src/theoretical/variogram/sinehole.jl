@@ -4,21 +4,23 @@
 
 """
     SineHoleVariogram(; range, sill, nugget)
-    SineHoleVariogram(ball; sill, nugget)
 
 A sine hole variogram with `range`, `sill` and `nugget`.
-Optionally, use a custom metric `ball`.
+
+    SineHoleVariogram(ball; sill, nugget)
+
+Alternatively, use a custom metric `ball`.
 """
-struct SineHoleVariogram{V,B} <: Variogram
+struct SineHoleVariogram{B,V} <: Variogram
+  ball::B
   sill::V
   nugget::V
-  ball::B
-  SineHoleVariogram(sill::V, nugget::V, ball::B) where {V,B} = new{float(V),B}(sill, nugget, ball)
+  SineHoleVariogram(ball::B, sill::V, nugget::V) where {B,V} = new{B,float(V)}(ball, sill, nugget)
 end
 
-SineHoleVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = SineHoleVariogram(sill, nugget, ball)
+SineHoleVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = SineHoleVariogram(ball, sill, nugget)
 
-SineHoleVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill))) = SineHoleVariogram(sill, nugget, MetricBall(range))
+SineHoleVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill))) = SineHoleVariogram(MetricBall(range), sill, nugget)
 
 constructor(::SineHoleVariogram) = SineHoleVariogram
 

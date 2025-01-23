@@ -205,16 +205,15 @@ function _printfields(io, f; singleline=false)
     pos = i == len ? poslast : poscommon
     value = getfield(f, i)
     if value isa MetricBall
-      print(io, precommon)
+      print(io, pre)
       if isisotropic(value)
         print(io, "range: ", first(radii(value)))
       else
         print(io, "ranges: ", radii(value))
+        print(io, pos)
+        print(io, pre)
+        print(io, "rotation: ", rotation(value))
       end
-      print(io, poscommon)
-      m = nameof(typeof(metric(value)))
-      print(io, pre)
-      print(io, "distance: ", m)
       print(io, pos)
     else
       print(io, pre)
