@@ -5,11 +5,27 @@
 """
     GaussianVariogram(; range, sill, nugget)
 
-A Gaussian variogram with `range`, `sill` and `nugget`.
+A Gaussian variogram with `range` in length units,
+and `sill` and `nugget` contributions.
+
+    GaussianVariogram(; ranges, rotation, sill, nugget)
+
+Alternatively, use multiple `ranges` and `rotation` matrix
+to construct an anisotropic model.
 
     GaussianVariogram(ball; sill, nugget)
 
 Alternatively, use a custom metric `ball`.
+
+## Examples
+
+```julia
+# isotropic model
+GaussianVariogram(range=2.0m)
+
+# anisotropic model
+GaussianVariogram(ranges=(1.0m, 2.0m))
+```
 """
 struct GaussianVariogram{B,V} <: Variogram
   ball::B
@@ -18,9 +34,10 @@ struct GaussianVariogram{B,V} <: Variogram
   GaussianVariogram(ball::B, sill::V, nugget::V) where {B,V} = new{B,float(V)}(ball, sill, nugget)
 end
 
-GaussianVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = GaussianVariogram(ball, sill, nugget)
+GaussianVariogram(ball; sill=1.0, nugget=zero(sill)) = GaussianVariogram(ball, sill, nugget)
 
-GaussianVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill))) = GaussianVariogram(MetricBall(range), sill, nugget)
+GaussianVariogram(; range=1.0, ranges=nothing, rotation=I, sill=1.0, nugget=zero(sill)) =
+  GaussianVariogram(rangeball(range, ranges, rotation), sill, nugget)
 
 constructor(::GaussianVariogram) = GaussianVariogram
 

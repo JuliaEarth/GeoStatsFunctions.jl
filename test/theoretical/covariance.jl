@@ -6,7 +6,7 @@
     (ExponentialCovariance, ExponentialVariogram),
     (GaussianCovariance, GaussianVariogram),
     (MaternCovariance, MaternVariogram),
-    (PentasphericalCovariance, PentasphericalVariogram),
+    (PentaSphericalCovariance, PentaSphericalVariogram),
     (SineHoleCovariance, SineHoleVariogram),
     (SphericalCovariance, SphericalVariogram)
   ]
@@ -21,7 +21,7 @@
     (ExponentialCovariance, ExponentialVariogram),
     (GaussianCovariance, GaussianVariogram),
     (MaternCovariance, MaternVariogram),
-    (PentasphericalCovariance, PentasphericalVariogram),
+    (PentaSphericalCovariance, PentaSphericalVariogram),
     (SineHoleCovariance, SineHoleVariogram),
     (SphericalCovariance, SphericalVariogram)
   ]
@@ -91,10 +91,10 @@
   ├─ nugget: 0.0
   └─ order: 1.0"""
 
-  cov = PentasphericalCovariance()
-  @test sprint(show, cov) == "PentasphericalCovariance(range: 1.0 m, sill: 1.0, nugget: 0.0)"
+  cov = PentaSphericalCovariance()
+  @test sprint(show, cov) == "PentaSphericalCovariance(range: 1.0 m, sill: 1.0, nugget: 0.0)"
   @test sprint(show, MIME"text/plain"(), cov) == """
-  PentasphericalCovariance
+  PentaSphericalCovariance
   ├─ range: 1.0 m
   ├─ sill: 1.0
   └─ nugget: 0.0"""

@@ -94,7 +94,7 @@ end
 
 @defcov MaternCovariance MaternVariogram
 
-@defcov PentasphericalCovariance PentasphericalVariogram
+@defcov PentaSphericalCovariance PentaSphericalVariogram
 
 @defcov SineHoleCovariance SineHoleVariogram
 

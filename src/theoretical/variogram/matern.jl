@@ -5,12 +5,28 @@
 """
     MaternVariogram(; range, sill, nugget, order)
 
-A Matérn variogram with `range`, `sill`, `nugget`
-and `order` of the Bessel function.
+A Matérn variogram with `range` in length units,
+`sill` and `nugget` contributions, and `order` of
+Bessel function.
+
+    MaternVariogram(; ranges, rotation, sill, nugget, order)
+
+Alternatively, use multiple `ranges` and `rotation` matrix
+to construct an anisotropic model.
 
     MaternVariogram(ball; sill, nugget, order)
 
 Alternatively, use a custom metric `ball`.
+
+## Examples
+
+```julia
+# isotropic model
+MaternVariogram(range=2.0m)
+
+# anisotropic model
+MaternVariogram(ranges=(1.0m, 2.0m))
+```
 """
 struct MaternVariogram{B,V,O} <: Variogram
   ball::B
@@ -21,10 +37,10 @@ struct MaternVariogram{B,V,O} <: Variogram
     new{B,float(V),float(O)}(ball, sill, nugget, order)
 end
 
-MaternVariogram(ball; sill=1.0, nugget=zero(typeof(sill)), order=1.0) = MaternVariogram(ball, sill, nugget, order)
+MaternVariogram(ball; sill=1.0, nugget=zero(sill), order=1.0) = MaternVariogram(ball, sill, nugget, order)
 
-MaternVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill)), order=1.0) =
-  MaternVariogram(MetricBall(range), sill, nugget, order)
+MaternVariogram(; range=1.0, ranges=nothing, rotation=I, sill=1.0, nugget=zero(sill), order=1.0) =
+  MaternVariogram(rangeball(range, ranges, rotation), sill, nugget, order)
 
 constructor(::MaternVariogram) = MaternVariogram
 

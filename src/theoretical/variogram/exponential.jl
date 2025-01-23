@@ -5,11 +5,27 @@
 """
     ExponentialVariogram(; range, sill, nugget)
 
-A exponential variogram with `range`, `sill` and `nugget`.
+An exponential variogram with `range` in length units,
+and `sill` and `nugget` contributions.
+
+    ExponentialVariogram(; ranges, rotation, sill, nugget)
+
+Alternatively, use multiple `ranges` and `rotation` matrix
+to construct an anisotropic model.
 
     ExponentialVariogram(ball; sill, nugget)
 
 Alternatively, use a custom metric `ball`.
+
+## Examples
+
+```julia
+# isotropic model
+ExponentialVariogram(range=2.0m)
+
+# anisotropic model
+ExponentialVariogram(ranges=(1.0m, 2.0m))
+```
 """
 struct ExponentialVariogram{B,V} <: Variogram
   ball::B
@@ -18,10 +34,10 @@ struct ExponentialVariogram{B,V} <: Variogram
   ExponentialVariogram(ball::B, sill::V, nugget::V) where {B,V} = new{B,float(V)}(ball, sill, nugget)
 end
 
-ExponentialVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = ExponentialVariogram(ball, sill, nugget)
+ExponentialVariogram(ball; sill=1.0, nugget=zero(sill)) = ExponentialVariogram(ball, sill, nugget)
 
-ExponentialVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill))) =
-  ExponentialVariogram(MetricBall(range), sill, nugget)
+ExponentialVariogram(; range=1.0, ranges=nothing, rotation=I, sill=1.0, nugget=zero(sill)) =
+  ExponentialVariogram(rangeball(range, ranges, rotation), sill, nugget)
 
 constructor(::ExponentialVariogram) = ExponentialVariogram
 

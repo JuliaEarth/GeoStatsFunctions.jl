@@ -5,11 +5,27 @@
 """
     SphericalVariogram(; range, sill, nugget)
 
-A spherical variogram with `range`, `sill` and `nugget`.
+A spherical variogram with `range` in length units,
+and `sill` and `nugget` contributions.
+
+    SphericalVariogram(; ranges, rotation, sill, nugget)
+
+Alternatively, use multiple `ranges` and `rotation` matrix
+to construct an anisotropic model.
 
     SphericalVariogram(ball; sill, nugget)
 
 Alternatively, use a custom metric `ball`.
+
+## Examples
+
+```julia
+# isotropic model
+SphericalVariogram(range=2.0m)
+
+# anisotropic model
+SphericalVariogram(ranges=(1.0m, 2.0m))
+```
 """
 struct SphericalVariogram{B,V} <: Variogram
   ball::B
@@ -18,10 +34,10 @@ struct SphericalVariogram{B,V} <: Variogram
   SphericalVariogram(ball::B, sill::V, nugget::V) where {B,V} = new{B,float(V)}(ball, sill, nugget)
 end
 
-SphericalVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = SphericalVariogram(ball, sill, nugget)
+SphericalVariogram(ball; sill=1.0, nugget=zero(sill)) = SphericalVariogram(ball, sill, nugget)
 
-SphericalVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill))) =
-  SphericalVariogram(MetricBall(range), sill, nugget)
+SphericalVariogram(; range=1.0, ranges=nothing, rotation=I, sill=1.0, nugget=zero(sill)) =
+  SphericalVariogram(rangeball(range, ranges, rotation), sill, nugget)
 
 constructor(::SphericalVariogram) = SphericalVariogram
 

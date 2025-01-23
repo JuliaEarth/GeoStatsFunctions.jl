@@ -12,7 +12,7 @@
     SphericalVariogram(),
     SphericalVariogram(range=2.0),
     CubicVariogram(),
-    PentasphericalVariogram(),
+    PentaSphericalVariogram(),
     SineHoleVariogram(),
     CircularVariogram()
   ]
@@ -28,12 +28,17 @@
     SphericalVariogram(),
     SphericalVariogram(range=2.0),
     CubicVariogram(),
-    PentasphericalVariogram(),
+    PentaSphericalVariogram(),
     PowerVariogram()
   ]
 
   # anisotropic variogram models
-  γa = [GaussianVariogram(MetricBall((2.0, 1.0))), MaternVariogram(MetricBall((3.0, 2.0, 1.0)))]
+  γa = [
+    GaussianVariogram(ranges=(2.0, 1.0)),
+    ExponentialVariogram(ranges=(2.0, 1.0)),
+    MaternVariogram(ranges=(3.0, 2.0, 1.0)),
+    SphericalVariogram(ranges=(2.0, 1.0))
+  ]
 
   # check stationarity
   @test all(isstationary, γs)
@@ -47,8 +52,8 @@
   @test all(!isisotropic, γa)
 
   # check metric ball
-  @test metricball(γa[1]) == MetricBall((2.0, 1.0))
-  @test metricball(γa[2]) == MetricBall((3.0, 2.0, 1.0))
+  @test metricball(GaussianVariogram(ranges=(2.0, 1.0))) == MetricBall((2.0, 1.0))
+  @test metricball(MaternVariogram(ranges=(3.0, 2.0, 1.0))) == MetricBall((3.0, 2.0, 1.0))
   @test metricball(GaussianVariogram(range=2.0)) == MetricBall(2.0)
   @test metricball(SphericalVariogram(range=2.0)) == MetricBall(2.0)
   @test metricball(ExponentialVariogram(range=2.0)) == MetricBall(2.0)
@@ -130,7 +135,7 @@
     MaternVariogram(sill=1.0u"K^2"),
     SphericalVariogram(sill=1.0u"K^2"),
     CubicVariogram(sill=1.0u"K^2"),
-    PentasphericalVariogram(sill=1.0u"K^2"),
+    PentaSphericalVariogram(sill=1.0u"K^2"),
     SineHoleVariogram(sill=1.0u"K^2"),
     CircularVariogram(sill=1.0u"K^2")
   ]
@@ -185,7 +190,7 @@
     GaussianVariogram(),
     MaternVariogram(),
     NuggetEffect(),
-    PentasphericalVariogram(),
+    PentaSphericalVariogram(),
     PowerVariogram(),
     SineHoleVariogram(),
     SphericalVariogram()
@@ -228,7 +233,7 @@
   @test γ.order isa Float64
   γ = NuggetEffect(nugget=1)
   @test nugget(γ) isa Float64
-  γ = PentasphericalVariogram(sill=1, nugget=1)
+  γ = PentaSphericalVariogram(sill=1, nugget=1)
   @test sill(γ) isa Float64
   @test nugget(γ) isa Float64
   γ = PowerVariogram(scaling=1, nugget=1, exponent=1)
@@ -290,10 +295,10 @@
   NuggetEffect
   └─ nugget: 1.0"""
 
-  γ = PentasphericalVariogram()
-  @test sprint(show, γ) == "PentasphericalVariogram(range: 1.0 m, sill: 1.0, nugget: 0.0)"
+  γ = PentaSphericalVariogram()
+  @test sprint(show, γ) == "PentaSphericalVariogram(range: 1.0 m, sill: 1.0, nugget: 0.0)"
   @test sprint(show, MIME"text/plain"(), γ) == """
-  PentasphericalVariogram
+  PentaSphericalVariogram
   ├─ range: 1.0 m
   ├─ sill: 1.0
   └─ nugget: 0.0"""

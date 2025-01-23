@@ -3,31 +3,47 @@
 # ------------------------------------------------------------------
 
 """
-    PentasphericalVariogram(; range, sill, nugget)
+    PentaSphericalVariogram(; range, sill, nugget)
 
-A pentaspherical variogram with `range`, `sill` and `nugget`.
+A pentaspherical variogram with `range` in length units,
+and `sill` and `nugget` contributions.
 
-    PentasphericalVariogram(ball; sill, nugget)
+    PentaSphericalVariogram(; ranges, rotation, sill, nugget)
+
+Alternatively, use multiple `ranges` and `rotation` matrix
+to construct an anisotropic model.
+
+    PentaSphericalVariogram(ball; sill, nugget)
 
 Alternatively, use a custom metric `ball`.
+
+## Examples
+
+```julia
+# isotropic model
+PentaSphericalVariogram(range=2.0m)
+
+# anisotropic model
+PentaSphericalVariogram(ranges=(1.0m, 2.0m))
+```
 """
-struct PentasphericalVariogram{B,V} <: Variogram
+struct PentaSphericalVariogram{B,V} <: Variogram
   ball::B
   sill::V
   nugget::V
-  PentasphericalVariogram(ball::B, sill::V, nugget::V) where {B,V} = new{B,float(V)}(ball, sill, nugget)
+  PentaSphericalVariogram(ball::B, sill::V, nugget::V) where {B,V} = new{B,float(V)}(ball, sill, nugget)
 end
 
-PentasphericalVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = PentasphericalVariogram(ball, sill, nugget)
+PentaSphericalVariogram(ball; sill=1.0, nugget=zero(sill)) = PentaSphericalVariogram(ball, sill, nugget)
 
-PentasphericalVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill))) =
-  PentasphericalVariogram(MetricBall(range), sill, nugget)
+PentaSphericalVariogram(; range=1.0, ranges=nothing, rotation=I, sill=1.0, nugget=zero(sill)) =
+  PentaSphericalVariogram(rangeball(range, ranges, rotation), sill, nugget)
 
-constructor(::PentasphericalVariogram) = PentasphericalVariogram
+constructor(::PentaSphericalVariogram) = PentaSphericalVariogram
 
-isstationary(::Type{<:PentasphericalVariogram}) = true
+isstationary(::Type{<:PentaSphericalVariogram}) = true
 
-function (γ::PentasphericalVariogram)(h)
+function (γ::PentaSphericalVariogram)(h)
   r = radius(γ.ball)
   s = γ.sill
   n = γ.nugget

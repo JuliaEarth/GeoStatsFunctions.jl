@@ -24,6 +24,9 @@ end
 
 defaultmaxlag(data) = _minside(boundingbox(domain(data))) / 2
 
+rangeball(range, ::Nothing, rotation) = MetricBall(range)
+rangeball(range, ranges, rotation) = MetricBall(ranges, rotation)
+
 function _minside(box)
   s = _sides(box)
   minimum(filter(>(zero(eltype(s))), s))

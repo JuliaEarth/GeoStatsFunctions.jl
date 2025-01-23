@@ -5,11 +5,27 @@
 """
     CubicVariogram(; range, sill, nugget)
 
-A cubic variogram with `range`, `sill` and `nugget`.
+A cubic variogram with `range` in length units,
+and `sill` and `nugget` contributions.
+
+    CubicVariogram(; ranges, rotation, sill, nugget)
+
+Alternatively, use multiple `ranges` and `rotation` matrix
+to construct an anisotropic model.
 
     CubicVariogram(ball; sill, nugget)
 
 Alternatively, use a custom metric `ball`.
+
+## Examples
+
+```julia
+# isotropic model
+CubicVariogram(range=2.0m)
+
+# anisotropic model
+CubicVariogram(ranges=(1.0m, 2.0m))
+```
 """
 struct CubicVariogram{B,V} <: Variogram
   ball::B
@@ -18,9 +34,10 @@ struct CubicVariogram{B,V} <: Variogram
   CubicVariogram(ball::B, sill::V, nugget::V) where {B,V} = new{B,float(V)}(ball, sill, nugget)
 end
 
-CubicVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = CubicVariogram(ball, sill, nugget)
+CubicVariogram(ball; sill=1.0, nugget=zero(sill)) = CubicVariogram(ball, sill, nugget)
 
-CubicVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill))) = CubicVariogram(MetricBall(range), sill, nugget)
+CubicVariogram(; range=1.0, ranges=nothing, rotation=I, sill=1.0, nugget=zero(sill)) =
+  CubicVariogram(rangeball(range, ranges, rotation), sill, nugget)
 
 constructor(::CubicVariogram) = CubicVariogram
 

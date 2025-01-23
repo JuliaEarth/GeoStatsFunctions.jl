@@ -88,7 +88,7 @@ function fit(::Type{Variogram}, g::EmpiricalVariogram, algo::FitAlgo=WeightedLea
     ExponentialVariogram,
     GaussianVariogram,
     MaternVariogram,
-    PentasphericalVariogram,
+    PentaSphericalVariogram,
     SineHoleVariogram,
     SphericalVariogram
   )

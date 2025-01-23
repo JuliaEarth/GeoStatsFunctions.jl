@@ -5,11 +5,27 @@
 """
     SineHoleVariogram(; range, sill, nugget)
 
-A sine hole variogram with `range`, `sill` and `nugget`.
+A sinehole variogram with `range` in length units,
+and `sill` and `nugget` contributions.
+
+    SineHoleVariogram(; ranges, rotation, sill, nugget)
+
+Alternatively, use multiple `ranges` and `rotation` matrix
+to construct an anisotropic model.
 
     SineHoleVariogram(ball; sill, nugget)
 
 Alternatively, use a custom metric `ball`.
+
+## Examples
+
+```julia
+# isotropic model
+SineHoleVariogram(range=2.0m)
+
+# anisotropic model
+SineHoleVariogram(ranges=(1.0m, 2.0m))
+```
 """
 struct SineHoleVariogram{B,V} <: Variogram
   ball::B
@@ -18,9 +34,10 @@ struct SineHoleVariogram{B,V} <: Variogram
   SineHoleVariogram(ball::B, sill::V, nugget::V) where {B,V} = new{B,float(V)}(ball, sill, nugget)
 end
 
-SineHoleVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = SineHoleVariogram(ball, sill, nugget)
+SineHoleVariogram(ball; sill=1.0, nugget=zero(sill)) = SineHoleVariogram(ball, sill, nugget)
 
-SineHoleVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill))) = SineHoleVariogram(MetricBall(range), sill, nugget)
+SineHoleVariogram(; range=1.0, ranges=nothing, rotation=I, sill=1.0, nugget=zero(sill)) =
+  SineHoleVariogram(rangeball(range, ranges, rotation), sill, nugget)
 
 constructor(::SineHoleVariogram) = SineHoleVariogram
 

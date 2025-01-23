@@ -75,7 +75,7 @@ export
   ExponentialVariogram,
   MaternVariogram,
   CubicVariogram,
-  PentasphericalVariogram,
+  PentaSphericalVariogram,
   SineHoleVariogram,
   CircularVariogram,
   PowerVariogram,
@@ -92,7 +92,7 @@ export
   ExponentialCovariance,
   MaternCovariance,
   CubicCovariance,
-  PentasphericalCovariance,
+  PentaSphericalCovariance,
   SineHoleCovariance,
   CircularCovariance,
 

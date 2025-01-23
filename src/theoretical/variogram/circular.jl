@@ -1,11 +1,31 @@
+# ------------------------------------------------------------------
+# Licensed under the MIT License. See LICENSE in the project root.
+# ------------------------------------------------------------------
+
 """
     CircularVariogram(; range, sill, nugget)
 
-A circular variogram with `range`, `sill` and `nugget`.
+A circular variogram with `range` in length units,
+and `sill` and `nugget` contributions.
+
+    CircularVariogram(; ranges, rotation, sill, nugget)
+
+Alternatively, use multiple `ranges` and `rotation` matrix
+to construct an anisotropic model.
 
     CircularVariogram(ball; sill, nugget)
 
 Alternatively, use a custom metric `ball`.
+
+## Examples
+
+```julia
+# isotropic model
+CircularVariogram(range=2.0m)
+
+# anisotropic model
+CircularVariogram(ranges=(1.0m, 2.0m))
+```
 """
 struct CircularVariogram{B,V} <: Variogram
   ball::B
@@ -14,9 +34,10 @@ struct CircularVariogram{B,V} <: Variogram
   CircularVariogram(ball::B, sill::V, nugget::V) where {B,V} = new{B,float(V)}(ball, sill, nugget)
 end
 
-CircularVariogram(ball; sill=1.0, nugget=zero(typeof(sill))) = CircularVariogram(ball, sill, nugget)
+CircularVariogram(ball; sill=1.0, nugget=zero(sill)) = CircularVariogram(ball, sill, nugget)
 
-CircularVariogram(; range=1.0, sill=1.0, nugget=zero(typeof(sill))) = CircularVariogram(MetricBall(range), sill, nugget)
+CircularVariogram(; range=1.0, ranges=nothing, rotation=I, sill=1.0, nugget=zero(sill)) =
+  CircularVariogram(rangeball(range, ranges, rotation), sill, nugget)
 
 constructor(::CircularVariogram) = CircularVariogram
 
