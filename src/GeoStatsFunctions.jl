@@ -80,7 +80,6 @@ export
   CircularVariogram,
   PowerVariogram,
   NuggetEffect,
-  NestedVariogram,
   sill,
   nugget,
   structures,

@@ -204,7 +204,7 @@
     @test range(g) == 2.0u"m"
   end
 
-  # scale with NestedVariogram
+  # scale with CompositeFunction
   γ = GaussianVariogram(range=2.0) + ExponentialVariogram(range=3.0)
   g = GeoStatsFunctions.scale(γ, 2)
   @test range(g) == 6.0u"m"
@@ -328,7 +328,7 @@
   └─ nugget: 0.0"""
 end
 
-@testset "NestedVariogram" begin
+@testset "CompositeFunction" begin
   # nested variogram with nugget effect
   γ = NuggetEffect(0.2) + GaussianVariogram(nugget=0.1, sill=0.8, range=50.0)
   @test sill(γ) ≈ 1.0
@@ -398,7 +398,7 @@ end
   @test isstationary(γ)
 
   # test constructor explicitly
-  γ = NestedVariogram((1.0, 2.0), (ExponentialVariogram(), SphericalVariogram()))
+  γ = GeoStatsFunctions.CompositeFunction((1.0, 2.0), (ExponentialVariogram(), SphericalVariogram()))
   @test sill(γ) == 3.0
   @test range(γ) == 1.0u"m"
   @test nugget(γ) == 0.0

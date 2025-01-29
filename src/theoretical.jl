@@ -190,6 +190,7 @@ end
 include("theoretical/variogram.jl")
 include("theoretical/covariance.jl")
 include("theoretical/transiogram.jl")
+include("theoretical/composite.jl")
 
 # -----------------
 # HELPER FUNCTIONS
