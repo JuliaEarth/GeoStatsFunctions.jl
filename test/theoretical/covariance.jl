@@ -49,6 +49,15 @@
   @test range(cov) == 1.0u"m"
   @test GeoStatsFunctions.scale(cov, 2) == GaussianCovariance(range=2.0, sill=1.0, nugget=0.0)
 
+  cov = SphericalCovariance()
+  @test sill(cov) == 1.0
+  @test nugget(cov) == 0.0
+  @test structures(cov) == (0.0, (1.0,), (SphericalCovariance(),))
+  @test (@elapsed sill(cov)) < 1e-5
+  @test (@elapsed nugget(cov)) < 1e-5
+  @test (@allocated sill(cov)) < 32
+  @test (@allocated nugget(cov)) < 32
+
   # shows
   cov = CircularCovariance()
   @test sprint(show, cov) == "CircularCovariance(range: 1.0 m, sill: 1.0, nugget: 0.0)"

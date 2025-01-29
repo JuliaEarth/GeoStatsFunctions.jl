@@ -13,56 +13,77 @@ abstract type Covariance <: GeoStatsFunction end
 # GEOSTATSFUNCTION API
 # ---------------------
 
-metricball(c::Covariance) = metricball(c.γ)
+metricball(cov::Covariance) = metricball(cov.γ)
 
-(c::Covariance)(h) = sill(c.γ) - c.γ(h)
+(cov::Covariance)(h) = sill(cov.γ) - cov.γ(h)
 
-"""
-    isstationary(c)
+isstationary(cov::Covariance) = isstationary(cov.γ)
 
-Check if covariance `c` possesses the 2nd-order stationary property.
-"""
-isstationary(c::Covariance) = isstationary(c.γ)
-
-"""
-    sill(c)
-
-Return the sill of the covariance `c`.
-"""
-sill(c::Covariance) = sill(c.γ)
+# ---------------
+# COVARIANCE API
+# ---------------
 
 """
-    nugget(c)
+    sill(cov)
 
-Return the nugget of the covariance `c`.
+Return the sill of the covariance `cov`.
 """
-nugget(c::Covariance) = nugget(c.γ)
+sill(cov::Covariance) = sill(cov.γ)
 
 """
-    scale(c, s)
+    nugget(cov)
 
-Scale metric ball of covariance `c` with strictly
+Return the nugget of the covariance `cov`.
+"""
+nugget(cov::Covariance) = nugget(cov.γ)
+
+"""
+    structures(cov)
+
+Return the individual structures of a (possibly composite)
+covariance as a tuple. The structures are the total nugget,
+and the coefficients (or contributions) for for the remaining
+non-trivial structures after normalization (i.e. sill=1, nugget=0).
+
+## Examples
+
+```julia
+cov₁ = GaussianCovariance(nugget=1, sill=2)
+cov₂ = SphericalCovariance(nugget=2, sill=3)
+
+structures(2cov₁ + 3cov₂)
+```
+"""
+function structures(cov::C) where {C<:Covariance}
+  cₒ, c, γ = structures(cov.γ)
+  cₒ, c, C.(γ)
+end
+
+"""
+    scale(cov, s)
+
+Scale metric ball of covariance `cov` with strictly
 positive scaling factor `s`.
 """
-scale(c::C, s::Real) where {C<:Covariance} = C(scale(c.γ, s))
+scale(cov::C, s::Real) where {C<:Covariance} = C(scale(cov.γ, s))
 
 # -----------
 # IO METHODS
 # -----------
 
-function Base.show(io::IO, c::Covariance)
+function Base.show(io::IO, cov::Covariance)
   ioctx = IOContext(io, :compact => true)
-  summary(ioctx, c)
+  summary(ioctx, cov)
   print(ioctx, "(")
-  _printfields(ioctx, c.γ, singleline=true)
+  _printfields(ioctx, cov.γ, singleline=true)
   print(ioctx, ")")
 end
 
-function Base.show(io::IO, ::MIME"text/plain", c::Covariance)
+function Base.show(io::IO, ::MIME"text/plain", cov::Covariance)
   ioctx = IOContext(io, :compact => true, :limit => true)
-  summary(ioctx, c)
+  summary(ioctx, cov)
   println(ioctx)
-  _printfields(ioctx, c.γ)
+  _printfields(ioctx, cov.γ)
 end
 
 # heper macro to define covariances

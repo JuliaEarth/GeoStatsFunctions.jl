@@ -43,11 +43,7 @@ function structures(f::CompositeFunction)
   cs, fs = cs[inds], fs[inds]
 
   # adjust sill and nugget
-  fs = map(fs) do f
-    T = typeof(sill(f))
-    f = @set f.sill = one(T)
-    f = @set f.nugget = zero(T)
-  end
+  fs = map(f -> first(last(structures(f))), fs)
 
   cₒ, cs, fs
 end

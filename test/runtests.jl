@@ -26,9 +26,10 @@ testfiles = [
   "theoretical/variogram.jl",
   "theoretical/covariance.jl",
   "theoretical/transiogram.jl",
-  "theoretical/sampling.jl",
+  "theoretical/composite.jl",
 
   # misc operations
+  "sampling.jl",
   "fitting.jl"
 ]
 
