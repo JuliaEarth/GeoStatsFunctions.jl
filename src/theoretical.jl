@@ -28,7 +28,14 @@ isstationary(f::GeoStatsFunction) = isstationary(typeof(f))
 
 Tells whether or not the geostatistical function `f` is isotropic.
 """
-isisotropic(f::GeoStatsFunction) = isisotropic(metricball(f))
+isisotropic(f::GeoStatsFunction) = hasequalradii(metricball(f))
+
+"""
+    isbanded(f)
+
+Tells whether or not the geostatistical function `f` produces a banded matrix.
+"""
+isbanded(f::GeoStatsFunction) = isbanded(typeof(f))
 
 """
     metricball(f)
@@ -207,7 +214,7 @@ function _printfields(io, f; singleline=false)
     value = getfield(f, i)
     if value isa MetricBall
       print(io, pre)
-      if isisotropic(value)
+      if hasequalradii(value)
         print(io, "range: ", first(radii(value)))
       else
         print(io, "ranges: ", radii(value))

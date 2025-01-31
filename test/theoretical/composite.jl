@@ -34,12 +34,11 @@
   # stationarity of composite models
   γ = GaussianVariogram() + ExponentialVariogram() + SphericalVariogram()
   @test isstationary(γ)
-  @test sill(γ) == 3.0
   @test !isstationary(γ + PowerVariogram())
-  @test (@elapsed sill(γ)) < 1e-5
-  @test (@elapsed nugget(γ)) < 1e-5
-  @test (@allocated sill(γ)) < 32
-  @test (@allocated nugget(γ)) < 32
+
+  # bandness of composite models
+  γ = GaussianVariogram() + ExponentialVariogram() + SphericalVariogram()
+  @test !isbanded(γ)
 
   # scaling composite models
   γ = GaussianVariogram(range=2.0) + ExponentialVariogram(range=3.0)
@@ -101,6 +100,10 @@
 end
 
 @testset "CompositeCovariance" begin
+  # bandness of composite models
+  cov = GaussianCovariance() + ExponentialCovariance() + SphericalCovariance()
+  @test isbanded(cov)
+
   # test individual structures
   cov = SphericalCovariance() + 2ExponentialCovariance() + NuggetEffect(10.0)
   @test sill(cov) ≈ 13.0

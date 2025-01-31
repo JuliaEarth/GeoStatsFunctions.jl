@@ -20,6 +20,8 @@ abstract type Transiogram <: GeoStatsFunction end
 
 isstationary(::Type{<:Transiogram}) = true
 
+isbanded(::Type{<:Transiogram}) = true
+
 # ----------------
 # TRANSIOGRAM API
 # ----------------

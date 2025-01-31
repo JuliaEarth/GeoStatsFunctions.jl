@@ -12,6 +12,9 @@
   # check anisotropy
   @test all(isisotropic, ts)
 
+  # check bandness
+  @test all(isbanded, ts)
+
   # mean lengths
   for t in ts
     @test meanlengths(t) == (1.0u"m", 1.0u"m")

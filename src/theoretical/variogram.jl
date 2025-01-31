@@ -9,6 +9,12 @@ A theoretical variogram function (e.g. Gaussian variogram).
 """
 abstract type Variogram <: GeoStatsFunction end
 
+# ---------------------
+# GEOSTATSFUNCTION API
+# ---------------------
+
+isbanded(::Type{<:Variogram}) = false
+
 """
     sill(γ)
 

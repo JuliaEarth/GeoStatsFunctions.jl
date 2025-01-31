@@ -13,11 +13,13 @@ abstract type Covariance <: GeoStatsFunction end
 # GEOSTATSFUNCTION API
 # ---------------------
 
+isstationary(cov::Covariance) = isstationary(cov.γ)
+
+isbanded(::Type{<:Covariance}) = true
+
 metricball(cov::Covariance) = metricball(cov.γ)
 
 (cov::Covariance)(h) = sill(cov.γ) - cov.γ(h)
-
-isstationary(cov::Covariance) = isstationary(cov.γ)
 
 # ---------------
 # COVARIANCE API

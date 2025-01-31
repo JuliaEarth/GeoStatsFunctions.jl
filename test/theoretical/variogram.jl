@@ -51,6 +51,13 @@
   @test isisotropic(sum(γs) + sum(γn) + sum(γnd))
   @test all(!isisotropic, γa)
 
+  # check bandness
+  @test all(!isbanded, γs)
+  @test all(!isbanded, γn)
+  @test all(!isbanded, γnd)
+  @test !isbanded(sum(γs) + sum(γn) + sum(γnd))
+  @test all(!isbanded, γa)
+
   # check metric ball
   @test metricball(GaussianVariogram(ranges=(2.0, 1.0))) == MetricBall((2.0, 1.0))
   @test metricball(MaternVariogram(ranges=(3.0, 2.0, 1.0))) == MetricBall((3.0, 2.0, 1.0))

@@ -8,7 +8,7 @@ using StaticArrays
 using LinearAlgebra
 using CSV, DelimitedFiles
 using Test, StableRNGs
-import CoDa: Composition
+using CoDa: Composition
 
 # environment settings
 datadir = joinpath(@__DIR__, "data")

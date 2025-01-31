@@ -13,6 +13,8 @@
     γ = VarioType()
     cov = CovType(γ)
     @test cov(x, y) == sill(γ) - γ(x, y)
+    @test !isbanded(γ)
+    @test isbanded(cov)
   end
 
   for (CovType, VarioType) in [

@@ -23,6 +23,8 @@ isstationary(f::CompositeFunction) = all(isstationary, f.fs)
 
 isisotropic(f::CompositeFunction) = all(isisotropic, f.fs)
 
+isbanded(f::CompositeFunction) = all(isbanded, f.fs)
+
 sill(f::CompositeFunction) = raw(sum(f.cs .* map(sill, f.fs)))
 
 nugget(f::CompositeFunction) = raw(sum(f.cs .* map(nugget, f.fs)))

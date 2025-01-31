@@ -25,7 +25,6 @@ using Random
 using Printf
 
 import Base: merge, +, *
-import Meshes: isisotropic
 
 # temporary fix for ⋅ with missing values
 # https://github.com/JuliaLang/julia/issues/40743
@@ -64,9 +63,13 @@ export
   GeoStatsFunction,
   isstationary,
   isisotropic,
+  isbanded,
   metricball,
+  structures,
   meanlengths,
   proportions,
+  sill,
+  nugget,
 
   # theoretical variograms
   Variogram,
@@ -80,9 +83,6 @@ export
   CircularVariogram,
   PowerVariogram,
   NuggetEffect,
-  sill,
-  nugget,
-  structures,
 
   # theoretical covariances
   Covariance,
