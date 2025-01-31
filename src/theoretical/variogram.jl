@@ -13,6 +13,8 @@ abstract type Variogram <: GeoStatsFunction end
 # GEOSTATSFUNCTION API
 # ---------------------
 
+issymmetric(::Type{<:Variogram}) = true
+
 isbanded(::Type{<:Variogram}) = false
 
 """

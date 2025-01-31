@@ -51,6 +51,13 @@
   @test isisotropic(sum(γs) + sum(γn) + sum(γnd))
   @test all(!isisotropic, γa)
 
+  # check symmetry
+  @test all(issymmetric, γs)
+  @test all(issymmetric, γn)
+  @test all(issymmetric, γnd)
+  @test issymmetric(sum(γs) + sum(γn) + sum(γnd))
+  @test all(issymmetric, γa)
+
   # check bandness
   @test all(!isbanded, γs)
   @test all(!isbanded, γn)

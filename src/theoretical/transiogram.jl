@@ -20,6 +20,8 @@ abstract type Transiogram <: GeoStatsFunction end
 
 isstationary(::Type{<:Transiogram}) = true
 
+issymmetric(::Type{<:Transiogram}) = false
+
 isbanded(::Type{<:Transiogram}) = true
 
 # ----------------

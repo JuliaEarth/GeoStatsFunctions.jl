@@ -31,6 +31,13 @@ Tells whether or not the geostatistical function `f` is isotropic.
 isisotropic(f::GeoStatsFunction) = hasequalradii(metricball(f))
 
 """
+    issymmetric(f)
+
+Tell whether or not the geostatistical function `f` is symmetric.
+"""
+issymmetric(f::GeoStatsFunction) = issymmetric(typeof(f))
+
+"""
     isbanded(f)
 
 Tells whether or not the geostatistical function `f` produces a banded matrix.

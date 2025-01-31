@@ -23,6 +23,8 @@ isstationary(f::CompositeFunction) = all(isstationary, f.fs)
 
 isisotropic(f::CompositeFunction) = all(isisotropic, f.fs)
 
+issymmetric(f::CompositeFunction) = all(issymmetric, f.cs) && all(issymmetric, f.fs)
+
 isbanded(f::CompositeFunction) = all(isbanded, f.fs)
 
 sill(f::CompositeFunction) = raw(sum(f.cs .* map(sill, f.fs)))

@@ -31,14 +31,16 @@
   γ₂ = GaussianVariogram() + ExponentialVariogram()
   @test nugget(γ₁) == nugget(γ₂)
 
-  # stationarity of composite models
+  # traits with composite models
   γ = GaussianVariogram() + ExponentialVariogram() + SphericalVariogram()
   @test isstationary(γ)
+  @test issymmetric(γ)
+  @test !isbanded(γ)
   @test !isstationary(γ + PowerVariogram())
 
-  # bandness of composite models
-  γ = GaussianVariogram() + ExponentialVariogram() + SphericalVariogram()
-  @test !isbanded(γ)
+  # non-symmetric coefficients
+  γ = [1 0; 1 1] * GaussianVariogram()
+  @test !issymmetric(γ)
 
   # scaling composite models
   γ = GaussianVariogram(range=2.0) + ExponentialVariogram(range=3.0)
@@ -100,9 +102,14 @@
 end
 
 @testset "CompositeCovariance" begin
-  # bandness of composite models
+  # traits with composite models
   cov = GaussianCovariance() + ExponentialCovariance() + SphericalCovariance()
+  @test issymmetric(cov)
   @test isbanded(cov)
+
+  # non-symmetric coefficients
+  cov = [1 0; 1 1] * GaussianCovariance()
+  @test !issymmetric(cov)
 
   # test individual structures
   cov = SphericalCovariance() + 2ExponentialCovariance() + NuggetEffect(10.0)

@@ -12,6 +12,9 @@
   # check anisotropy
   @test all(isisotropic, ts)
 
+  # check symmetry
+  @test all(!issymmetric, ts)
+
   # check bandness
   @test all(isbanded, ts)
 

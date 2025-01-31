@@ -15,6 +15,8 @@ abstract type Covariance <: GeoStatsFunction end
 
 isstationary(cov::Covariance) = isstationary(cov.γ)
 
+issymmetric(::Type{<:Covariance}) = true
+
 isbanded(::Type{<:Covariance}) = true
 
 metricball(cov::Covariance) = metricball(cov.γ)

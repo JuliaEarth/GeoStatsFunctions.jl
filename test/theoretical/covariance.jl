@@ -15,6 +15,8 @@
     @test cov(x, y) == sill(γ) - γ(x, y)
     @test !isbanded(γ)
     @test isbanded(cov)
+    @test issymmetric(γ)
+    @test issymmetric(cov)
   end
 
   for (CovType, VarioType) in [

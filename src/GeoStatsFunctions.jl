@@ -25,6 +25,7 @@ using Random
 using Printf
 
 import Base: merge, +, *
+import LinearAlgebra: issymmetric
 
 # temporary fix for ⋅ with missing values
 # https://github.com/JuliaLang/julia/issues/40743
@@ -63,6 +64,7 @@ export
   GeoStatsFunction,
   isstationary,
   isisotropic,
+  issymmetric,
   isbanded,
   metricball,
   structures,
