@@ -6,12 +6,11 @@ funplot(f; kwargs...) = _funplot(f; kwargs...)
 
 function _funplot(
   f::GeoStatsFunction;
-
   # common options
-  color=:slategray,
+  color=:teal,
   size=1.5,
   maxlag=nothing,
-  levels=nothing
+  labels=nothing
 )
   # auxiliary parameters
   n = nvariates(f)
@@ -35,31 +34,60 @@ function _funplot(
   # lag range starting at 1e-6 to avoid nugget artifact
   hs = range(1e-6 * oneunit(hmax), stop=hmax, length=100)
 
-  # evaluate function
+  # evaluate main function
   F = map(v) do vⱼ
     fs = [f(p, p + ustrip(h) * vⱼ) for h in hs]
     [getindex.(fs, i, j) for i in 1:n, j in 1:n]
   end
 
+  # evaluate base function
+  λ, π, F̂ = if _hasbasefun(f)
+    λ = meanlengths(f)
+    π = proportions(f)
+    f̂ = MatrixExponentialTransiogram(lengths=λ, proportions=π)
+    F̂ = map(v) do vⱼ
+      fs = [f̂(p, p + ustrip(h) * vⱼ) for h in hs]
+      [getindex.(fs, i, j) for i in 1:n, j in 1:n]
+    end
+    λ, π, F̂
+  else
+    nothing, nothing, nothing
+  end
+
   # aesthetic options
   label = Dict(1 => "1ˢᵗ axis", 2 => "2ⁿᵈ axis", 3 => "3ʳᵈ axis")
   style = Dict(1 => :solid, 2 => :dash, 3 => :dot)
-  level = isnothing(levels) ? (1:n) : levels
+  vars = isnothing(labels) ? (1:n) : labels
 
   # build figure
   fig = Makie.Figure()
   for i in 1:n, j in 1:n
-    lᵢ, lⱼ = level[i], level[j]
-    title = n > 1 ? "$lᵢ → $lⱼ" : ""
+    title = n > 1 ? "$(vars[i]) → $(vars[j])" : ""
     ax = Makie.Axis(fig[i, j], title=title)
     for (k, Fₖ) in enumerate(F)
+      # display main function
       Makie.lines!(ax, hs, Fₖ[i, j], color=color, linewidth=size, linestyle=style[k], label=label[k])
+      if _hasbasefun(f)
+        if i == j
+          # display mean lengths
+          Makie.lines!(ax, [zero(hmax), λ[i]], [1.0, 0.0], color=:slategray, linewidth=size, linestyle=:dash)
+          # display proportions
+          Makie.hlines!(ax, π[i], color=:slategray, linewidth=size, linestyle=:dash)
+        else
+          # display base function
+          F̂ₖ = F̂[k]
+          Makie.lines!(ax, hs, F̂ₖ[i, j], color=:slategray, linewidth=size, linestyle=:dot)
+        end
+      end
     end
     position = (i == j) && isbanded(f) ? :rt : :rb
     d > 1 && Makie.axislegend(position=position)
   end
   fig
 end
+
+_hasbasefun(f::GeoStatsFunction) = false
+_hasbasefun(t::Transiogram) = true
 
 # ----------------
 # SPECIALIZATIONS

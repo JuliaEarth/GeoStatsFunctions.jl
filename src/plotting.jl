@@ -12,7 +12,7 @@ Plot the geostatistical function `f` with given `options`.
 * `color`  - color
 * `size`   - size (line width)
 * `maxlag` - maximum lag
-* `levels` - categorical levels
+* `labels` - variable names
 
 ## Empirical function options:
 
@@ -39,7 +39,7 @@ Plot the varioplane or transioplane `f` with given `options`.
 
 * `colormap` - Color map
 * `maxlag`   - maximum lag
-* `levels`   - categorical levels
+* `labels`   - variable names
 
 ## Theoretical function options
 

@@ -4,18 +4,16 @@
 
 function _funplot(
   γ::EmpiricalVariogram;
-
   # common options
-  color=:slategray,
+  color=:teal,
   size=1.5,
   maxlag=nothing,
-
   # empirical options
   pointsize=12,
   showtext=true,
   textsize=12,
   showhist=true,
-  histcolor=:slategray
+  histcolor=:teal
 )
   # retrieve coordinates and counts
   x = γ.abscissas
