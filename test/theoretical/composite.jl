@@ -42,6 +42,11 @@
   γ = [1 0; 1 1] * GaussianVariogram()
   @test !issymmetric(γ)
 
+  # metric ball and range
+  γ = GaussianVariogram(range=2.0) + ExponentialVariogram(range=3.0)
+  @test metricball(γ) == MetricBall(3.0)
+  @test range(γ) == 3.0u"m"
+
   # scaling composite models
   γ = GaussianVariogram(range=2.0) + ExponentialVariogram(range=3.0)
   g = GeoStatsFunctions.scale(γ, 2)

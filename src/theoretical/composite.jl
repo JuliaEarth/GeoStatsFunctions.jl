@@ -31,6 +31,8 @@ sill(f::CompositeFunction) = raw(sum(f.cs .* map(sill, f.fs)))
 
 nugget(f::CompositeFunction) = raw(sum(f.cs .* map(nugget, f.fs)))
 
+metricball(f::CompositeFunction) = metricball(argmax(fᵢ -> range(fᵢ), f.fs))
+
 Base.range(f::CompositeFunction) = maximum(range(fᵢ) for fᵢ in f.fs)
 
 scale(f::CompositeFunction, s::Real) = CompositeFunction(f.cs, map(fᵢ -> scale(fᵢ, s), f.fs))
