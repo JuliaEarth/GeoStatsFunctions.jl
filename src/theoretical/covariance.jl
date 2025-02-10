@@ -21,6 +21,8 @@ isbanded(::Type{<:Covariance}) = true
 
 metricball(cov::Covariance) = metricball(cov.γ)
 
+nvariates(::Type{<:Covariance}) = 1
+
 (cov::Covariance)(h) = sill(cov.γ) - cov.γ(h)
 
 # ---------------

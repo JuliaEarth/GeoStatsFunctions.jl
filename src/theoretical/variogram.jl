@@ -17,6 +17,8 @@ issymmetric(::Type{<:Variogram}) = true
 
 isbanded(::Type{<:Variogram}) = false
 
+nvariates(::Type{<:Variogram}) = 1
+
 """
     sill(γ)
 

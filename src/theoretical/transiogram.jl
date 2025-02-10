@@ -24,6 +24,8 @@ issymmetric(::Type{<:Transiogram}) = false
 
 isbanded(::Type{<:Transiogram}) = true
 
+nvariates(t::Transiogram) = length(proportions(t))
+
 # ----------------
 # TRANSIOGRAM API
 # ----------------

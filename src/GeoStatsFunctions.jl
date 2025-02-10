@@ -67,6 +67,7 @@ export
   issymmetric,
   isbanded,
   metricball,
+  nvariates,
   structures,
   meanlengths,
   proportions,

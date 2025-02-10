@@ -17,6 +17,7 @@
     @test isbanded(cov)
     @test issymmetric(γ)
     @test issymmetric(cov)
+    @test nvariates(cov) == 1
   end
 
   for (CovType, VarioType) in [

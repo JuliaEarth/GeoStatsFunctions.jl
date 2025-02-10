@@ -35,6 +35,8 @@ metricball(f::CompositeFunction) = metricball(argmax(fᵢ -> range(fᵢ), f.fs))
 
 Base.range(f::CompositeFunction) = maximum(range(fᵢ) for fᵢ in f.fs)
 
+nvariates(f::CompositeFunction) = maximum(size(cᵢ, 1) for cᵢ in f.cs)
+
 scale(f::CompositeFunction, s::Real) = CompositeFunction(f.cs, map(fᵢ -> scale(fᵢ, s), f.fs))
 
 function structures(f::CompositeFunction)

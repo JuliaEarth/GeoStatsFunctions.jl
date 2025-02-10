@@ -18,6 +18,9 @@
   # check bandness
   @test all(isbanded, ts)
 
+  # number of variates
+  @test all(nvariates.(ts) .== 2)
+
   # mean lengths
   for t in ts
     @test meanlengths(t) == (1.0u"m", 1.0u"m")
@@ -59,6 +62,7 @@ end
   # corresponding exponential transiogram
   t = MatrixExponentialTransiogram((1.0u"m", 2.0u"m", 3.0u"m"), (0.2, 0.5, 0.3))
   @test t isa MatrixExponentialTransiogram
+  @test nvariates(t) == 3
   @test meanlengths(t) == (1.0u"m", 2.0u"m", 3.0u"m")
 
   # random transition rate matrix
@@ -66,6 +70,7 @@ end
   R = A ./ sum(A, dims=2)
   t = MatrixExponentialTransiogram(R)
   @test t isa MatrixExponentialTransiogram
+  @test nvariates(t) == 3
   @test meanlengths(t) == Tuple((1 ./ -diag(R)) * u"m")
 
   # invalid transition rate matrix
@@ -88,6 +93,7 @@ end
   gtb = georef(csv, ("X", "Y", "Z"))
   t = EmpiricalTransiogram(gtb, "FACIES", maxlag=20, nlags=20)
   τ = PiecewiseLinearTransiogram(t.abscissas, t.ordinates)
+  @test nvariates(τ) == 5
   @test τ(0.0u"m") == I(5)
   @test all(x -> 0 < x < 1, τ(5.0u"m"))
   @test all(allequal, eachcol(τ(100.0u"m")))

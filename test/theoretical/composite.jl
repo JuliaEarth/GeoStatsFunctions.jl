@@ -47,6 +47,14 @@
   @test metricball(γ) == MetricBall(3.0)
   @test range(γ) == 3.0u"m"
 
+  # number of variates
+  C₁ = [1.0 0.5; 0.5 2.0]
+  C₂ = [3.0 0.0; 0.0 3.0]
+  γ₁ = GaussianVariogram(range=2.0) + ExponentialVariogram(range=3.0)
+  γ₂ = C₁ * GaussianVariogram(range=1.0) + C₂ * SphericalVariogram(range=2.0)
+  @test nvariates(γ₁) == 1
+  @test nvariates(γ₂) == 2
+
   # scaling composite models
   γ = GaussianVariogram(range=2.0) + ExponentialVariogram(range=3.0)
   g = GeoStatsFunctions.scale(γ, 2)
@@ -115,6 +123,19 @@ end
   # non-symmetric coefficients
   cov = [1 0; 1 1] * GaussianCovariance()
   @test !issymmetric(cov)
+
+  # metric ball and range
+  cov = GaussianCovariance(range=2.0) + ExponentialCovariance(range=3.0)
+  @test metricball(cov) == MetricBall(3.0)
+  @test range(cov) == 3.0u"m"
+
+  # number of variates
+  C₁ = [1.0 0.5; 0.5 2.0]
+  C₂ = [3.0 0.0; 0.0 3.0]
+  cov₁ = GaussianCovariance(range=2.0) + ExponentialCovariance(range=3.0)
+  cov₂ = C₁ * GaussianCovariance(range=1.0) + C₂ * SphericalCovariance(range=2.0)
+  @test nvariates(cov₁) == 1
+  @test nvariates(cov₂) == 2
 
   # test individual structures
   cov = SphericalCovariance() + 2ExponentialCovariance() + NuggetEffect(10.0)
