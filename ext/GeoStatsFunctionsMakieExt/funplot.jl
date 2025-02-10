@@ -41,7 +41,7 @@ function _funplot(
   end
 
   # evaluate base function
-  λ, π, F̂ = if _hasbasefun(f)
+  λ, π, F̂ = if _istransiogram(f)
     λ = meanlengths(f)
     π = proportions(f)
     f̂ = MatrixExponentialTransiogram(lengths=λ, proportions=π)
@@ -67,7 +67,7 @@ function _funplot(
     for (k, Fₖ) in enumerate(F)
       # display main function
       Makie.lines!(ax, hs, Fₖ[i, j], color=color, linewidth=size, linestyle=style[k], label=label[k])
-      if _hasbasefun(f)
+      if _istransiogram(f)
         if i == j
           # display mean lengths
           Makie.lines!(ax, [zero(hmax), λ[i]], [1.0, 0.0], color=:slategray, linewidth=size, linestyle=:dash)
@@ -86,8 +86,8 @@ function _funplot(
   fig
 end
 
-_hasbasefun(f::GeoStatsFunction) = false
-_hasbasefun(t::Transiogram) = true
+_istransiogram(f::GeoStatsFunction) = false
+_istransiogram(t::Transiogram) = true
 
 # ----------------
 # SPECIALIZATIONS
