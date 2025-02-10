@@ -51,7 +51,7 @@ function _funplot(
   for i in 1:N, j in 1:N
     lᵢ, lⱼ = level[i], level[j]
     title = N > 1 ? "$lᵢ → $lⱼ" : ""
-    ax = Makie.Axis(fig[i, j], title = title)
+    ax = Makie.Axis(fig[i, j], title=title)
     for (k, Fₖ) in enumerate(F)
       Makie.lines!(ax, hs, Fₖ[i, j], color=color, linewidth=size, linestyle=style[k], label=label[k])
     end

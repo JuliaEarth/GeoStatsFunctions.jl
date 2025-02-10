@@ -18,7 +18,7 @@ function _funplot(
   histcolor=:slategray,
 
   # transiogram options
-  levels=nothing,
+  levels=nothing
 )
   # number of labels
   L = Base.size(t.ordinates, 1)
@@ -120,4 +120,3 @@ function _funplot(
 
   fig
 end
-

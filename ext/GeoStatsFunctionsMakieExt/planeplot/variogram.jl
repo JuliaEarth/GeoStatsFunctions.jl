@@ -49,7 +49,7 @@ function _planeplot(
   # geometric options
   normal=nothing,
   nlags=20,
-  nangs=50,
+  nangs=50
 )
   # auxiliary parameters
   b = metricball(γ)
