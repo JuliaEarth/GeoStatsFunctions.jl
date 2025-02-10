@@ -14,43 +14,43 @@ function _funplot(
   levels=nothing
 )
   # auxiliary parameters
-  N = nvariates(f)
+  n = nvariates(f)
   b = metricball(f)
   R = rotation(b)
   r = radii(b)
-  n = length(r)
+  d = length(r)
   U = eltype(r)
 
   # reference point
-  p = Point(ntuple(i -> U(0), n))
+  p = Point(ntuple(i -> U(0), d))
 
   # rotated basis
-  v = ntuple(n) do j
-    R * Vec(ntuple(i -> U(i == j), n))
+  v = ntuple(d) do j
+    R * Vec(ntuple(i -> U(i == j), d))
   end
 
   # maximum lag
-  H = isnothing(maxlag) ? _maxlag(f) : _addunit(maxlag, u"m")
+  hmax = isnothing(maxlag) ? _maxlag(f) : _addunit(maxlag, u"m")
 
   # lag range starting at 1e-6 to avoid nugget artifact
-  hs = range(1e-6 * oneunit(H), stop=H, length=100)
+  hs = range(1e-6 * oneunit(hmax), stop=hmax, length=100)
 
   # evaluate function
   F = map(v) do vⱼ
     fs = [f(p, p + ustrip(h) * vⱼ) for h in hs]
-    [getindex.(fs, i, j) for i in 1:N, j in 1:N]
+    [getindex.(fs, i, j) for i in 1:n, j in 1:n]
   end
 
   # aesthetic options
-  label = Dict(1 => "1st axis", 2 => "2nd axis", 3 => "3rd axis")
+  label = Dict(1 => "1ˢᵗ axis", 2 => "2ⁿᵈ axis", 3 => "3ʳᵈ axis")
   style = Dict(1 => :solid, 2 => :dash, 3 => :dot)
-  level = isnothing(levels) ? (1:N) : levels
+  level = isnothing(levels) ? (1:n) : levels
 
   # build figure
   fig = Makie.Figure()
-  for i in 1:N, j in 1:N
+  for i in 1:n, j in 1:n
     lᵢ, lⱼ = level[i], level[j]
-    title = N > 1 ? "$lᵢ → $lⱼ" : ""
+    title = n > 1 ? "$lᵢ → $lⱼ" : ""
     ax = Makie.Axis(fig[i, j], title=title)
     for (k, Fₖ) in enumerate(F)
       Makie.lines!(ax, hs, Fₖ[i, j], color=color, linewidth=size, linestyle=style[k], label=label[k])
