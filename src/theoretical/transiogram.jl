@@ -30,7 +30,7 @@ nvariates(t::Transiogram) = length(proportions(t))
 # TRANSIOGRAM API
 # ----------------
 
-meanlengths(t::Transiogram) = radii(metricball(t))
+meanlengths(t::Transiogram) = ntuple(i -> range(t), nvariates(t))
 
 proportions(t::Transiogram) = Tuple(normalize(diag(t(100range(t))), 1))
 

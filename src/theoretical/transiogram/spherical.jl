@@ -3,9 +3,15 @@
 # ------------------------------------------------------------------
 
 """
-    SphericalTransiogram(; ranges, proportions)
+    SphericalTransiogram(; range, proportions)
 
-A spherical transiogram with `ranges`, and `proportions`.
+A spherical transiogram with `range` in length units,
+and categorical `proportions`.
+
+    SphericalTransiogram(; ranges, rotation, proportions)
+
+Alternatively, use multiple `ranges` and `rotation` matrix
+to construct an anisotropic model.
 
     SphericalTransiogram(ball; proportions)
 
@@ -13,19 +19,19 @@ Alternatively, use a custom metric `ball`.
 """
 struct SphericalTransiogram{B,P} <: Transiogram
   ball::B
-  prop::P
+  proportions::P
 end
 
 SphericalTransiogram(ball; proportions=(0.5, 0.5)) = SphericalTransiogram(ball, proportions)
 
-SphericalTransiogram(; ranges=(1.0u"m", 1.0u"m"), proportions=(0.5, 0.5)) =
-  SphericalTransiogram(MetricBall(ranges), proportions)
+SphericalTransiogram(; range=1.0, ranges=nothing, rotation=I, proportions=(0.5, 0.5)) =
+  SphericalTransiogram(rangeball(range, ranges, rotation), proportions)
 
 constructor(::SphericalTransiogram) = SphericalTransiogram
 
 function (t::SphericalTransiogram)(h)
   r = radius(t.ball)
-  p = t.prop
+  p = t.proportions
   L = length(p)
   h′, r′ = unitless(h, r)
   v = 3(h′ / r′) / 2 - (h′ / r′)^3 / 2

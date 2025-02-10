@@ -3,9 +3,15 @@
 # ------------------------------------------------------------------
 
 """
-    ExponentialTransiogram(; ranges, proportions)
+    ExponentialTransiogram(; range, proportions)
 
-A exponential transiogram with `ranges`, and `proportions`.
+An exponential transiogram with `range` in length units,
+and categorical `proportions`.
+
+    ExponentialTransiogram(; ranges, rotation, proportions)
+
+Alternatively, use multiple `ranges` and `rotation` matrix
+to construct an anisotropic model.
 
     ExponentialTransiogram(ball; proportions)
 
@@ -13,19 +19,19 @@ Alternatively, use a custom metric `ball`.
 """
 struct ExponentialTransiogram{B,P} <: Transiogram
   ball::B
-  prop::P
+  proportions::P
 end
 
 ExponentialTransiogram(ball; proportions=(0.5, 0.5)) = ExponentialTransiogram(ball, proportions)
 
-ExponentialTransiogram(; ranges=(1.0u"m", 1.0u"m"), proportions=(0.5, 0.5)) =
-  ExponentialTransiogram(MetricBall(ranges), proportions)
+ExponentialTransiogram(; range=1.0, ranges=nothing, rotation=I, proportions=(0.5, 0.5)) =
+  ExponentialTransiogram(rangeball(range, ranges, rotation), proportions)
 
 constructor(::ExponentialTransiogram) = ExponentialTransiogram
 
 function (t::ExponentialTransiogram)(h)
   r = radius(t.ball)
-  p = t.prop
+  p = t.proportions
   L = length(p)
   h′, r′ = unitless(h, r)
   v = 1 - exp(-3(h′ / r′))

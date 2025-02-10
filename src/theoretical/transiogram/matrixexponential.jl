@@ -7,14 +7,27 @@
 
 An exponential transiogram with transition `rate` matrix.
 
-    MatrixExponentialTransiogram(lengths, proportions)
+    MatrixExponentialTransiogram(; range, lengths, proportions)
 
-Alternatively, build transition rate matrix from mean `lengths`
-and relative `proportions`.
+Alternatively, build Euclidean ball with given `range` and
+transition rate matrix from mean `lengths` and relative
+`proportions`.
+
+    MatrixExponentialTransiogram(; ranges, rotation, lengths, proportions)
+
+Alternatively, use multiple `ranges` and `rotation` matrix
+to construct an anisotropic model.
 
     MatrixExponentialTransiogram(ball, rate)
 
 Alternatively, use a custom metric `ball`.
+
+## Examples
+
+```julia
+MatrixExponentialTransiogram(lengths=(3.0, 2.0, 1.0))
+MatrixExponentialTransiogram(proportions=(0.5, 0.5))
+```
 
 ## References
 
@@ -46,12 +59,11 @@ function MatrixExponentialTransiogram(rate::AbstractMatrix)
   MatrixExponentialTransiogram(ball, rate)
 end
 
-MatrixExponentialTransiogram(ball::MetricBall, lens::Tuple, props::Tuple) =
-  MatrixExponentialTransiogram(ball, baseratematrix(lens, props))
+MatrixExponentialTransiogram(ball::MetricBall; lengths=(1.0, 1.0), proportions=(0.5, 0.5)) =
+  MatrixExponentialTransiogram(ball, baseratematrix(lengths, proportions))
 
-MatrixExponentialTransiogram(lens::Tuple, props::Tuple) = MatrixExponentialTransiogram(baseratematrix(lens, props))
-
-MatrixExponentialTransiogram() = MatrixExponentialTransiogram((1.0u"m", 1.0u"m"), (0.5, 0.5))
+MatrixExponentialTransiogram(; range=1.0, ranges=nothing, rotation=I, lengths=(1.0, 1.0), proportions=(0.5, 0.5)) =
+  MatrixExponentialTransiogram(rangeball(range, ranges, rotation), baseratematrix(lengths, proportions))
 
 meanlengths(t::MatrixExponentialTransiogram) = Tuple(1 ./ -diag(t.rate))
 
@@ -100,6 +112,9 @@ function baseratematrix(l, p)
   nₗ = length(l)
   nₚ = length(p)
 
+  # add units if necessary
+  lᵤ = aslen.(l)
+
   # sanity checks
   if nₗ != nₚ
     throw(ArgumentError("lengths and proportions must have the same length"))
@@ -112,5 +127,5 @@ function baseratematrix(l, p)
   end
 
   # Eq. 17 and 18 of Carle et al 1998.
-  SMatrix{nₗ,nₗ}(i == j ? -1 / l[i] : (p[j] / (1 - p[i])) / l[i] for i in 1:nₗ, j in 1:nₗ)
+  SMatrix{nₗ,nₗ}(i == j ? -1 / lᵤ[i] : (p[j] / (1 - p[i])) / lᵤ[i] for i in 1:nₗ, j in 1:nₗ)
 end

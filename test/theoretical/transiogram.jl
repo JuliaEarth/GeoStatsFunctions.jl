@@ -60,7 +60,7 @@ end
   ] * u"m^-1"
 
   # corresponding exponential transiogram
-  t = MatrixExponentialTransiogram((1.0u"m", 2.0u"m", 3.0u"m"), (0.2, 0.5, 0.3))
+  t = MatrixExponentialTransiogram(lengths=(1.0u"m", 2.0u"m", 3.0u"m"), proportions=(0.2, 0.5, 0.3))
   @test t isa MatrixExponentialTransiogram
   @test nvariates(t) == 3
   @test meanlengths(t) == (1.0u"m", 2.0u"m", 3.0u"m")

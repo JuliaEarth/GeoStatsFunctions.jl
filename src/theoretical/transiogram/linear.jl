@@ -3,9 +3,15 @@
 # ------------------------------------------------------------------
 
 """
-    LinearTransiogram(; ranges, proportions)
+    LinearTransiogram(; range, proportions)
 
-A linear transiogram with `ranges`, and `proportions`.
+A linear transiogram with `range` in length units,
+and categorical `proportions`.
+
+    LinearTransiogram(; ranges, rotation, proportions)
+
+Alternatively, use multiple `ranges` and `rotation` matrix
+to construct an anisotropic model.
 
     LinearTransiogram(ball; proportions)
 
@@ -13,19 +19,19 @@ Alternatively, use a custom metric `ball`.
 """
 struct LinearTransiogram{B,P} <: Transiogram
   ball::B
-  prop::P
+  proportions::P
 end
 
 LinearTransiogram(ball; proportions=(0.5, 0.5)) = LinearTransiogram(ball, proportions)
 
-LinearTransiogram(; ranges=(1.0u"m", 1.0u"m"), proportions=(0.5, 0.5)) =
-  LinearTransiogram(MetricBall(ranges), proportions)
+LinearTransiogram(; range=1.0, ranges=nothing, rotation=I, proportions=(0.5, 0.5)) =
+  LinearTransiogram(rangeball(range, ranges, rotation), proportions)
 
 constructor(::LinearTransiogram) = LinearTransiogram
 
 function (t::LinearTransiogram)(h)
   r = radius(t.ball)
-  p = t.prop
+  p = t.proportions
   L = length(p)
   h′, r′ = unitless(h, r)
   v = h′ / r′

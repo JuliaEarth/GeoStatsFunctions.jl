@@ -3,9 +3,15 @@
 # ------------------------------------------------------------------
 
 """
-    GaussianTransiogram(; ranges, proportions)
+    GaussianTransiogram(; range, proportions)
 
-A Gaussian transiogram with `ranges`, and `proportions`.
+A Gaussian transiogram with `range` in length units,
+and categorical `proportions`.
+
+    GaussianTransiogram(; ranges, rotation, proportions)
+
+Alternatively, use multiple `ranges` and `rotation` matrix
+to construct an anisotropic model.
 
     GaussianTransiogram(ball; proportions)
 
@@ -13,19 +19,19 @@ Alternatively, use a custom metric `ball`.
 """
 struct GaussianTransiogram{B,P} <: Transiogram
   ball::B
-  prop::P
+  proportions::P
 end
 
 GaussianTransiogram(ball; proportions=(0.5, 0.5)) = GaussianTransiogram(ball, proportions)
 
-GaussianTransiogram(; ranges=(1.0u"m", 1.0u"m"), proportions=(0.5, 0.5)) =
-  GaussianTransiogram(MetricBall(ranges), proportions)
+GaussianTransiogram(; range=1.0, ranges=nothing, rotation=I, proportions=(0.5, 0.5)) =
+  GaussianTransiogram(rangeball(range, ranges, rotation), proportions)
 
 constructor(::GaussianTransiogram) = GaussianTransiogram
 
 function (t::GaussianTransiogram)(h)
   r = radius(t.ball)
-  p = t.prop
+  p = t.proportions
   L = length(p)
   h′, r′ = unitless(h, r)
   v = 1 - exp(-3(h′ / r′)^2)
