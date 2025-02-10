@@ -2,9 +2,7 @@
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
 
-funplot(f; kwargs...) = _funplot(f; kwargs...)
-
-function _funplot(
+function funplot(
   f::GeoStatsFunction;
   # common options
   color=:teal,
@@ -86,12 +84,66 @@ function _funplot(
   fig
 end
 
-_istransiogram(f::GeoStatsFunction) = false
+function funplot(
+  f::EmpiricalGeoStatsFunction;
+  # common options
+  color=:teal,
+  size=1.5,
+  maxlag=nothing,
+  labels=nothing,
+  # empirical options
+  pointsize=12,
+  showtext=true,
+  textsize=12,
+  showhist=true,
+  histcolor=:teal
+)
+  # number of variables
+  n = nvariates(f)
+
+  # aesthetic options
+  vars = isnothing(labels) ? (1:n) : labels
+
+  fig = Makie.Figure()
+  for i in 1:n, j in 1:n
+    title = n > 1 ? "$(vars[i]) → $(vars[j])" : ""
+    ax = Makie.Axis(fig[i, j], title=title)
+
+    # retrieve coordinates and counts
+    hs = f.abscissas
+    fs = _istransiogram(f) ? f.ordinates[i, j] : f.ordinates
+    ns = f.counts
+
+    # retrieve maximum lag
+    hmax = isnothing(maxlag) ? last(hs) : _addunit(maxlag, u"m")
+
+    # discard empty bins
+    hs = hs[ns .> 0]
+    fs = fs[ns .> 0]
+    ns = ns[ns .> 0]
+
+    # discard above maximum lag
+    ns = ns[hs .≤ hmax]
+    fs = fs[hs .≤ hmax]
+    hs = hs[hs .≤ hmax]
+
+    # visualize histogram
+    if showhist
+      ms = ns * (maximum(fs) / maximum(ns)) / 10
+      Makie.barplot!(ax, hs, ms, color=histcolor, alpha=0.3, gap=0.0)
+    end
+
+    # visualize function
+    Makie.scatterlines!(ax, hs, fs, color=color, markersize=pointsize, linewidth=size)
+
+    # visualize text counts
+    if showtext
+      Makie.text!(ax, hs, fs, text=string.(ns), fontsize=textsize)
+    end
+  end
+  fig
+end
+
+_istransiogram(f) = false
 _istransiogram(t::Transiogram) = true
-
-# ----------------
-# SPECIALIZATIONS
-# ----------------
-
-include("funplot/variogram.jl")
-include("funplot/transiogram.jl")
+_istransiogram(t::EmpiricalTransiogram) = true

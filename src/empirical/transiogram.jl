@@ -120,6 +120,8 @@ function PlanarTransiogram(normal, data::AbstractGeoTable, var; ntol=1e-6u"m", k
   EmpiricalTransiogram(Π, var; kwargs...)
 end
 
+nvariates(t::EmpiricalTransiogram) = size(t.ordinates, 1)
+
 """
     merge(tα, tβ)
 

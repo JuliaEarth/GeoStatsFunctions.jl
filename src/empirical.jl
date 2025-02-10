@@ -22,6 +22,13 @@ An empirical geostatistical function estimated from data.
 """
 abstract type EmpiricalGeoStatsFunction end
 
+"""
+    nvariates(f)
+
+Return the number of (co)variates of the empirical geostatistical function `f`.
+"""
+nvariates(f::EmpiricalGeoStatsFunction) = nvariates(typeof(f))
+
 # -----------
 # IO METHODS
 # -----------

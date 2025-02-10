@@ -128,6 +128,8 @@ function PlanarVariogram(normal, data::AbstractGeoTable, var₁, var₂=var₁; 
   EmpiricalVariogram(Π, var₁, var₂; kwargs...)
 end
 
+nvariates(::Type{<:EmpiricalVariogram}) = 1
+
 """
     merge(γα, γβ)
 
