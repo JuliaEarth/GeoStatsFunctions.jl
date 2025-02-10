@@ -59,17 +59,26 @@ function Makie.plot!(plot::VarioPlot{<:Tuple{Variogram}})
   # retrieve maximum lag
   maxlag = plot[:maxlag]
 
+  # adjust maximum lag
   H = if isnothing(maxlag[])
     Makie.@lift _maxlag($γ)
   else
     Makie.@lift _addunit($maxlag, u"m")
   end
 
-  # start at 1e-6 instead of 0 to avoid
-  # nugget artifact in visualization
-  x = Makie.@lift range(1e-6unit($H), stop=$H, length=100)
-  y = Makie.@lift $γ.($x)
+  # lag range starting at 1e-6 to avoid nugget artifact
+  hs = Makie.@lift range(1e-6unit($H), stop=$H, length=100)
 
-  # visualize variogram
-  Makie.lines!(plot, x, y, color=plot[:color], linewidth=plot[:size])
+  b = Makie.@lift metricball($γ)
+  R = Makie.@lift rotation($b)
+  r = Makie.@lift radii($b)
+  n = Makie.@lift length($r)
+  U = Makie.@lift eltype($r)
+  p = Makie.@lift Point(ntuple(i -> $U(0), $n))
+  for j in 1:n[]
+    sⱼ = Dict(1 => :solid, 2 => :dash, 3 => :dot)[j]
+    vⱼ = Makie.@lift $R * Vec(ntuple(i -> $U(i == j), $n))
+    gs = Makie.@lift [$γ($p, $p + ustrip(h) * $vⱼ) for h in $hs]
+    Makie.lines!(plot, hs, gs, color=plot[:color], linewidth=plot[:size], linestyle=sⱼ)
+  end
 end
