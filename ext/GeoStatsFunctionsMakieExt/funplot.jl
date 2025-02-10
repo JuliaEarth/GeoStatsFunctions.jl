@@ -2,8 +2,8 @@
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
 
-planeplot(f; kwargs...) = _planeplot(f; kwargs...)
+funplot(f; kwargs...) = _funplot(f; kwargs...)
 
-include("planeplot/variogram.jl")
-include("planeplot/covariance.jl")
-include("planeplot/transiogram.jl")
+include("funplot/variogram.jl")
+include("funplot/covariance.jl")
+include("funplot/transiogram.jl")

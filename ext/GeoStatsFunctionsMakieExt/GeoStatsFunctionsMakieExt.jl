@@ -11,12 +11,9 @@ using LinearAlgebra
 
 import Makie
 
-import GeoStatsFunctions: varioplot, varioplot!
-import GeoStatsFunctions: transioplot, transioplot!
-import GeoStatsFunctions: planeplot, planeplot!
+import GeoStatsFunctions: funplot, planeplot
 
-include("varioplot.jl")
-include("transioplot.jl")
+include("funplot.jl")
 include("planeplot.jl")
 include("utils.jl")
 

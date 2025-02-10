@@ -110,11 +110,7 @@ export
   WeightedLeastSquares,
 
   # plotting functions
-  varioplot,
-  varioplot!,
-  transioplot,
-  transioplot!,
-  planeplot,
-  planeplot!
+  funplot,
+  planeplot
 
 end

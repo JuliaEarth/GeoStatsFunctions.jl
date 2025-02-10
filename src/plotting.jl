@@ -3,43 +3,26 @@
 # ------------------------------------------------------------------
 
 """
-    varioplot(γ; [options])
+    funplot(f; [options])
 
-Plot the variogram `γ` with given `options`.
+Plot the geostatistical function `f` with given `options`.
 
-## Common variogram options:
+## Common options:
 
-* `color`  - color of variogram
-* `size`   - size of variogram
-* `maxlag` - maximum lag of variogram
+* `color`  - color
+* `size`   - size (line width)
+* `maxlag` - maximum lag
 
-## Empirical variogram options:
+## Empirical function options:
 
-* `pointsize`   - size of points of variogram
+* `pointsize`   - size of points
 * `showtext`    - show text counts
 * `textsize`    - size of text counts
 * `showhist`    - show histogram
 * `histcolor`   - color of histogram
 
-### Notes
+## Transiogram function options:
 
-* This function will only work in the presence of
-  a Makie.jl backend via package extensions in
-  Julia v1.9 or later versions of the language.
-"""
-function varioplot end
-function varioplot! end
-
-"""
-    transioplot(t; [options])
-
-Plot the transiogram `t` with given `options`.
-
-## Common transiogram options:
-
-* `color`  - color of transiogram
-* `size`   - size of transiogram
-* `maxlag` - maximum lag of variogram
 * `levels` - categorical levels
 
 ### Notes
@@ -48,17 +31,27 @@ Plot the transiogram `t` with given `options`.
   a Makie.jl backend via package extensions in
   Julia v1.9 or later versions of the language.
 """
-function transioplot end
-function transioplot! end
+function funplot end
 
 """
     planeplot(f; [options])
 
 Plot the varioplane or transioplane `f` with given `options`.
 
-## Available options
+## Common options
 
-* `colormap` - Color map of plane plot.
+* `colormap` - Color map
+* `maxlag`   - maximum lag
+
+## Theoretical function options
+
+* `normal` - Normal direction to plane (default to vertical)
+* `nlags`  - Number of lags (default to `20`)
+* `nangs`  - Number of angles (default to `50`)
+
+## Transiogram options
+
+* `levels` - categorical levels
 
 ### Notes
 
@@ -67,4 +60,3 @@ Plot the varioplane or transioplane `f` with given `options`.
   Julia v1.9 or later versions of the language.
 """
 function planeplot end
-function planeplot! end

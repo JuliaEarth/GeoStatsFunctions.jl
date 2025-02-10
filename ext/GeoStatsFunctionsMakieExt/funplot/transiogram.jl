@@ -2,20 +2,23 @@
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
 
-function transioplot(
+function _funplot(
   t::EmpiricalTransiogram;
-  # common transiogram options
+
+  # common options
   color=:slategray,
   size=1.5,
   maxlag=nothing,
-  levels=nothing,
 
-  # empirical transiogram options
+  # empirical options
   pointsize=12,
   showtext=true,
   textsize=12,
   showhist=true,
-  histcolor=:slategray
+  histcolor=:slategray,
+
+  # transiogram options
+  levels=nothing,
 )
   # number of labels
   L = Base.size(t.ordinates, 1)
@@ -33,10 +36,18 @@ function transioplot(
     y = t.ordinates[i, j]
     n = t.counts
 
+    # retrieve maximum lag
+    H = isnothing(maxlag) ? last(x) : _addunit(maxlag, u"m")
+
     # discard empty bins
     x = x[n .> 0]
     y = y[n .> 0]
     n = n[n .> 0]
+
+    # discard above maximum lag
+    n = n[x .≤ H]
+    y = y[x .≤ H]
+    x = x[x .≤ H]
 
     # visualize frequencies as bars
     if showhist
@@ -58,20 +69,19 @@ function transioplot(
   fig
 end
 
-function transioplot(
+function _funplot(
   t::Transiogram;
-  # common transiogram options
+
+  # common options
   color=:slategray,
   size=1.5,
   maxlag=nothing,
+
+  # transiogram options
   levels=nothing
 )
   # retrieve maximum lag
-  H = if isnothing(maxlag)
-    _maxlag(t)
-  else
-    _addunit(maxlag, u"m")
-  end
+  H = isnothing(maxlag) ? _maxlag(t) : _addunit(maxlag, u"m")
 
   # transiogram up to maximum lag
   hs = range(zero(H), stop=H, length=100)
@@ -88,23 +98,23 @@ function transioplot(
     Makie.lines!(ax, hs, getindex.(ts, i, j), color=color, linewidth=size, label="$lᵢ → $lⱼ")
     Makie.axislegend(position=i == j ? :rt : :rb)
   end
+
   fig
 end
 
-function transioplot(
+function _funplot(
   t::MatrixExponentialTransiogram;
-  # common transiogram options
+
+  # common options
   color=:slategray,
   size=1.5,
   maxlag=nothing,
+
+  # transiogram options
   levels=nothing
 )
   # retrieve maximum lag
-  H = if isnothing(maxlag)
-    _maxlag(t)
-  else
-    _addunit(maxlag, u"m")
-  end
+  H = isnothing(maxlag) ? _maxlag(t) : _addunit(maxlag, u"m")
 
   # transiogram up to maximum lag
   hs = range(zero(H), stop=H, length=100)
@@ -140,5 +150,7 @@ function transioplot(
     end
     Makie.axislegend(position=i == j ? :rt : :rb)
   end
+
   fig
 end
+
