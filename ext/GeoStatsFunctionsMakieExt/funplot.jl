@@ -56,7 +56,7 @@ function _funplot(
       Makie.lines!(ax, hs, Fₖ[i, j], color=color, linewidth=size, linestyle=style[k], label=label[k])
     end
     position = (i == j) && isbanded(f) ? :rt : :rb
-    length(F) > 1 && Makie.axislegend(position=position)
+    d > 1 && Makie.axislegend(position=position)
   end
   fig
 end
