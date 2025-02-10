@@ -11,20 +11,28 @@ function _funplot(
   color=:slategray,
   size=1.5,
   maxlag=nothing,
-
-  # transiogram options
   levels=nothing
 )
-  # setup rotated basis
-  p, v, hs = _setupbasis(f, maxlag)
+  # evaluate at rotated basis
+  hs, N, F = _evalbasis(f, maxlag)
 
   # aesthetic options
   label = Dict(1 => "1st axis", 2 => "2nd axis", 3 => "3rd axis")
   style = Dict(1 => :solid, 2 => :dash, 3 => :dot)
-  aes = (; color, size, label, style, levels)
+  level = isnothing(levels) ? (1:N) : levels
 
-  # build figure
-  _buildfigure(f, p, v, hs, aes)
+  fig = Makie.Figure()
+  for i in 1:N, j in 1:N
+    lᵢ, lⱼ = level[i], level[j]
+    title = N > 1 ? "$lᵢ → $lⱼ" : ""
+    ax = Makie.Axis(fig[i, j], title = title)
+    for (k, Fₖ) in enumerate(F)
+      Makie.lines!(ax, hs, Fₖ[i, j], color=color, linewidth=size, linestyle=style[k], label=label[k])
+    end
+    position = (i == j) && isbanded(f) ? :rt : :rb
+    length(F) > 1 && Makie.axislegend(position=position)
+  end
+  fig
 end
 
 # ----------------
@@ -32,14 +40,13 @@ end
 # ----------------
 
 include("funplot/variogram.jl")
-include("funplot/covariance.jl")
 include("funplot/transiogram.jl")
 
 # -----------------
 # HELPER FUNCTIONS
 # -----------------
 
-function _setupbasis(f, maxlag)
+function _evalbasis(f, maxlag)
   # auxiliary parameters
   b = metricball(f)
   R = rotation(b)
@@ -61,16 +68,14 @@ function _setupbasis(f, maxlag)
   # lag range starting at 1e-6 to avoid nugget artifact
   hs = range(1e-6 * oneunit(H), stop=H, length=100)
 
-  p, v, hs
-end
+  # number of variates
+  N = nvariates(f)
 
-function _buildfigure(f, p, v, hs, aes)
-  fig = Makie.Figure()
-  ax = Makie.Axis(fig[1, 1])
-  for (j, vⱼ) in enumerate(v)
+  # reshape results
+  F = map(v) do vⱼ
     fs = [f(p, p + ustrip(h) * vⱼ) for h in hs]
-    Makie.lines!(ax, hs, fs, color=aes.color, linewidth=aes.size, linestyle=aes.style[j], label=aes.label[j])
+    [getindex.(fs, i, j) for i in 1:N, j in 1:N]
   end
-  length(v) > 1 && Makie.axislegend(position=:rb)
-  fig
+
+  hs, N, F
 end

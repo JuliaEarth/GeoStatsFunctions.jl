@@ -70,39 +70,6 @@ function _funplot(
 end
 
 function _funplot(
-  t::Transiogram;
-
-  # common options
-  color=:slategray,
-  size=1.5,
-  maxlag=nothing,
-
-  # transiogram options
-  levels=nothing
-)
-  # retrieve maximum lag
-  H = isnothing(maxlag) ? _maxlag(t) : _addunit(maxlag, u"m")
-
-  # transiogram up to maximum lag
-  hs = range(zero(H), stop=H, length=100)
-  ts = t.(hs)
-
-  # categorical labels
-  L = Base.size(first(ts), 1)
-  l = isnothing(levels) ? (1:L) : levels
-
-  fig = Makie.Figure()
-  for i in 1:L, j in 1:L
-    lᵢ, lⱼ = l[i], l[j]
-    ax = Makie.Axis(fig[i, j])
-    Makie.lines!(ax, hs, getindex.(ts, i, j), color=color, linewidth=size, label="$lᵢ → $lⱼ")
-    Makie.axislegend(position=i == j ? :rt : :rb)
-  end
-
-  fig
-end
-
-function _funplot(
   t::MatrixExponentialTransiogram;
 
   # common options

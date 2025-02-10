@@ -12,6 +12,7 @@ Plot the geostatistical function `f` with given `options`.
 * `color`  - color
 * `size`   - size (line width)
 * `maxlag` - maximum lag
+* `levels` - categorical levels
 
 ## Empirical function options:
 
@@ -20,10 +21,6 @@ Plot the geostatistical function `f` with given `options`.
 * `textsize`    - size of text counts
 * `showhist`    - show histogram
 * `histcolor`   - color of histogram
-
-## Transiogram function options:
-
-* `levels` - categorical levels
 
 ### Notes
 
@@ -42,16 +39,13 @@ Plot the varioplane or transioplane `f` with given `options`.
 
 * `colormap` - Color map
 * `maxlag`   - maximum lag
+* `levels`   - categorical levels
 
 ## Theoretical function options
 
 * `normal` - Normal direction to plane (default to vertical)
 * `nlags`  - Number of lags (default to `20`)
 * `nangs`  - Number of angles (default to `50`)
-
-## Transiogram options
-
-* `levels` - categorical levels
 
 ### Notes
 

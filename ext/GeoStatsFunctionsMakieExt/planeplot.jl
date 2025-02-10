@@ -5,5 +5,4 @@
 planeplot(f; kwargs...) = _planeplot(f; kwargs...)
 
 include("planeplot/variogram.jl")
-include("planeplot/covariance.jl")
 include("planeplot/transiogram.jl")
