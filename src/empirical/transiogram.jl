@@ -36,7 +36,7 @@ See also: [`DirectionalTransiogram`](@ref), [`PlanarTransiogram`](@ref).
 * Carle et al 1998. [Conditional Simulation of Hydrofacies Architecture:
   A Transition Probability/Markov Approach](https://doi.org/10.2110/sepmcheg.01.147)
 """
-struct EmpiricalTransiogram{ℒ<:Len,V,D,E} <: EmpiricalFunction
+struct EmpiricalTransiogram{ℒ<:Len,V,D,E} <: EmpiricalGeoStatsFunction
   counts::Vector{Int}
   abscissas::Vector{ℒ}
   ordinates::Matrix{Vector{V}}

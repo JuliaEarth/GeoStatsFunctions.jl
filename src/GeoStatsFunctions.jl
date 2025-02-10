@@ -49,6 +49,7 @@ include("precompile.jl")
 
 export
   # empirical functions
+  EmpiricalGeoStatsFunction,
   EmpiricalVariogram,
   EmpiricalTransiogram,
 

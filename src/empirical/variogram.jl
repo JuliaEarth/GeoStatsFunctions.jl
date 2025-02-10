@@ -46,7 +46,7 @@ See also: [`DirectionalVariogram`](@ref), [`PlanarVariogram`](@ref),
 * Hoffimann, J and Zadrozny, B. 2019. [Efficient variography with partition variograms]
   (https://www.sciencedirect.com/science/article/pii/S0098300419302936)
 """
-struct EmpiricalVariogram{ℒ<:Len,V,D,E} <: EmpiricalFunction
+struct EmpiricalVariogram{ℒ<:Len,V,D,E} <: EmpiricalGeoStatsFunction
   counts::Vector{Int}
   abscissas::Vector{ℒ}
   ordinates::Vector{V}

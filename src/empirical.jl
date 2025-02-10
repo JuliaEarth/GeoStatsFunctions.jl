@@ -16,39 +16,39 @@ include("empirical/estimalgo.jl")
 # -----------------------------
 
 """
-    EmpiricalFunction
+    EmpiricalGeoStatsFunction
 
-An empirical function estimated from data.
+An empirical geostatistical function estimated from data.
 """
-abstract type EmpiricalFunction end
+abstract type EmpiricalGeoStatsFunction end
 
 # -----------
 # IO METHODS
 # -----------
 
-Base.summary(io::IO, γ::EmpiricalFunction) = print(io, nameof(typeof(γ)))
+Base.summary(io::IO, f::EmpiricalGeoStatsFunction) = print(io, nameof(typeof(f)))
 
-function Base.show(io::IO, γ::EmpiricalFunction)
+function Base.show(io::IO, f::EmpiricalGeoStatsFunction)
   ioctx = IOContext(io, :compact => true)
-  summary(ioctx, γ)
+  summary(ioctx, f)
   print(ioctx, "(")
-  print(ioctx, "distance: ", γ.distance)
-  print(ioctx, ", estimator: ", γ.estimator)
-  print(ioctx, ", npairs: ", sum(γ.counts))
+  print(ioctx, "distance: ", f.distance)
+  print(ioctx, ", estimator: ", f.estimator)
+  print(ioctx, ", npairs: ", sum(f.counts))
   print(ioctx, ")")
 end
 
-function Base.show(io::IO, ::MIME"text/plain", γ::EmpiricalFunction)
+function Base.show(io::IO, ::MIME"text/plain", f::EmpiricalGeoStatsFunction)
   ioctx = IOContext(io, :compact => true, :limit => true)
-  summary(ioctx, γ)
+  summary(ioctx, f)
   println(ioctx)
   print(ioctx, "├─ abscissas: ")
-  _printlnvec(ioctx, γ.abscissas, 3)
+  _printlnvec(ioctx, f.abscissas, 3)
   print(ioctx, "├─ ordinates: ")
-  _printlnvec(ioctx, γ.ordinates, 3)
-  println(ioctx, "├─ distance: ", γ.distance)
-  println(ioctx, "├─ estimator: ", γ.estimator)
-  print(ioctx, "└─ npairs: ", sum(γ.counts))
+  _printlnvec(ioctx, f.ordinates, 3)
+  println(ioctx, "├─ distance: ", f.distance)
+  println(ioctx, "├─ estimator: ", f.estimator)
+  print(ioctx, "└─ npairs: ", sum(f.counts))
 end
 
 # ----------------

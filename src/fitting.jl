@@ -25,7 +25,7 @@ julia> fit(ExponentialVariogram, g, maxsill=1.0)
 julia> fit(GaussianVariogram, g, WeightedLeastSquares())
 ```
 """
-fit(F::Type{<:GeoStatsFunction}, f::EmpiricalFunction, algo::FitAlgo=WeightedLeastSquares(); kwargs...) =
+fit(F::Type{<:GeoStatsFunction}, f::EmpiricalGeoStatsFunction, algo::FitAlgo=WeightedLeastSquares(); kwargs...) =
   _fit(F, f, algo; kwargs...) |> first
 
 """
@@ -40,7 +40,7 @@ using algorithm `algo` and return the one with minimum error.
 julia> fit([SphericalVariogram, ExponentialVariogram], g)
 ```
 """
-function fit(Fs, f::EmpiricalFunction, algo::FitAlgo=WeightedLeastSquares(); kwargs...)
+function fit(Fs, f::EmpiricalGeoStatsFunction, algo::FitAlgo=WeightedLeastSquares(); kwargs...)
   # fit each variogram type
   res = [_fit(F, f, algo; kwargs...) for F in Fs]
   fs, ϵs = first.(res), last.(res)
@@ -62,7 +62,8 @@ fit(SphericalVariogram, g, h -> exp(-h))
 fit(Variogram, g, h -> exp(-h/100))
 ```
 """
-fit(F, f::EmpiricalFunction, weightfun::Function; kwargs...) = fit(F, f, WeightedLeastSquares(weightfun); kwargs...)
+fit(F, f::EmpiricalGeoStatsFunction, weightfun::Function; kwargs...) =
+  fit(F, f, WeightedLeastSquares(weightfun); kwargs...)
 
 # ----------
 # VARIOGRAM
