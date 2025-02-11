@@ -31,9 +31,9 @@ Plot the geostatistical function `f` with given `options`.
 function funplot end
 
 """
-    planeplot(f; [options])
+    surfplot(f; [options])
 
-Plot the varioplane or transioplane `f` with given `options`.
+Plot the geostatistical surface `f` with given `options`.
 
 ## Common options
 
@@ -53,4 +53,4 @@ Plot the varioplane or transioplane `f` with given `options`.
   a Makie.jl backend via package extensions in
   Julia v1.9 or later versions of the language.
 """
-function planeplot end
+function surfplot end

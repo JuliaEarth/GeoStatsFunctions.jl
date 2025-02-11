@@ -58,8 +58,11 @@ export
   DirectionalTransiogram,
   PlanarVariogram,
   PlanarTransiogram,
-  EmpiricalVarioplane,
-  EmpiricalTransioplane,
+
+  # empirical surfaces
+  EmpiricalGeoStatsSurface,
+  EmpiricalVariogramSurface,
+  EmpiricalTransiogramSurface,
 
   # theoretical functions
   GeoStatsFunction,
@@ -113,6 +116,6 @@ export
 
   # plotting functions
   funplot,
-  planeplot
+  surfplot
 
 end

@@ -11,10 +11,10 @@ using LinearAlgebra
 
 import Makie
 
-import GeoStatsFunctions: funplot, planeplot
+import GeoStatsFunctions: funplot, surfplot
 
 include("funplot.jl")
-include("planeplot.jl")
+include("surfplot.jl")
 include("utils.jl")
 
 end

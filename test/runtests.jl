@@ -18,9 +18,9 @@ testfiles = [
   # empirical
   "empirical/matrices.jl",
   "empirical/variogram.jl",
-  "empirical/varioplane.jl",
   "empirical/transiogram.jl",
-  "empirical/transioplane.jl",
+  "empirical/variosurf.jl",
+  "empirical/transiosurf.jl",
 
   # theoretical
   "theoretical/variogram.jl",

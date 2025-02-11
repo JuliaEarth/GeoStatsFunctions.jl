@@ -1,10 +1,10 @@
-@testset "EmpiricalTransioplane" begin
+@testset "EmpiricalTransiogramSurface" begin
   img = readdlm(joinpath(datadir, "anisotropic.tsv"))
   data = georef((c=[v < 0 ? 1 : 2 for v in img],))
-  t = EmpiricalTransioplane(data, :c, maxlag=50.0)
-  @test sprint(show, t) == "EmpiricalTransioplane"
+  t = EmpiricalTransiogramSurface(data, :c, maxlag=50.0)
+  @test sprint(show, t) == "EmpiricalTransiogramSurface"
   @test sprint(show, MIME"text/plain"(), t) == """
-  EmpiricalTransioplane
+  EmpiricalTransiogramSurface
     100 angles
     └─0.00°
     └─3.64°

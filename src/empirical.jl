@@ -18,7 +18,7 @@ include("empirical/estimalgo.jl")
 """
     EmpiricalGeoStatsFunction
 
-An empirical geostatistical function estimated from data.
+An empirical geostatistical function.
 """
 abstract type EmpiricalGeoStatsFunction end
 
@@ -69,5 +69,12 @@ include("empirical/transiogram.jl")
 # HIGH-ORDER FUNCTIONS
 # ---------------------
 
-include("empirical/varioplane.jl")
-include("empirical/transioplane.jl")
+"""
+    EmpiricalGeoStatsSurface
+
+An empirical geostatistical function surface.
+"""
+abstract type EmpiricalGeoStatsSurface end
+
+include("empirical/variosurf.jl")
+include("empirical/transiosurf.jl")

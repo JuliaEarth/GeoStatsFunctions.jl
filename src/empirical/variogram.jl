@@ -33,7 +33,7 @@ maximum lag is much smaller than the bounding box of
 the domain of the data.
 
 See also: [`DirectionalVariogram`](@ref), [`PlanarVariogram`](@ref),
-[`EmpiricalVarioplane`](@ref).
+[`EmpiricalVariogramSurface`](@ref).
 
 ## References
 

@@ -26,7 +26,8 @@ The `:ball` algorithm is considerably faster when the
 maximum lag is much smaller than the bounding box of
 the domain of the data.
 
-See also: [`DirectionalTransiogram`](@ref), [`PlanarTransiogram`](@ref).
+See also: [`DirectionalTransiogram`](@ref), [`PlanarTransiogram`](@ref),
+[`EmpiricalTransiogramSurface`](@ref).
 
 ## References
 

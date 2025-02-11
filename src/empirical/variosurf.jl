@@ -3,10 +3,10 @@
 # ------------------------------------------------------------------
 
 """
-    EmpiricalVarioplane(data, var₁, var₂=var₁;
-                        normal=Vec(0,0,1), nangs=50,
-                        ptol=0.5u"m", dtol=0.5u"m",
-                        [parameters])
+    EmpiricalVariogramSurface(data, var₁, var₂=var₁;
+                              normal=Vec(0,0,1), nangs=50,
+                              ptol=0.5u"m", dtol=0.5u"m",
+                              [parameters])
 
 Given a `normal` direction, estimate the (cross-)variogram of variables
 `var₁` and `var₂` along all directions in the corresponding plane of variation.
@@ -16,13 +16,13 @@ the tolerance `dtol` in length units for the direction partition, the number of
 angles `nangs` in the plane, and forward the `parameters` to the underlying
 [`EmpiricalVariogram`](@ref).
 """
-struct EmpiricalVarioplane{T,R,Z}
+struct EmpiricalVariogramSurface{T,R,Z} <: EmpiricalGeoStatsSurface
   θs::Vector{T}
   rs::Vector{R}
   zs::Vector{Z}
 end
 
-function EmpiricalVarioplane(
+function EmpiricalVariogramSurface(
   data::AbstractGeoTable,
   var₁,
   var₂=var₁;
@@ -68,18 +68,18 @@ function EmpiricalVarioplane(
   # varioplane values
   zs = [γ.ordinates for γ in γs]
 
-  EmpiricalVarioplane(θs, rs, zs)
+  EmpiricalVariogramSurface(θs, rs, zs)
 end
 
 # -----------
 # IO METHODS
 # -----------
 
-function Base.show(io::IO, ::EmpiricalVarioplane)
-  print(io, "EmpiricalVarioplane")
+function Base.show(io::IO, ::EmpiricalVariogramSurface)
+  print(io, "EmpiricalVariogramSurface")
 end
 
-function Base.show(io::IO, ::MIME"text/plain", γ::EmpiricalVarioplane)
+function Base.show(io::IO, ::MIME"text/plain", γ::EmpiricalVariogramSurface)
   θs = [@sprintf "%.2f" rad2deg(θ) for θ in γ.θs]
   nθ = length(θs)
   lines = ["  └─$(θ)°" for θ in θs]
