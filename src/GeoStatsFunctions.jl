@@ -22,7 +22,6 @@ using Statistics
 using Setfield
 using Unitful
 using Random
-using Printf
 
 import Base: merge, +, *
 import LinearAlgebra: issymmetric

@@ -2,19 +2,9 @@
   img = readdlm(joinpath(datadir, "anisotropic.tsv"))
   data = georef((z=img,))
   g = EmpiricalVariogramSurface(data, :z, maxlag=50.0)
-  @test sprint(show, g) == "EmpiricalVariogramSurface"
+  @test sprint(show, g) == "EmpiricalVariogramSurface(nangs: 50, nlags: 20)"
   @test sprint(show, MIME"text/plain"(), g) == """
   EmpiricalVariogramSurface
-    50 angles
-    └─0.00°
-    └─3.67°
-    └─7.35°
-    └─11.02°
-    └─14.69°
-    ⋮
-    └─165.31°
-    └─168.98°
-    └─172.65°
-    └─176.33°
-    └─180.00°"""
+  ├─ nangs: 50
+  └─ nlags: 20"""
 end
