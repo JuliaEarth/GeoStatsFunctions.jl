@@ -115,6 +115,8 @@ export
 
   # plotting functions
   funplot,
-  surfplot
+  funplot!,
+  surfplot,
+  surfplot!
 
 end

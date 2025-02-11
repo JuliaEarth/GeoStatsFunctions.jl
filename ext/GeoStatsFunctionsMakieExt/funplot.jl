@@ -2,13 +2,29 @@
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
 
-function funplot(
+function funplot(f; labels=nothing, kwargs...)
+  # variable names
+  n = nvariates(f)
+  v = isnothing(labels) ? (1:n) : labels
+
+  # initialize figure
+  fig = Makie.Figure()
+  for i in 1:n, j in 1:n
+    title = n > 1 ? "$(v[i]) → $(v[j])" : ""
+    Makie.Axis(fig[i, j], title=title)
+  end
+
+  # fill figure with plots
+  funplot!(fig, f; kwargs...)
+end
+
+function funplot!(
+  fig::Makie.Figure,
   f::GeoStatsFunction;
   # common options
   color=:teal,
   size=1.5,
-  maxlag=nothing,
-  labels=nothing
+  maxlag=nothing
 )
   # auxiliary parameters
   n = nvariates(f)
@@ -55,13 +71,11 @@ function funplot(
   # aesthetic options
   label = Dict(1 => "1ˢᵗ axis", 2 => "2ⁿᵈ axis", 3 => "3ʳᵈ axis")
   style = Dict(1 => :solid, 2 => :dash, 3 => :dot)
-  vars = isnothing(labels) ? (1:n) : labels
 
-  # build figure
-  fig = Makie.Figure()
+  # add plots to axes
+  I = LinearIndices((n, n))
   for i in 1:n, j in 1:n
-    title = n > 1 ? "$(vars[i]) → $(vars[j])" : ""
-    ax = Makie.Axis(fig[i, j], title=title)
+    ax = fig.content[I[j, i]]
     for (k, Fₖ) in enumerate(F)
       # display main function
       Makie.lines!(ax, hs, Fₖ[i, j], color=color, linewidth=size, linestyle=style[k], label=label[k])
@@ -84,13 +98,13 @@ function funplot(
   fig
 end
 
-function funplot(
+function funplot!(
+  fig::Makie.Figure,
   f::EmpiricalGeoStatsFunction;
   # common options
   color=:teal,
   size=1.5,
   maxlag=nothing,
-  labels=nothing,
   # empirical options
   pointsize=12,
   showtext=true,
@@ -100,14 +114,11 @@ function funplot(
 )
   # number of variables
   n = nvariates(f)
+  I = LinearIndices((n, n))
 
-  # aesthetic options
-  vars = isnothing(labels) ? (1:n) : labels
-
-  fig = Makie.Figure()
+  # add plots to axes
   for i in 1:n, j in 1:n
-    title = n > 1 ? "$(vars[i]) → $(vars[j])" : ""
-    ax = Makie.Axis(fig[i, j], title=title)
+    ax = fig.content[I[j, i]]
 
     # retrieve coordinates and counts
     hs = f.abscissas

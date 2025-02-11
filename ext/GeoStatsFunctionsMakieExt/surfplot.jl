@@ -2,12 +2,28 @@
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
 
-function surfplot(
+function surfplot(f; labels=nothing, kwargs...)
+  # variable names
+  n = nvariates(f)
+  v = isnothing(labels) ? (1:n) : labels
+
+  # initialize figure
+  fig = Makie.Figure()
+  for i in 1:n, j in 1:n
+    title = n > 1 ? "$(v[i]) → $(v[j])" : ""
+    ax = Makie.PolarAxis(fig[i, j], title=title)
+  end
+
+  # fill figure with plots
+  surfplot!(fig, f; kwargs...)
+end
+
+function surfplot!(
+  fig::Makie.Figure,
   f::GeoStatsFunction;
   # common options
   colormap=:viridis,
   maxlag=nothing,
-  labels=nothing,
   # geometric options
   normal=nothing,
   nlags=20,
@@ -71,25 +87,21 @@ function surfplot(
   rs = [zero(eltype(rs)); rs]
   Z = [Z[:, 1:1] Z]
 
-  # aesthetic options
-  vars = isnothing(labels) ? (1:n) : labels
-
-  fig = Makie.Figure()
+  I = LinearIndices((n, n))
   for i in 1:n, j in 1:n
-    title = n > 1 ? "$(vars[i]) → $(vars[j])" : ""
-    ax = Makie.PolarAxis(fig[i, j], title=title)
+    ax = fig.content[I[j, i]]
     Zᵢⱼ = getindex.(Z, i, j)
     Makie.surface!(ax, θs, ustrip.(rs), ustrip.(Zᵢⱼ), colormap=colormap, shading=Makie.NoShading)
   end
   fig
 end
 
-function surfplot(
+function surfplot!(
+  fig::Makie.Figure,
   f::EmpiricalGeoStatsSurface;
   # common options
   colormap=:viridis,
-  maxlag=nothing,
-  labels=nothing
+  maxlag=nothing
 )
   # auxiliary parameters
   n = nvariates(f)
@@ -119,13 +131,9 @@ function surfplot(
   # hide hole at center
   rs = [zero(eltype(rs)); rs]
 
-  # aesthetic options
-  vars = isnothing(labels) ? (1:n) : labels
-
-  fig = Makie.Figure()
+  I = LinearIndices((n, n))
   for i in 1:n, j in 1:n
-    title = n > 1 ? "$(vars[i]) → $(vars[j])" : ""
-    ax = Makie.PolarAxis(fig[i, j], title=title)
+    ax = fig.content[I[j, i]]
 
     # values in matrix form
     Zᵢⱼ = _istransiogram(f) ? getindex.(zs, i, j) : zs

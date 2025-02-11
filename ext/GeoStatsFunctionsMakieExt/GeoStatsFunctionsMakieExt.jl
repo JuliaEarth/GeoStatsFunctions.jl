@@ -11,7 +11,8 @@ using LinearAlgebra
 
 import Makie
 
-import GeoStatsFunctions: funplot, surfplot
+import GeoStatsFunctions: funplot, funplot!
+import GeoStatsFunctions: surfplot, surfplot!
 
 include("funplot.jl")
 include("surfplot.jl")

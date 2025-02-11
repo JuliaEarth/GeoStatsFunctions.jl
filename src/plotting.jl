@@ -31,6 +31,16 @@ Plot the geostatistical function `f` with given `options`.
 function funplot end
 
 """
+    funplot!(fig, f; [options])
+
+Mutating version of [`funplot`[@ref] where the figure `fig`
+is updated with the plot of the geostatistical function `f`.
+
+See the documentation of [`funplot`](@ref) for `options`.
+"""
+function funplot! end
+
+"""
     surfplot(f; [options])
 
 Plot the geostatistical surface `f` with given `options`.
@@ -54,3 +64,13 @@ Plot the geostatistical surface `f` with given `options`.
   Julia v1.9 or later versions of the language.
 """
 function surfplot end
+
+"""
+    surfplot!(fig, f; [options])
+
+Mutating version of [`surfplot`[@ref] where the figure `fig`
+is updated with the plot of the geostatistical surface `f`.
+
+See the documentation of [`surfplot`](@ref) for `options`.
+"""
+function surfplot! end
