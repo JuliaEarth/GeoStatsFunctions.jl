@@ -5,12 +5,12 @@
 function funplot(f; labels=nothing, kwargs...)
   # variable names
   n = nvariates(f)
-  v = isnothing(labels) ? (1:n) : labels
+  l = isnothing(labels) ? (1:n) : labels
 
   # initialize figure
   fig = Makie.Figure()
   for i in 1:n, j in 1:n
-    title = n > 1 ? "$(v[i]) → $(v[j])" : ""
+    title = n > 1 ? "$(l[i]) → $(l[j])" : ""
     Makie.Axis(fig[i, j], title=title)
   end
 
