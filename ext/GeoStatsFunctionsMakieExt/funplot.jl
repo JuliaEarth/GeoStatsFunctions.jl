@@ -143,7 +143,3 @@ function funplot(
   end
   fig
 end
-
-_istransiogram(f) = false
-_istransiogram(t::Transiogram) = true
-_istransiogram(t::EmpiricalTransiogram) = true

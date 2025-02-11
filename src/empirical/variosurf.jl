@@ -40,7 +40,7 @@ function EmpiricalVariogramSurface(
 
   Dim = embeddim(domain(data))
 
-  # basis for varioplane
+  # basis for surface
   if Dim == 2
     planes = [data]
     u, v = Vec(1.0, 0.0), Vec(0.0, 1.0)
@@ -49,7 +49,7 @@ function EmpiricalVariogramSurface(
     planes = collect(subset)
     u, v = householderbasis(normal)
   else
-    throw(ArgumentError("varioplane only supported in 2D or 3D"))
+    throw(ArgumentError("variogram surface only supported in 2D or 3D"))
   end
 
   # polar angles for half plane (variogram is symmetric)
@@ -65,11 +65,15 @@ function EmpiricalVariogramSurface(
   # polar radii
   rs = first(γs).abscissas
 
-  # varioplane values
+  # surface values
   zs = [γ.ordinates for γ in γs]
 
   EmpiricalVariogramSurface(θs, rs, zs)
 end
+
+nvariates(::Type{<:EmpiricalVariogramSurface}) = 1
+
+issymmetric(::Type{<:EmpiricalVariogramSurface}) = true
 
 # -----------
 # IO METHODS

@@ -39,7 +39,7 @@ function EmpiricalTransiogramSurface(
 
   Dim = embeddim(domain(data))
 
-  # basis for transioplane
+  # basis for surface
   if Dim == 2
     planes = [data]
     u, v = Vec(1.0, 0.0), Vec(0.0, 1.0)
@@ -48,7 +48,7 @@ function EmpiricalTransiogramSurface(
     planes = collect(subset)
     u, v = householderbasis(normal)
   else
-    throw(ArgumentError("transioplane only supported in 2D or 3D"))
+    throw(ArgumentError("transiogram surface only supported in 2D or 3D"))
   end
 
   # polar angles for full plane (transiogram is asymmetric)
@@ -64,11 +64,15 @@ function EmpiricalTransiogramSurface(
   # polar radii
   rs = first(ts).abscissas
 
-  # transioplane values
+  # surface values
   zs = [t.ordinates for t in ts]
 
   EmpiricalTransiogramSurface(θs, rs, zs)
 end
+
+nvariates(t::EmpiricalTransiogramSurface) = size(first(t.zs), 1)
+
+issymmetric(::Type{<:EmpiricalTransiogramSurface}) = false
 
 # -----------
 # IO METHODS

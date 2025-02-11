@@ -72,9 +72,23 @@ include("empirical/transiogram.jl")
 """
     EmpiricalGeoStatsSurface
 
-An empirical geostatistical function surface.
+An empirical geostatistical surface.
 """
 abstract type EmpiricalGeoStatsSurface end
+
+"""
+    issymmetric(f)
+
+Tell whether or not the empirical geostatistical surface `f` is symmetric.
+"""
+issymmetric(f::EmpiricalGeoStatsSurface) = issymmetric(typeof(f))
+
+"""
+    nvariates(f)
+
+Return the number of (co)variates of the empirical geostatistical surface `f`.
+"""
+nvariates(f::EmpiricalGeoStatsSurface) = nvariates(typeof(f))
 
 include("empirical/variosurf.jl")
 include("empirical/transiosurf.jl")

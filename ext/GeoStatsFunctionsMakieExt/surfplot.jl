@@ -2,9 +2,7 @@
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
 
-surfplot(f; kwargs...) = _planeplot(f; kwargs...)
-
-function _planeplot(
+function surfplot(
   f::GeoStatsFunction;
   # common options
   colormap=:viridis,
@@ -86,31 +84,33 @@ function _planeplot(
   fig
 end
 
-function _planeplot(
-  f; # empirical plane
+function surfplot(
+  f::EmpiricalGeoStatsSurface;
   # common options
   colormap=:viridis,
   maxlag=nothing,
   labels=nothing
 )
+  # auxiliary parameters
+  n = nvariates(f)
+
   # polar radius
   rs = f.rs
 
   # polar angle
-  θs = if issymmetric(f)
-    range(0, 2π, length=2length(f.θs))
-  else
-    f.θs
-  end
+  θs = f.θs
 
   # function values
   zs = f.zs
 
+  # exploit symmetry
+  if issymmetric(f)
+    θs = range(0, stop=2π, length=2length(θs))
+    zs = [zs; zs]
+  end
+
   # hide hole at center
   rs = [zero(eltype(rs)); rs]
-
-  # number of variables
-  n = size(first(zs), 1)
 
   # aesthetic options
   vars = isnothing(labels) ? (1:n) : labels
@@ -121,12 +121,8 @@ function _planeplot(
     ax = Makie.PolarAxis(fig[i, j], title=title)
 
     # values in matrix form
-    Z = reduce(hcat, getindex.(zs, i, j))
-
-    # exploit symmetry
-    if issymmetric(f)
-      Z = [Z Z]
-    end
+    V = _istransiogram(f) ? getindex.(zs, i, j) : zs
+    Z = reduce(hcat, V)
 
     # hide hole at center
     Z = [Z[1:1, :]; Z]

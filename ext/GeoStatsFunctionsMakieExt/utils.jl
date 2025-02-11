@@ -13,3 +13,8 @@ _maxlag(t::PiecewiseLinearTransiogram) = last(t.abscissas)
 _addunit(x::Number, u) = x * u
 _addunit(x::Len, _) = x
 _addunit(x::Quantity, _) = throw(ArgumentError("$(unit(x)) is not a valid length unit"))
+
+_istransiogram(f) = false
+_istransiogram(t::Transiogram) = true
+_istransiogram(t::EmpiricalTransiogram) = true
+_istransiogram(t::EmpiricalTransiogramSurface) = true
