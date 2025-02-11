@@ -22,6 +22,8 @@ isisotropic(::NuggetEffect) = true
 
 sill(γ::NuggetEffect) = γ.nugget
 
+metricball(::NuggetEffect) = MetricBall(0u"m")
+
 Base.range(::NuggetEffect) = 0u"m"
 
 scale(γ::NuggetEffect, ::Real) = γ

@@ -102,6 +102,7 @@
   γ = NuggetEffect(nugget=0.2)
   @test nugget(γ) == 0.2
   @test sill(γ) == 0.2
+  @test metricball(γ) == MetricBall(0u"m")
   @test range(γ) == 0u"m"
 
   # regularization properties
