@@ -103,11 +103,18 @@ function surfplot(
   # function values
   zs = f.zs
 
+  # maximum lag
+  hmax = isnothing(maxlag) ? _maxlag(f) : _addunit(maxlag, u"m")
+
   # exploit symmetry
   if issymmetric(f)
     θs = range(0, stop=2π, length=2length(θs))
     zs = [zs; zs]
   end
+
+  # discard above maximum lag
+  is = findall(≤(hmax), rs)
+  rs = rs[is]
 
   # hide hole at center
   rs = [zero(eltype(rs)); rs]
@@ -123,6 +130,9 @@ function surfplot(
     # values in matrix form
     Zᵢⱼ = _istransiogram(f) ? getindex.(zs, i, j) : zs
     Z = reduce(hcat, Zᵢⱼ)
+
+    # discard above maximum lag
+    Z = Z[is, :]
 
     # hide hole at center
     Z = [Z[1:1, :]; Z]

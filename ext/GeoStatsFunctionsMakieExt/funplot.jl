@@ -115,7 +115,7 @@ function funplot(
     ns = f.counts
 
     # retrieve maximum lag
-    hmax = isnothing(maxlag) ? last(hs) : _addunit(maxlag, u"m")
+    hmax = isnothing(maxlag) ? _maxlag(f) : _addunit(maxlag, u"m")
 
     # discard empty bins
     hs = hs[ns .> 0]
