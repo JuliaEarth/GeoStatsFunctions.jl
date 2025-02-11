@@ -90,5 +90,32 @@ Return the number of (co)variates of the empirical geostatistical surface `f`.
 """
 nvariates(f::EmpiricalGeoStatsSurface) = nvariates(typeof(f))
 
+# -----------
+# IO METHODS
+# -----------
+
+Base.summary(io::IO, f::EmpiricalGeoStatsSurface) = print(io, nameof(typeof(f)))
+
+function Base.show(io::IO, f::EmpiricalGeoStatsSurface)
+  ioctx = IOContext(io, :compact => true)
+  summary(ioctx, f)
+  print(ioctx, "(")
+  print(ioctx, "nangs: ", length(f.θs))
+  print(ioctx, ", nlags: ", length(f.rs))
+  print(ioctx, ")")
+end
+
+function Base.show(io::IO, ::MIME"text/plain", f::EmpiricalGeoStatsSurface)
+  ioctx = IOContext(io, :compact => true, :limit => true)
+  summary(ioctx, f)
+  println(ioctx)
+  println(ioctx, "├─ nangs: ", length(f.θs))
+  print(ioctx, "└─ nlags: ", length(f.rs))
+end
+
+# ----------------
+# IMPLEMENTATIONS
+# ----------------
+
 include("empirical/variosurf.jl")
 include("empirical/transiosurf.jl")

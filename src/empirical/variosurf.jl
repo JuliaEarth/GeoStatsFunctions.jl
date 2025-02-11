@@ -74,21 +74,3 @@ end
 nvariates(::Type{<:EmpiricalVariogramSurface}) = 1
 
 issymmetric(::Type{<:EmpiricalVariogramSurface}) = true
-
-# -----------
-# IO METHODS
-# -----------
-
-function Base.show(io::IO, ::EmpiricalVariogramSurface)
-  print(io, "EmpiricalVariogramSurface")
-end
-
-function Base.show(io::IO, ::MIME"text/plain", γ::EmpiricalVariogramSurface)
-  θs = [@sprintf "%.2f" rad2deg(θ) for θ in γ.θs]
-  nθ = length(θs)
-  lines = ["  └─$(θ)°" for θ in θs]
-  lines = length(lines) > 11 ? vcat(lines[1:5], ["  ⋮"], lines[(end - 4):end]) : lines
-  println(io, γ)
-  println(io, "  $nθ angles")
-  print(io, join(lines, "\n"))
-end

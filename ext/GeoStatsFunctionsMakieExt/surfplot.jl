@@ -79,7 +79,7 @@ function surfplot(
     title = n > 1 ? "$(vars[i]) → $(vars[j])" : ""
     ax = Makie.PolarAxis(fig[i, j], title=title)
     Zᵢⱼ = getindex.(Z, i, j)
-    Makie.surface!(ax, θs, ustrip.(rs), Zᵢⱼ, colormap=colormap, shading=Makie.NoShading)
+    Makie.surface!(ax, θs, ustrip.(rs), ustrip.(Zᵢⱼ), colormap=colormap, shading=Makie.NoShading)
   end
   fig
 end
@@ -121,8 +121,8 @@ function surfplot(
     ax = Makie.PolarAxis(fig[i, j], title=title)
 
     # values in matrix form
-    V = _istransiogram(f) ? getindex.(zs, i, j) : zs
-    Z = reduce(hcat, V)
+    Zᵢⱼ = _istransiogram(f) ? getindex.(zs, i, j) : zs
+    Z = reduce(hcat, Zᵢⱼ)
 
     # hide hole at center
     Z = [Z[1:1, :]; Z]
@@ -130,7 +130,7 @@ function surfplot(
     # transpose for plotting
     Z = transpose(Z)
 
-    Makie.surface!(ax, θs, ustrip.(rs), Z, colormap=colormap, shading=Makie.NoShading)
+    Makie.surface!(ax, θs, ustrip.(rs), ustrip.(Z), colormap=colormap, shading=Makie.NoShading)
   end
   fig
 end

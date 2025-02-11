@@ -73,21 +73,3 @@ end
 nvariates(t::EmpiricalTransiogramSurface) = size(first(t.zs), 1)
 
 issymmetric(::Type{<:EmpiricalTransiogramSurface}) = false
-
-# -----------
-# IO METHODS
-# -----------
-
-function Base.show(io::IO, ::EmpiricalTransiogramSurface)
-  print(io, "EmpiricalTransiogramSurface")
-end
-
-function Base.show(io::IO, ::MIME"text/plain", γ::EmpiricalTransiogramSurface)
-  θs = [@sprintf "%.2f" rad2deg(θ) for θ in γ.θs]
-  nθ = length(θs)
-  lines = ["  └─$(θ)°" for θ in θs]
-  lines = length(lines) > 11 ? vcat(lines[1:5], ["  ⋮"], lines[(end - 4):end]) : lines
-  println(io, γ)
-  println(io, "  $nθ angles")
-  print(io, join(lines, "\n"))
-end
