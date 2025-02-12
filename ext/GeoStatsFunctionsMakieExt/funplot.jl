@@ -26,6 +26,75 @@ function funplot!(
   size=1.5,
   maxlag=nothing
 )
+  # maximum lag
+  hmax = isnothing(maxlag) ? _maxlag(f) : _addunit(maxlag, u"m")
+
+  # lag range starting at 1e-6 to avoid nugget artifact
+  hs = range(1e-6 * oneunit(hmax), stop=hmax, length=100)
+
+  # evaluate main function
+  F = _eval(f, hs)
+
+  # evaluate base function
+  λ, π, F̂ = if _istransiogram(f)
+    b = metricball(f)
+    λ = meanlengths(f)
+    π = proportions(f)
+    f̂ = MatrixExponentialTransiogram(b; lengths=λ, proportions=π)
+    F̂ = _eval(f̂, hs)
+    λ, π, F̂
+  else
+    nothing, nothing, nothing
+  end
+
+  # aesthetic options
+  label = Dict(1 => "1ˢᵗ axis", 2 => "2ⁿᵈ axis", 3 => "3ʳᵈ axis")
+  style = Dict(1 => :solid, 2 => :dash, 3 => :dot)
+
+  # add plots to axes
+  d = length(F)
+  n = nvariates(f)
+  I = LinearIndices((n, n))
+  for i in 1:n, j in 1:n
+    ax = fig.content[I[j, i]]
+    for (k, Fₖ) in enumerate(F)
+      # display main function
+      Makie.lines!(ax, hs, Fₖ[i, j], color=color, linewidth=size, linestyle=style[k], label=label[k])
+      if _istransiogram(f)
+        if i == j
+          # display mean lengths
+          Makie.lines!(ax, [zero(hmax), λ[i]], [1.0, 0.0], color=:slategray, linewidth=size, linestyle=:dash)
+          # display proportions
+          Makie.hlines!(ax, π[i], color=:slategray, linewidth=size, linestyle=:dash)
+        else
+          # display base function
+          F̂ₖ = F̂[k]
+          Makie.lines!(ax, hs, F̂ₖ[i, j], color=:slategray, linewidth=size, linestyle=style[k])
+        end
+      end
+    end
+    position = (i == j) && isbanded(f) ? :rt : :rb
+    d > 1 && Makie.axislegend(ax, position=position)
+  end
+  fig
+end
+
+_eval(f, hs) = isisotropic(f) ? _isoeval(f, hs) : _anisoeval(f, hs)
+
+function _isoeval(f, hs)
+  # auxiliary parameters
+  n = nvariates(f)
+
+  # evaluate all lags
+  fs = f.(hs)
+
+  # reshape result
+  Fᵢₛₒ = [getindex.(fs, i, j) for i in 1:n, j in 1:n]
+
+  [Fᵢₛₒ]
+end
+
+function _anisoeval(f, hs)
   # auxiliary parameters
   n = nvariates(f)
   b = metricball(f)
@@ -42,60 +111,11 @@ function funplot!(
     R * Vec(ntuple(i -> U(i == j), d))
   end
 
-  # maximum lag
-  hmax = isnothing(maxlag) ? _maxlag(f) : _addunit(maxlag, u"m")
-
-  # lag range starting at 1e-6 to avoid nugget artifact
-  hs = range(1e-6 * oneunit(hmax), stop=hmax, length=100)
-
-  # evaluate main function
-  F = map(v) do vⱼ
+  # evaluate along basis vectors
+  map(v) do vⱼ
     fs = [f(p, p + ustrip(h) * vⱼ) for h in hs]
     [getindex.(fs, i, j) for i in 1:n, j in 1:n]
   end
-
-  # evaluate base function
-  λ, π, F̂ = if _istransiogram(f)
-    λ = meanlengths(f)
-    π = proportions(f)
-    f̂ = MatrixExponentialTransiogram(lengths=λ, proportions=π)
-    F̂ = map(v) do vⱼ
-      fs = [f̂(p, p + ustrip(h) * vⱼ) for h in hs]
-      [getindex.(fs, i, j) for i in 1:n, j in 1:n]
-    end
-    λ, π, F̂
-  else
-    nothing, nothing, nothing
-  end
-
-  # aesthetic options
-  label = Dict(1 => "1ˢᵗ axis", 2 => "2ⁿᵈ axis", 3 => "3ʳᵈ axis")
-  style = Dict(1 => :solid, 2 => :dash, 3 => :dot)
-
-  # add plots to axes
-  I = LinearIndices((n, n))
-  for i in 1:n, j in 1:n
-    ax = fig.content[I[j, i]]
-    for (k, Fₖ) in enumerate(F)
-      # display main function
-      Makie.lines!(ax, hs, Fₖ[i, j], color=color, linewidth=size, linestyle=style[k], label=label[k])
-      if _istransiogram(f)
-        if i == j
-          # display mean lengths
-          Makie.lines!(ax, [zero(hmax), λ[i]], [1.0, 0.0], color=:slategray, linewidth=size, linestyle=:dash)
-          # display proportions
-          Makie.hlines!(ax, π[i], color=:slategray, linewidth=size, linestyle=:dash)
-        else
-          # display base function
-          F̂ₖ = F̂[k]
-          Makie.lines!(ax, hs, F̂ₖ[i, j], color=:slategray, linewidth=size, linestyle=:dot)
-        end
-      end
-    end
-    position = (i == j) && isbanded(f) ? :rt : :rb
-    d > 1 && Makie.axislegend(position=position)
-  end
-  fig
 end
 
 function funplot!(
