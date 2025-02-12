@@ -122,7 +122,7 @@ function funplot!(
   fig::Makie.Figure,
   f::EmpiricalGeoStatsFunction;
   # common options
-  color=:black,
+  color=:slategray,
   size=1.5,
   maxlag=nothing,
   # empirical options
@@ -130,7 +130,7 @@ function funplot!(
   showtext=true,
   textsize=12,
   showhist=true,
-  histcolor=:black
+  histcolor=:slategray
 )
   # number of variables
   n = nvariates(f)
