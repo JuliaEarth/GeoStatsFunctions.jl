@@ -47,7 +47,7 @@ function surfplot!(
       v⃗ = Vec(U(0), U(1))
     end
   else
-    n⃗ = normal
+    n⃗ = Vec(normal)
     d = length(n⃗)
     m = length(r)
     @assert d == m "normal vector is not compatible with given function"
