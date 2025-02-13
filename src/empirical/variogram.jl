@@ -3,13 +3,13 @@
 # ------------------------------------------------------------------
 
 """
-    EmpiricalVariogram(data, var₁, var₂=var₁; [parameters])
+    EmpiricalVariogram(data, var₁, var₂=var₁; [options])
 
 Computes the empirical (a.k.a. experimental) omnidirectional
 (cross-)variogram for variables `var₁` and `var₂` stored in
 geospatial `data`.
 
-## Parameters
+## Options
 
   * nlags     - number of lags (default to `20`)
   * maxlag    - maximum lag in length units (default to 1/2 of minimum side of bounding box)
@@ -81,12 +81,12 @@ function EmpiricalVariogram(
 end
 
 """
-    EmpiricalVariogram(partition, var₁, var₂=var₁; [parameters])
+    EmpiricalVariogram(partition, var₁, var₂=var₁; [options])
 
 Compute the empirical (cross-)variogram of the geospatial `partition` for
 variables `var₁` and `var₂` as described in Hoffimann & Zadrozny 2019.
 
-Optionally, forward `parameters` for the underlying [`EmpiricalVariogram`](@ref).
+Forwards `options` to the underlying [`EmpiricalVariogram`](@ref).
 
 ## References
 
@@ -102,12 +102,12 @@ function EmpiricalVariogram(partition::Partition, var₁, var₂=var₁; kwargs.
 end
 
 """
-    DirectionalVariogram(direction, data, var₁, var₂=var₁; dtol=1e-6u"m", [parameters])
+    DirectionalVariogram(direction, data, var₁, var₂=var₁; dtol=1e-6u"m", [options])
 
 Computes the empirical (cross-)variogram for the variables `var₁` and `var₂` stored in
 geospatial `data` along a given `direction` with band tolerance `dtol` in length units.
 
-Optionally, forward `parameters` for the underlying [`EmpiricalVariogram`](@ref).
+Forwards `options` to the underlying [`EmpiricalVariogram`](@ref).
 """
 function DirectionalVariogram(dir, data::AbstractGeoTable, var₁, var₂=var₁; dtol=1e-6u"m", kwargs...)
   Π = partition(MersenneTwister(123), data, DirectionPartition(dir; tol=dtol))
@@ -115,13 +115,13 @@ function DirectionalVariogram(dir, data::AbstractGeoTable, var₁, var₂=var₁
 end
 
 """
-    PlanarVariogram(normal, data, var₁, var₂=var₁; ntol=1e-6u"m", [parameters])
+    PlanarVariogram(normal, data, var₁, var₂=var₁; ntol=1e-6u"m", [options])
 
 Computes the empirical (cross-)variogram for the variables `var₁` and `var₂` stored in
 geospatial `data` along a plane perpendicular to a `normal` direction with plane
 tolerance `ntol` in length units.
 
-Optionally, forward `parameters` for the underlying [`EmpiricalVariogram`](@ref).
+Forwards `options` to the underlying [`EmpiricalVariogram`](@ref).
 """
 function PlanarVariogram(normal, data::AbstractGeoTable, var₁, var₂=var₁; ntol=1e-6u"m", kwargs...)
   Π = partition(MersenneTwister(123), data, PlanePartition(normal; tol=ntol))

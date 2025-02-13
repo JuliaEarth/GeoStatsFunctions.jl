@@ -3,7 +3,7 @@
 # ------------------------------------------------------------------
 
 """
-    ratematrix(data, var; [parameters])
+    ratematrix(data, var; [minlag])
 
 Estimate the transition rate matrix for categorical variable
 `var` stored in geospatial `data` using a minimum lag `minlag`.
@@ -13,7 +13,7 @@ See also [`probmatrix`](@ref), [`countmatrix`](@ref)
 ratematrix(data::AbstractGeoTable, var; minlag=_defaultminlag(data)) = _ratematrix(_domvals(data, var)..., minlag)
 
 """
-    probmatrix(data, var; [parameters])
+    probmatrix(data, var; [minlag])
 
 Estimate the transition probability matrix for categorical variable
 `var` stored in geospatial `data` using a minimum lag `minlag`.
@@ -23,7 +23,7 @@ See also [`ratematrix`](@ref), [`countmatrix`](@ref)
 probmatrix(data::AbstractGeoTable, var; minlag=_defaultminlag(data)) = _probmatrix(_domvals(data, var)..., minlag)
 
 """
-    countmatrix(data, var; [parameters])
+    countmatrix(data, var; [minlag])
 
 Estimate the transition count matrix for categorical variable
 `var` stored in geospatial `data` using a minimum lag `minlag`.
