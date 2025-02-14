@@ -270,6 +270,10 @@
   @test (@allocated sill(γ)) < 32
   @test (@allocated nugget(γ)) < 32
 
+  # structures in the presence of units
+  γ = SphericalVariogram(sill=1u"K^2")
+  @test structures(γ) == (0.0, (1.0,), (SphericalVariogram(sill=1u"K^2"),))
+
   # shows
   γ = CircularVariogram()
   @test sprint(show, γ) == "CircularVariogram(range: 1.0 m, sill: 1.0, nugget: 0.0)"

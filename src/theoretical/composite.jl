@@ -53,7 +53,11 @@ function structures(f::CompositeFunction)
   # adjust sill and nugget
   fs = map(f -> first(last(structures(f))), fs)
 
-  cₒ, cs, fs
+  # strip units from coefficients
+  ucₒ = ustrip.(cₒ)
+  ucs = map(c -> ustrip.(c), cs)
+
+  ucₒ, ucs, fs
 end
 
 (f::CompositeFunction)(h) = raw(sum(f.cs .* map(fᵢ -> fᵢ(h), f.fs)))

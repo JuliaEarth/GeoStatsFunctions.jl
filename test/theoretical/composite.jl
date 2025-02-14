@@ -106,6 +106,10 @@
   γ = SphericalVariogram(sill=2.0) + ExponentialVariogram(nugget=0.1)
   @test structures(γ) == (0.1, (2.0, 0.9), (SphericalVariogram(), ExponentialVariogram()))
 
+  # structures in the presence of units
+  γ = SphericalVariogram(sill=1.0u"K^2") + 2ExponentialVariogram(sill=1.0u"K^2") + NuggetEffect(10.0u"K^2")
+  @test structures(γ) == (10.0, (1.0, 2.0), (SphericalVariogram(sill=1.0u"K^2"), ExponentialVariogram(sill=1.0u"K^2")))
+
   # composite model with change of support
   γ = GaussianVariogram() + SphericalVariogram()
   p = Point(1.0, 2.0, 3.0)

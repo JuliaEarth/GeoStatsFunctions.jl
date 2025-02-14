@@ -55,7 +55,9 @@ function structures(γ::Variogram)
   c = sill(γ) - nugget(γ)
   γ = @set γ.sill = oneunit(c)
   γ = @set γ.nugget = zero(c)
-  cₒ, (c,), (γ,)
+  ucₒ = ustrip.(cₒ)
+  uc = ustrip.(c)
+  ucₒ, (uc,), (γ,)
 end
 
 """
