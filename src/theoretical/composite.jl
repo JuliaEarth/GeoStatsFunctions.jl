@@ -2,11 +2,6 @@
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
 
-# helper function to extract raw data
-# from uniform scaling objects
-raw(a::UniformScaling) = a.λ
-raw(a) = a
-
 """
     CompositeFunction(cs, fs)
 
@@ -17,6 +12,13 @@ coefficients `cs = (c₁, c₂, ..., cₙ)` and geostatistical functions
 struct CompositeFunction{CS,FS} <: GeoStatsFunction
   cs::CS
   fs::FS
+
+  function CompositeFunction(cs::CS, fs::FS) where {CS,FS}
+    # convert arrays to static arrays of floats
+    cs′ = map(c -> _static(float(c)), cs)
+    CS′ = typeof(cs′)
+    new{CS′,FS}(cs′, fs)
+  end
 end
 
 isstationary(f::CompositeFunction) = all(isstationary, f.fs)
@@ -27,9 +29,9 @@ issymmetric(f::CompositeFunction) = all(issymmetric, f.cs) && all(issymmetric, f
 
 isbanded(f::CompositeFunction) = all(isbanded, f.fs)
 
-sill(f::CompositeFunction) = raw(sum(f.cs .* map(sill, f.fs)))
+sill(f::CompositeFunction) = sum(f.cs .* map(sill, f.fs))
 
-nugget(f::CompositeFunction) = raw(sum(f.cs .* map(nugget, f.fs)))
+nugget(f::CompositeFunction) = sum(f.cs .* map(nugget, f.fs))
 
 metricball(f::CompositeFunction) = metricball(argmax(fᵢ -> range(fᵢ), f.fs))
 
@@ -43,8 +45,8 @@ function structures(f::CompositeFunction)
   ks, fs = f.cs, f.fs
 
   # total nugget and contributions
-  cₒ = raw(sum(@. ks * nugget(fs)))
-  cs = @. raw(ks * (sill(fs) - nugget(fs)))
+  cₒ = sum(@. ks * nugget(fs))
+  cs = @. ks * (sill(fs) - nugget(fs))
 
   # discard nugget effect terms
   inds = findall(fᵢ -> !(fᵢ isa NuggetEffect), fs)
@@ -60,12 +62,12 @@ function structures(f::CompositeFunction)
   ucₒ, ucs, fs
 end
 
-(f::CompositeFunction)(h) = raw(sum(f.cs .* map(fᵢ -> fᵢ(h), f.fs)))
-(f::CompositeFunction)(u::Point, v::Point) = raw(sum(f.cs .* map(fᵢ -> fᵢ(u, v), f.fs)))
+(f::CompositeFunction)(h) = sum(f.cs .* map(fᵢ -> fᵢ(h), f.fs))
+(f::CompositeFunction)(u::Point, v::Point) = sum(f.cs .* map(fᵢ -> fᵢ(u, v), f.fs))
 
 # algebraic structure
 *(c, f::GeoStatsFunction) = CompositeFunction((c,), (f,))
-*(c, f::CompositeFunction) = CompositeFunction(map(x -> c .* x, f.cs), f.fs)
+*(c, f::CompositeFunction) = CompositeFunction(map(cᵢ -> c .* cᵢ, f.cs), f.fs)
 +(f₁::GeoStatsFunction, f₂::GeoStatsFunction) = CompositeFunction((1, 1), (f₁, f₂))
 +(f₁::CompositeFunction, f₂::GeoStatsFunction) = CompositeFunction((f₁.cs..., 1), (f₁.fs..., f₂))
 +(f₁::GeoStatsFunction, f₂::CompositeFunction) = CompositeFunction((1, f₂.cs...), (f₁, f₂.fs...))
@@ -77,7 +79,7 @@ end
 
 function Base.show(io::IO, f::CompositeFunction)
   O = IOContext(io, :compact => true)
-  coeffs = 1 .* raw.(f.cs)
+  coeffs = f.cs
   models = nameof.(typeof.(f.fs))
   lines = ["$c × $f" for (c, f) in zip(coeffs, models)]
   print(O, join(lines, " + "))
@@ -85,7 +87,7 @@ end
 
 function Base.show(io::IO, ::MIME"text/plain", f::CompositeFunction)
   O = IOContext(io, :compact => true)
-  coeffs = 1 .* raw.(f.cs)
+  coeffs = f.cs
   models = f.fs
   name = "CompositeFunction"
   header = isisotropic(f) ? name : name * " (anisotropic)"
@@ -98,3 +100,10 @@ function Base.show(io::IO, ::MIME"text/plain", f::CompositeFunction)
   lines = ["    └─$c" for c in coeffs]
   print(O, join(lines, "\n"))
 end
+
+# -----------------
+# HELPER FUNCTIONS
+# -----------------
+
+_static(c) = c
+_static(c::AbstractMatrix) = SMatrix{size(c)...}(c)
