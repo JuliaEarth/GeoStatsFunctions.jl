@@ -21,6 +21,10 @@ struct CompositeFunction{CS,FS} <: GeoStatsFunction
   end
 end
 
+# ---------------------
+# GEOSTATSFUNCTION API
+# ---------------------
+
 isstationary(f::CompositeFunction) = all(isstationary, f.fs)
 
 isisotropic(f::CompositeFunction) = all(isisotropic, f.fs)
@@ -29,17 +33,21 @@ issymmetric(f::CompositeFunction) = all(issymmetric, f.cs) && all(issymmetric, f
 
 isbanded(f::CompositeFunction) = all(isbanded, f.fs)
 
-sill(f::CompositeFunction) = sum(f.cs .* map(sill, f.fs))
-
-nugget(f::CompositeFunction) = sum(f.cs .* map(nugget, f.fs))
-
 metricball(f::CompositeFunction) = metricball(argmax(fᵢ -> range(fᵢ), f.fs))
 
 Base.range(f::CompositeFunction) = maximum(range(fᵢ) for fᵢ in f.fs)
 
+scale(f::CompositeFunction, s::Real) = sum(f.cs .* map(fᵢ -> scale(fᵢ, s), f.fs))
+
 nvariates(f::CompositeFunction) = maximum(size(cᵢ, 1) for cᵢ in f.cs)
 
-scale(f::CompositeFunction, s::Real) = CompositeFunction(f.cs, map(fᵢ -> scale(fᵢ, s), f.fs))
+# -------------------------
+# VARIOGRAM/COVARIANCE API
+# -------------------------
+
+sill(f::CompositeFunction) = sum(f.cs .* map(sill, f.fs))
+
+nugget(f::CompositeFunction) = sum(f.cs .* map(nugget, f.fs))
 
 function structures(f::CompositeFunction)
   ks, fs = f.cs, f.fs
@@ -61,6 +69,10 @@ function structures(f::CompositeFunction)
 
   ucₒ, ucs, fs
 end
+
+# -----------
+# EVALUATION
+# -----------
 
 (f::CompositeFunction)(h) = sum(f.cs .* map(fᵢ -> fᵢ(h), f.fs))
 (f::CompositeFunction)(u::Point, v::Point) = sum(f.cs .* map(fᵢ -> fᵢ(u, v), f.fs))

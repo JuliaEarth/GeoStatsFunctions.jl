@@ -216,7 +216,7 @@
     @test GeoStatsFunctions.constructor(γ)() == γ
   end
 
-  # scale
+  # scale metric ball
   for γ in [GaussianVariogram(), SphericalVariogram(), ExponentialVariogram()]
     g = GeoStatsFunctions.scale(γ, 2)
     @test range(g) == 2.0u"m"

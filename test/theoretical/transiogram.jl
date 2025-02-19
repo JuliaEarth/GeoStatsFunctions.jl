@@ -18,6 +18,12 @@
   # check bandness
   @test all(isbanded, ts)
 
+  # scale metric ball
+  for t in ts
+    t′ = GeoStatsFunctions.scale(t, 2)
+    @test range(t′) == 2.0u"m"
+  end
+
   # number of variates
   @test all(nvariates.(ts) .== 2)
 
@@ -70,6 +76,7 @@ end
   # corresponding exponential transiogram
   t = MatrixExponentialTransiogram(lengths=(1.0u"m", 2.0u"m", 3.0u"m"), proportions=(0.2, 0.5, 0.3))
   @test t isa MatrixExponentialTransiogram
+  @test range(GeoStatsFunctions.scale(t, 2)) == 2u"m"
   @test nvariates(t) == 3
   @test meanlengths(t) == (1.0u"m", 2.0u"m", 3.0u"m")
   @test all(proportions(t) .≈ (0.12403100775193801, 0.38759689922480606, 0.48837209302325607))
@@ -102,6 +109,7 @@ end
   gtb = georef(csv, ("X", "Y", "Z"))
   t = EmpiricalTransiogram(gtb, "FACIES", maxlag=20, nlags=20)
   τ = PiecewiseLinearTransiogram(t.abscissas, t.ordinates)
+  @test range(GeoStatsFunctions.scale(τ, 2)) == 2u"m"
   @test nvariates(τ) == 5
   @test τ(0.0u"m") == I(5)
   @test all(x -> 0 < x < 1, τ(5.0u"m"))

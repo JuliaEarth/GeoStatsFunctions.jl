@@ -59,6 +59,14 @@ Return the maximum effective range of the geostatistical function `f`.
 Base.range(f::GeoStatsFunction) = maximum(radii(metricball(f)))
 
 """
+    scale(f, s)
+
+Scale the metric ball of the geostatistical function `f`
+with a strictly positive scaling factor `s`.
+"""
+function scale end
+
+"""
     nvariates(f)
 
 Return the number of (co)variates of the geostatistical function `f`.

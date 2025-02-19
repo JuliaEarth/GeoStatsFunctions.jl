@@ -17,6 +17,11 @@ issymmetric(::Type{<:Variogram}) = true
 
 isbanded(::Type{<:Variogram}) = false
 
+function scale(γ::Variogram, s::Real)
+  V = constructor(γ)
+  V(s * metricball(γ); sill=sill(γ), nugget=nugget(γ))
+end
+
 nvariates(::Type{<:Variogram}) = 1
 
 """
@@ -58,17 +63,6 @@ function structures(γ::Variogram)
   ucₒ = ustrip.(cₒ)
   uc = ustrip.(c)
   ucₒ, (uc,), (γ,)
-end
-
-"""
-    scale(γ, s)
-
-Scale metric ball of variogram `γ` with strictly
-positive scaling factor `s`.
-"""
-function scale(γ::Variogram, s::Real)
-  V = constructor(γ)
-  V(s * metricball(γ); sill=sill(γ), nugget=nugget(γ))
 end
 
 # leverage symmetry of variograms

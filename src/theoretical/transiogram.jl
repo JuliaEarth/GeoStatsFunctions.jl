@@ -24,6 +24,11 @@ issymmetric(::Type{<:Transiogram}) = false
 
 isbanded(::Type{<:Transiogram}) = true
 
+function scale(t::Transiogram, s::Real)
+  T = constructor(t)
+  T(s * metricball(t); proportions=proportions(t))
+end
+
 nvariates(t::Transiogram) = length(proportions(t))
 
 # ----------------

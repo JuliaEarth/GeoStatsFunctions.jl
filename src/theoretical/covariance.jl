@@ -21,6 +21,8 @@ isbanded(::Type{<:Covariance}) = true
 
 metricball(cov::Covariance) = metricball(cov.γ)
 
+scale(cov::C, s::Real) where {C<:Covariance} = C(scale(cov.γ, s))
+
 nvariates(::Type{<:Covariance}) = 1
 
 (cov::Covariance)(h) = sill(cov.γ) - cov.γ(h)
@@ -64,14 +66,6 @@ function structures(cov::C) where {C<:Covariance}
   cₒ, c, γ = structures(cov.γ)
   cₒ, c, C.(γ)
 end
-
-"""
-    scale(cov, s)
-
-Scale metric ball of covariance `cov` with strictly
-positive scaling factor `s`.
-"""
-scale(cov::C, s::Real) where {C<:Covariance} = C(scale(cov.γ, s))
 
 # -----------
 # IO METHODS

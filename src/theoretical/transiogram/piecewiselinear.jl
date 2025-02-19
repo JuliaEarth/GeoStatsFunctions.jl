@@ -63,6 +63,13 @@ function PiecewiseLinearTransiogram(abscissas::AbstractVector, ordinates::Abstra
   PiecewiseLinearTransiogram(ball, abscissas, ordinates)
 end
 
+constructor(::PiecewiseLinearTransiogram) = PiecewiseLinearTransiogram
+
+function scale(t::PiecewiseLinearTransiogram, s::Real)
+  T = constructor(t)
+  T(s * metricball(t), t.abscissas, t.ordinates, t.ordinfinity)
+end
+
 proportions(t::PiecewiseLinearTransiogram) = Tuple(diag(t.ordinfinity))
 
 function (t::PiecewiseLinearTransiogram)(h)
