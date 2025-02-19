@@ -72,6 +72,7 @@ end
   @test t isa MatrixExponentialTransiogram
   @test nvariates(t) == 3
   @test meanlengths(t) == (1.0u"m", 2.0u"m", 3.0u"m")
+  @test all(proportions(t) .≈ (0.12403100775193801, 0.38759689922480606, 0.48837209302325607))
 
   # random transition rate matrix
   A = rand(3, 3)

@@ -5,12 +5,12 @@
 """
     MatrixExponentialTransiogram(rate)
 
-An exponential transiogram with transition `rate` matrix.
+A matrix-exponential transiogram with transition `rate` matrix.
 
     MatrixExponentialTransiogram(; range, lengths, proportions)
 
 Alternatively, build Euclidean ball with given `range` and
-transition rate matrix from mean `lengths` and relative
+base transition rate matrix from mean `lengths` and relative
 `proportions`.
 
     MatrixExponentialTransiogram(; ranges, rotation, lengths, proportions)
@@ -36,6 +36,12 @@ MatrixExponentialTransiogram(proportions=(0.5, 0.5))
 
 * Carle et al 1998. [Conditional Simulation of Hydrofacies Architecture:
   A Transition Probability/Markov Approach](https://doi.org/10.2110/sepmcheg.01.147)
+
+### Notes
+
+The final proportions of the matrix-exponential model can be different
+from the relative proportions specified during construction. They are
+also a function of the mean lengths.
 """
 struct MatrixExponentialTransiogram{B<:MetricBall,R<:StaticMatrix} <: Transiogram
   ball::B
