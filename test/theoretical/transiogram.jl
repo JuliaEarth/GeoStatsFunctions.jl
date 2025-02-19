@@ -41,6 +41,14 @@
     @test isapprox(t(1000.0), [0.5 0.5; 0.5 0.5], atol=1e-5)
   end
 
+  # non-uniform proportions
+  t = LinearTransiogram(proportions=(0.7, 0.2, 0.1))
+  @test proportions(t) == (0.7, 0.2, 0.1)
+  @test isapprox(t(1000.0), repeat([0.7 0.2 0.1], 3, 1), atol=1e-5)
+  t = GaussianTransiogram(proportions=(0.7, 0.2, 0.1))
+  @test proportions(t) == (0.7, 0.2, 0.1)
+  @test isapprox(t(1000.0), repeat([0.7 0.2 0.1], 3, 1), atol=1e-5)
+
   # pairwise evaluation
   ps = [Point(0, 0), Point(1, 1), Point(2, 2)]
   for t in ts
@@ -102,4 +110,32 @@ end
   ps = [Point(0, 0, 0), Point(1, 1, 1), Point(2, 2, 2)]
   T = GeoStatsFunctions.pairwise(τ, ps)
   @test size(T) == (15, 15)
+
+  # uniform proportions from zero off-diagonals
+  h = [0.5, 1.5, 2.5]
+  d = [1.0, 0.5, 0.0]
+  o = [0.0, 0.5, 1.0]
+  T = [[d] [o]; [o] [d]]
+  τ = PiecewiseLinearTransiogram(h, T)
+  @test proportions(τ) == (0.5, 0.5)
+  @test τ(100) == [0.5 0.5; 0.5 0.5]
+
+  # non-uniform proportions
+  p1 = 0.7
+  p2 = 0.2
+  p3 = 0.1
+  h = [0.5, 1.5, 2.5]
+  T11 = [1.0, 0.5, p1]
+  T21 = [0.0, 0.5, p1]
+  T31 = [0.0, 0.5, p1]
+  T12 = [0.0, 0.5, p2]
+  T22 = [1.0, 0.5, p2]
+  T32 = [0.0, 0.5, p2]
+  T13 = [0.0, 0.5, p3]
+  T23 = [0.0, 0.5, p3]
+  T33 = [1.0, 0.5, p3]
+  T = [[T11] [T12] [T13]; [T21] [T22] [T23]; [T31] [T32] [T33]]
+  τ = PiecewiseLinearTransiogram(h, T)
+  @test all(proportions(τ) .≈ (p1, p2, p3))
+  @test τ(100) ≈ [p1 p2 p3; p1 p2 p3; p1 p2 p3]
 end

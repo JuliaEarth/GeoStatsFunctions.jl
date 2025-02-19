@@ -45,7 +45,14 @@ function PiecewiseLinearTransiogram(ball::MetricBall, abscissas::AbstractVector,
   end
 
   # ordinate matrix at infinity
-  p = normalize(diag(last(Y)), 1)
+  yₖ = diag(last(Y))
+  p = if all(iszero, yₖ)
+    # corner case with uniform proportions
+    m⁻¹ = eltype(yₖ)(1 / m)
+    SVector{m}(m⁻¹ for i in 1:m)
+  else
+    normalize(yₖ, 1)
+  end
   Y∞ = SMatrix{m,m}(p[j] for i in 1:m, j in 1:m)
 
   PiecewiseLinearTransiogram(b, x, Y, Y∞)
@@ -55,6 +62,8 @@ function PiecewiseLinearTransiogram(abscissas::AbstractVector, ordinates::Abstra
   ball = MetricBall(oneunit(eltype(abscissas)))
   PiecewiseLinearTransiogram(ball, abscissas, ordinates)
 end
+
+proportions(t::PiecewiseLinearTransiogram) = Tuple(diag(t.ordinfinity))
 
 function (t::PiecewiseLinearTransiogram)(h)
   h′ = aslen(h)
@@ -77,15 +86,11 @@ function Base.show(io::IO, t::PiecewiseLinearTransiogram)
   ioctx = IOContext(io, :compact => true)
   summary(ioctx, t)
   print(ioctx, "(")
-  print(ioctx, "ordinfinity: ")
-  _printvec(ioctx, t.ordinfinity, 1)
   if hasequalradii(t.ball)
-    print(ioctx, ", range: ", first(radii(t.ball)))
+    print(ioctx, "range: ", first(radii(t.ball)))
   else
-    print(ioctx, ", ranges: ", radii(t.ball))
+    print(ioctx, "ranges: ", radii(t.ball))
   end
-  m = nameof(typeof(metric(t.ball)))
-  print(ioctx, ", distance: ", m)
   print(ioctx, ")")
 end
 
@@ -93,17 +98,13 @@ function Base.show(io::IO, ::MIME"text/plain", t::PiecewiseLinearTransiogram)
   ioctx = IOContext(io, :compact => true, :limit => true)
   summary(ioctx, t)
   println(ioctx)
-  print(ioctx, "├─ abscissas: ")
-  _printlnvec(ioctx, t.abscissas, 3)
-  print(ioctx, "├─ ordinates: ")
-  _printlnvec(ioctx, t.ordinates, 3)
-  print(ioctx, "├─ ordinfinity: ")
-  _printlnvec(ioctx, t.ordinfinity, 3)
   if hasequalradii(t.ball)
     println(ioctx, "├─ range: ", first(radii(t.ball)))
   else
     println(ioctx, "├─ ranges: ", radii(t.ball))
   end
-  m = nameof(typeof(metric(t.ball)))
-  print(ioctx, "└─ distance: ", m)
+  print(ioctx, "├─ abscissas: ")
+  _printlnvec(ioctx, t.abscissas, 3)
+  print(ioctx, "├─ ordinates: ")
+  _printvec(ioctx, t.ordinates, 3)
 end

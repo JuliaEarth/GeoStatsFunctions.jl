@@ -67,42 +67,9 @@ MatrixExponentialTransiogram(; range=1.0, ranges=nothing, rotation=I, lengths=(1
 
 meanlengths(t::MatrixExponentialTransiogram) = Tuple(1 ./ -diag(t.rate))
 
+proportions(t::MatrixExponentialTransiogram) = Tuple(normalize(diag(t(100range(t))), 1))
+
 (t::MatrixExponentialTransiogram)(h) = exp(aslen(h) * t.rate)
-
-# -----------
-# IO METHODS
-# -----------
-
-function Base.show(io::IO, t::MatrixExponentialTransiogram)
-  ioctx = IOContext(io, :compact => true)
-  summary(ioctx, t)
-  print(ioctx, "(")
-  print(ioctx, "rate: ")
-  _printvec(ioctx, t.rate, 1)
-  if hasequalradii(t.ball)
-    print(ioctx, ", range: ", first(radii(t.ball)))
-  else
-    print(ioctx, ", ranges: ", radii(t.ball))
-  end
-  m = nameof(typeof(metric(t.ball)))
-  print(ioctx, ", distance: ", m)
-  print(ioctx, ")")
-end
-
-function Base.show(io::IO, ::MIME"text/plain", t::MatrixExponentialTransiogram)
-  ioctx = IOContext(io, :compact => true, :limit => true)
-  summary(ioctx, t)
-  println(ioctx)
-  print(ioctx, "├─ rate: ")
-  _printlnvec(ioctx, t.rate, 3)
-  if hasequalradii(t.ball)
-    println(ioctx, "├─ range: ", first(radii(t.ball)))
-  else
-    println(ioctx, "├─ ranges: ", radii(t.ball))
-  end
-  m = nameof(typeof(metric(t.ball)))
-  print(ioctx, "└─ distance: ", m)
-end
 
 # -----------------
 # HELPER FUNCTIONS

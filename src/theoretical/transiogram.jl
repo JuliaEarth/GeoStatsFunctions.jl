@@ -32,7 +32,7 @@ nvariates(t::Transiogram) = length(proportions(t))
 
 meanlengths(t::Transiogram) = ntuple(i -> range(t), nvariates(t))
 
-proportions(t::Transiogram) = Tuple(normalize(diag(t(100range(t))), 1))
+proportions(t::Transiogram) = t.proportions
 
 # ----------------
 # IMPLEMENTATIONS
