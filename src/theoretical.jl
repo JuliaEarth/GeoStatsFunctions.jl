@@ -183,10 +183,10 @@ and `domain₂`.
 function matrixparams(f::GeoStatsFunction, domain₁, domain₂)
   m = length(domain₁)
   n = length(domain₂)
+  k = nvariates(f)
   g₁ = first(domain₁)
   g₂ = first(domain₂)
   F = ustrip.(f(g₁, g₂))
-  k = size(F, 1)
   V = eltype(F)
   V, (m, n, k)
 end
