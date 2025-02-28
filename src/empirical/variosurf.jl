@@ -45,7 +45,7 @@ function EmpiricalVariogramSurface(
     planes = [data]
     u, v = Vec(1.0, 0.0), Vec(0.0, 1.0)
   elseif Dim == 3
-    subset = partition(rng, data, PlanePartition(normal, tol=ptol))
+    subset = partition(rng, data, PlanePartition(normal; tol=ptol))
     planes = collect(subset)
     u, v = householderbasis(normal)
   else
@@ -57,7 +57,7 @@ function EmpiricalVariogramSurface(
 
   # estimate directional variograms across planes
   γs = map(θs) do θ
-    dir = DirectionPartition(cos(θ) * u + sin(θ) * v, tol=dtol)
+    dir = DirectionPartition(cos(θ) * u + sin(θ) * v; tol=dtol)
     γ(plane) = EmpiricalVariogram(partition(rng, plane, dir), var₁, var₂; kwargs...)
     tmapreduce(γ, merge, planes)
   end

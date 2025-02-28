@@ -44,7 +44,7 @@ function EmpiricalTransiogramSurface(
     planes = [data]
     u, v = Vec(1.0, 0.0), Vec(0.0, 1.0)
   elseif Dim == 3
-    subset = partition(rng, data, PlanePartition(normal, tol=ptol))
+    subset = partition(rng, data, PlanePartition(normal; tol=ptol))
     planes = collect(subset)
     u, v = householderbasis(normal)
   else
@@ -56,7 +56,7 @@ function EmpiricalTransiogramSurface(
 
   # estimate directional transiograms across planes
   ts = map(θs) do θ
-    dir = DirectionPartition(cos(θ) * u + sin(θ) * v, tol=dtol)
+    dir = DirectionPartition(cos(θ) * u + sin(θ) * v; tol=dtol)
     t(plane) = EmpiricalTransiogram(partition(rng, plane, dir), var; kwargs...)
     tmapreduce(t, merge, planes)
   end
