@@ -1,7 +1,7 @@
 name = "GeoStatsFunctions"
 uuid = "6771c435-bc22-4842-b0c3-41852a255103"
 authors = ["Júlio Hoffimann <julio.hoffimann@gmail.com> and contributors"]
-version = "0.10.13"
+version = "0.10.14"
 
 [deps]
 Bessels = "0e736298-9ec6-45e8-9647-e4fc86a2fe38"
@@ -39,7 +39,7 @@ LinearAlgebra = "1.9"
 Makie = "0.21, 0.22"
 Meshes = "0.53"
 NearestNeighbors = "0.4"
-OhMyThreads = "0.5, 0.6, 0.7, 0.8"
+OhMyThreads = "0.5 - 0.8"
 Optim = "1.7"
 PrecompileTools = "1.2"
 Random = "1.9"
