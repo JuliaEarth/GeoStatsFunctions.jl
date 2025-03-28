@@ -24,9 +24,9 @@ Plot the geostatistical function `f` with given `options`.
 
 ### Notes
 
-* This function will only work in the presence of
-  a Makie.jl backend via package extensions in
-  Julia v1.9 or later versions of the language.
+This function will only work in the presence of
+a Makie.jl backend via package extensions in
+Julia v1.9 or later versions of the language.
 """
 function funplot end
 
@@ -59,9 +59,9 @@ Plot the geostatistical surface `f` with given `options`.
 
 ### Notes
 
-* This function will only work in the presence of
-  a Makie.jl backend via package extensions in
-  Julia v1.9 or later versions of the language.
+This function will only work in the presence of
+a Makie.jl backend via package extensions in
+Julia v1.9 or later versions of the language.
 """
 function surfplot end
 
