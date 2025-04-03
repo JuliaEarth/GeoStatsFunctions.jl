@@ -233,8 +233,8 @@
 
   # scale affects power variogram in a special way
   γ = PowerVariogram()
-  @test GeoStatsFunctions.scale(γ, 2)(1.0) == 1/2
-  @test GeoStatsFunctions.scale(γ, 3)(1.0) == 1/3
+  @test GeoStatsFunctions.scale(γ, 2)(1.0) == 1 / 2
+  @test GeoStatsFunctions.scale(γ, 3)(1.0) == 1 / 3
 
   # convert parameters to float
   γ = CircularVariogram(sill=1, nugget=1)
