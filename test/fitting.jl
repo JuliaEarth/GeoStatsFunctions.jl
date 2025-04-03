@@ -80,7 +80,7 @@
   sₜ = 1.00
   nₜ = 0.20
   eₜ = 1.50
-  γₜ = PowerVariogram(sₜ, nₜ, eₜ)
+  γₜ = PowerVariogram(; scaling=sₜ, nugget=nₜ, exponent=eₜ)
   xs = collect(0.0:0.1:10.0)u"m"
   ys = γₜ.(xs)
   ns = rand(1000:5000, length(xs))
@@ -94,7 +94,7 @@
   sₜ = 6.54
   nₜ = 1.45
   eₜ = 0.64
-  γₜ = PowerVariogram(sₜ, nₜ, eₜ)
+  γₜ = PowerVariogram(; scaling=sₜ, nugget=nₜ, exponent=eₜ)
   xs = collect(0.0:10.0:200.0)u"m"
   ys = γₜ.(xs)
   ns = rand(100:1000, length(xs))

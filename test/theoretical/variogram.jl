@@ -227,13 +227,14 @@
     @test range(g) == 2.0u"m"
   end
 
-  # scale doesn't affect NuggetEffect
+  # scale doesn't affect nugget effect
   γ = NuggetEffect()
   @test GeoStatsFunctions.scale(γ, 2) == γ
 
-  # scale doesn't affect PowerVariogram
+  # scale affects power variogram in a special way
   γ = PowerVariogram()
-  @test GeoStatsFunctions.scale(γ, 2) == γ
+  @test GeoStatsFunctions.scale(γ, 2)(1.0) == 1/2
+  @test GeoStatsFunctions.scale(γ, 3)(1.0) == 1/3
 
   # convert parameters to float
   γ = CircularVariogram(sill=1, nugget=1)
@@ -339,9 +340,10 @@
   └─ nugget: 0.0"""
 
   γ = PowerVariogram()
-  @test sprint(show, γ) == "PowerVariogram(scaling: 1.0, nugget: 0.0, exponent: 1.0)"
+  @test sprint(show, γ) == "PowerVariogram(length: 1.0 m, scaling: 1.0, nugget: 0.0, exponent: 1.0)"
   @test sprint(show, MIME"text/plain"(), γ) == """
   PowerVariogram
+  ├─ length: 1.0 m
   ├─ scaling: 1.0
   ├─ nugget: 0.0
   └─ exponent: 1.0"""
