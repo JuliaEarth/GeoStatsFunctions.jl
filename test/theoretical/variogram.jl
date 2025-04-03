@@ -105,6 +105,11 @@
   @test metricball(γ) == MetricBall(0u"m")
   @test range(γ) == 0u"m"
 
+  # power variogram
+  γ = PowerVariogram()
+  @test metricball(γ) == MetricBall(Inf * u"m")
+  @test range(γ) == Inf * u"m"
+
   # regularization properties
   γ = GaussianVariogram()
   u = Point(0.0, 0.0)

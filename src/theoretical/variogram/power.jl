@@ -22,6 +22,10 @@ isstationary(::Type{<:PowerVariogram}) = false
 
 isisotropic(::PowerVariogram) = true
 
+metricball(::PowerVariogram) = MetricBall(Inf * u"m")
+
+Base.range(::PowerVariogram) = Inf * u"m"
+
 function (γ::PowerVariogram)(h)
   s = γ.scaling
   a = γ.exponent
