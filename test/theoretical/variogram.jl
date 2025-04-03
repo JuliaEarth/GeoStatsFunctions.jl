@@ -229,8 +229,11 @@
 
   # scale doesn't affect NuggetEffect
   γ = NuggetEffect()
-  g = GeoStatsFunctions.scale(γ, 2)
-  @test g == γ
+  @test GeoStatsFunctions.scale(γ, 2) == γ
+
+  # scale doesn't affect PowerVariogram
+  γ = PowerVariogram()
+  @test GeoStatsFunctions.scale(γ, 2) == γ
 
   # convert parameters to float
   γ = CircularVariogram(sill=1, nugget=1)

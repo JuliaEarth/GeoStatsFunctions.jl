@@ -26,6 +26,8 @@ metricball(::PowerVariogram) = MetricBall(Inf * u"m")
 
 Base.range(::PowerVariogram) = Inf * u"m"
 
+scale(γ::PowerVariogram, ::Real) = γ
+
 function (γ::PowerVariogram)(h)
   s = γ.scaling
   a = γ.exponent
