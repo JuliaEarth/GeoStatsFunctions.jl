@@ -82,13 +82,14 @@ end
 Compute the empirical transiogram of the geospatial `partition` for
 the categorical variable `var`.
 
-Forwards `options` to the underlying [`EmpiricalTransiogram`](@ref).
+Forwards `options` to the underlying [`EmpiricalTransiogram`](@ref)
+calls with geospatial data.
 """
 function EmpiricalTransiogram(partition::Partition, var; kwargs...)
   # categorical levels across subsets
   gtb = parent(partition)
   cols = Tables.columns(values(gtb))
-  vals = Tables.getcolumn(cols, var)
+  vals = Tables.getcolumn(cols, Symbol(var))
   levs = levels(vals)
   # retain geospatial data with at least two elements
   filtered = Iterators.filter(d -> nelements(domain(d)) > 1, partition)
