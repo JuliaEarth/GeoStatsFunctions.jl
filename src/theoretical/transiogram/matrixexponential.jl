@@ -51,7 +51,8 @@ struct MatrixExponentialTransiogram{B<:MetricBall,R<:StaticMatrix} <: Transiogra
     if !allequal(size(rate))
       throw(ArgumentError("transition rate matrix must be square"))
     end
-    new(ball, rate)
+    urate = uconvert.(inv(unit(radius(ball))), rate)
+    new{B,typeof(urate)}(ball, urate)
   end
 end
 
@@ -82,7 +83,13 @@ meanlengths(t::MatrixExponentialTransiogram) = Tuple(1 ./ -diag(t.rate))
 
 proportions(t::MatrixExponentialTransiogram) = Tuple(normalize(diag(t(100range(t))), 1))
 
-(t::MatrixExponentialTransiogram)(h) = exp(aslen(h) * t.rate)
+function (t::MatrixExponentialTransiogram)(h)
+  r = radius(t.ball)
+  R = ustrip.(t.rate)
+  h′, r′ = unitless(h, r)
+  v = h′ / r′
+  exp(v * R)
+end
 
 # -----------------
 # HELPER FUNCTIONS
