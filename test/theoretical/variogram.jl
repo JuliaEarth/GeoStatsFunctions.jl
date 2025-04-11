@@ -287,80 +287,80 @@
   γ = CircularVariogram()
   @test sprint(show, γ) == "CircularVariogram(range: 1.0 m, sill: 1.0, nugget: 0.0)"
   @test sprint(show, MIME"text/plain"(), γ) == """
-  CircularVariogram
-  ├─ range: 1.0 m
-  ├─ sill: 1.0
-  └─ nugget: 0.0"""
+ CircularVariogram
+ ├─ range: 1.0 m
+ ├─ sill: 1.0
+ └─ nugget: 0.0"""
 
   γ = CubicVariogram()
   @test sprint(show, γ) == "CubicVariogram(range: 1.0 m, sill: 1.0, nugget: 0.0)"
   @test sprint(show, MIME"text/plain"(), γ) == """
-  CubicVariogram
-  ├─ range: 1.0 m
-  ├─ sill: 1.0
-  └─ nugget: 0.0"""
+ CubicVariogram
+ ├─ range: 1.0 m
+ ├─ sill: 1.0
+ └─ nugget: 0.0"""
 
   γ = ExponentialVariogram()
   @test sprint(show, γ) == "ExponentialVariogram(range: 1.0 m, sill: 1.0, nugget: 0.0)"
   @test sprint(show, MIME"text/plain"(), γ) == """
-  ExponentialVariogram
-  ├─ range: 1.0 m
-  ├─ sill: 1.0
-  └─ nugget: 0.0"""
+ ExponentialVariogram
+ ├─ range: 1.0 m
+ ├─ sill: 1.0
+ └─ nugget: 0.0"""
 
   γ = GaussianVariogram()
   @test sprint(show, γ) == "GaussianVariogram(range: 1.0 m, sill: 1.0, nugget: 0.0)"
   @test sprint(show, MIME"text/plain"(), γ) == """
-  GaussianVariogram
-  ├─ range: 1.0 m
-  ├─ sill: 1.0
-  └─ nugget: 0.0"""
+ GaussianVariogram
+ ├─ range: 1.0 m
+ ├─ sill: 1.0
+ └─ nugget: 0.0"""
 
   γ = MaternVariogram()
   @test sprint(show, γ) == "MaternVariogram(range: 1.0 m, sill: 1.0, nugget: 0.0, order: 1.0)"
   @test sprint(show, MIME"text/plain"(), γ) == """
-  MaternVariogram
-  ├─ range: 1.0 m
-  ├─ sill: 1.0
-  ├─ nugget: 0.0
-  └─ order: 1.0"""
+ MaternVariogram
+ ├─ range: 1.0 m
+ ├─ sill: 1.0
+ ├─ nugget: 0.0
+ └─ order: 1.0"""
 
   γ = NuggetEffect()
   @test sprint(show, γ) == "NuggetEffect(nugget: 1.0)"
   @test sprint(show, MIME"text/plain"(), γ) == """
-  NuggetEffect
-  └─ nugget: 1.0"""
+ NuggetEffect
+ └─ nugget: 1.0"""
 
   γ = PentaSphericalVariogram()
   @test sprint(show, γ) == "PentaSphericalVariogram(range: 1.0 m, sill: 1.0, nugget: 0.0)"
   @test sprint(show, MIME"text/plain"(), γ) == """
-  PentaSphericalVariogram
-  ├─ range: 1.0 m
-  ├─ sill: 1.0
-  └─ nugget: 0.0"""
+ PentaSphericalVariogram
+ ├─ range: 1.0 m
+ ├─ sill: 1.0
+ └─ nugget: 0.0"""
 
   γ = PowerVariogram()
   @test sprint(show, γ) == "PowerVariogram(length: 1.0 m, scaling: 1.0, nugget: 0.0, exponent: 1.0)"
   @test sprint(show, MIME"text/plain"(), γ) == """
-  PowerVariogram
-  ├─ length: 1.0 m
-  ├─ scaling: 1.0
-  ├─ nugget: 0.0
-  └─ exponent: 1.0"""
+ PowerVariogram
+ ├─ length: 1.0 m
+ ├─ scaling: 1.0
+ ├─ nugget: 0.0
+ └─ exponent: 1.0"""
 
   γ = SineHoleVariogram()
   @test sprint(show, γ) == "SineHoleVariogram(range: 1.0 m, sill: 1.0, nugget: 0.0)"
   @test sprint(show, MIME"text/plain"(), γ) == """
-  SineHoleVariogram
-  ├─ range: 1.0 m
-  ├─ sill: 1.0
-  └─ nugget: 0.0"""
+ SineHoleVariogram
+ ├─ range: 1.0 m
+ ├─ sill: 1.0
+ └─ nugget: 0.0"""
 
   γ = SphericalVariogram()
   @test sprint(show, γ) == "SphericalVariogram(range: 1.0 m, sill: 1.0, nugget: 0.0)"
   @test sprint(show, MIME"text/plain"(), γ) == """
-  SphericalVariogram
-  ├─ range: 1.0 m
-  ├─ sill: 1.0
-  └─ nugget: 0.0"""
+ SphericalVariogram
+ ├─ range: 1.0 m
+ ├─ sill: 1.0
+ └─ nugget: 0.0"""
 end
