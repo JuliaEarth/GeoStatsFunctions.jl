@@ -39,8 +39,9 @@ function funplot!(
   λ, π, F̂ = if _istransiogram(f)
     b = metricball(f)
     λ = meanlengths(f)
+    r = ustrip(range(f))
     π = proportions(f)
-    f̂ = MatrixExponentialTransiogram(b; lengths=λ, proportions=π)
+    f̂ = MatrixExponentialTransiogram(b; lengths=λ ./ r, proportions=π)
     F̂ = _eval(f̂, hs)
     λ, π, F̂
   else

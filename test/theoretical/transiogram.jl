@@ -101,6 +101,12 @@ end
   t = MatrixExponentialTransiogram(R)
   T = GeoStatsFunctions.pairwise(t, ps)
   @test size(T) == (9, 9)
+
+  # mean lengths with non-unit range
+  t = MatrixExponentialTransiogram(range=3.0, lengths=(1.0u"m", 2.0u"m", 3.0u"m"), proportions=(1/3, 1/3, 1/3))
+  @test meanlengths(t) == (3.0u"m", 6.0u"m", 9.0u"m")
+  t = MatrixExponentialTransiogram(ranges=(2.0, 1.0), lengths=(1.0u"m", 2.0u"m", 3.0u"m"), proportions=(1/3, 1/3, 1/3))
+  @test meanlengths(t) == (2.0u"m", 4.0u"m", 6.0u"m")
 end
 
 @testset "PiecewiseLinearTransiogram" begin

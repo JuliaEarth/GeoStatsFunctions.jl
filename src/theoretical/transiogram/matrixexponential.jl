@@ -79,7 +79,7 @@ function scale(t::MatrixExponentialTransiogram, s::Real)
   T(s * metricball(t), t.rate)
 end
 
-meanlengths(t::MatrixExponentialTransiogram) = Tuple(1 ./ -diag(t.rate))
+meanlengths(t::MatrixExponentialTransiogram) = Tuple(1 ./ -diag(t.rate)) .* ustrip(range(t))
 
 proportions(t::MatrixExponentialTransiogram) = Tuple(normalize(diag(t(100range(t))), 1))
 
