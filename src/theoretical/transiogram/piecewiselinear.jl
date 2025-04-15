@@ -65,10 +65,8 @@ end
 
 constructor(::PiecewiseLinearTransiogram) = PiecewiseLinearTransiogram
 
-function scale(t::PiecewiseLinearTransiogram, s::Real)
-  T = constructor(t)
-  T(s * metricball(t), t.abscissas, t.ordinates, t.ordinfinity)
-end
+scale(t::PiecewiseLinearTransiogram, s::Real) =
+  PiecewiseLinearTransiogram(s * t.ball, t.abscissas, t.ordinates, t.ordinfinity)
 
 proportions(t::PiecewiseLinearTransiogram) = Tuple(diag(t.ordinfinity))
 
