@@ -74,12 +74,11 @@ MatrixExponentialTransiogram(; range=1.0, ranges=nothing, rotation=I, lengths=(1
 
 constructor(::MatrixExponentialTransiogram) = MatrixExponentialTransiogram
 
-function scale(t::MatrixExponentialTransiogram, s::Real)
-  T = constructor(t)
-  T(s * metricball(t), t.rate)
-end
+Base.range(t::MatrixExponentialTransiogram) = maximum(meanlengths(t))
 
-meanlengths(t::MatrixExponentialTransiogram) = Tuple(1 ./ -diag(t.rate)) .* ustrip(range(t))
+scale(t::MatrixExponentialTransiogram, s::Real) = MatrixExponentialTransiogram(s * t.ball, t.rate)
+
+meanlengths(t::MatrixExponentialTransiogram) = Tuple(1 ./ -diag(t.rate)) .* ustrip(maximum(radii(t.ball)))
 
 proportions(t::MatrixExponentialTransiogram) = Tuple(normalize(diag(t(100range(t))), 1))
 

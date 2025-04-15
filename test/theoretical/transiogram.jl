@@ -76,10 +76,11 @@ end
   # corresponding exponential transiogram
   t = MatrixExponentialTransiogram(lengths=(1.0u"m", 2.0u"m", 3.0u"m"), proportions=(0.2, 0.5, 0.3))
   @test t isa MatrixExponentialTransiogram
-  @test range(GeoStatsFunctions.scale(t, 2)) == 2u"m"
+  @test range(t) == 3.0u"m"
   @test nvariates(t) == 3
   @test meanlengths(t) == (1.0u"m", 2.0u"m", 3.0u"m")
   @test all(proportions(t) .≈ (0.12403100775193801, 0.38759689922480606, 0.48837209302325607))
+  @test range(GeoStatsFunctions.scale(t, 2)) == 6.0u"m"
 
   # random transition rate matrix
   A = rand(3, 3)
