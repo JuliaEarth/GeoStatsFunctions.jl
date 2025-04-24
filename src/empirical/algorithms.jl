@@ -79,7 +79,7 @@ function accumulate(data, (var₁, var₂), estimator::Estimator, algo::AccumAlg
       # accumulate if lag is valid
       if 0 < lag ≤ nlags
         # evaluate function estimator
-        v = formula(estimator, z₁[i], z₁[j], z₂[i], z₂[j])
+        v = accumterm(estimator, z₁[i], z₁[j], z₂[i], z₂[j])
 
         # accumulate if value is valid
         if !ismissing(v)
@@ -92,7 +92,7 @@ function accumulate(data, (var₁, var₂), estimator::Estimator, algo::AccumAlg
   end
 
   # ordinate function
-  ordfun(Σy, n) = normsum(estimator, Σy, n)
+  ordfun(Σy, n) = accumnorm(estimator, Σy, n)
 
   # bin (or lag) size
   lags = range(δh / 2, stop=maxlag - δh / 2, length=nlags)
@@ -177,7 +177,7 @@ function accumulate(data, pairs, estimator::CarleEstimator, algo::AccumAlgo)
           Σy = Σ[k]
 
           # evaluate function estimator
-          v = formula(estimator, z₁[i], z₁[j], z₂[i], z₂[j])
+          v = accumterm(estimator, z₁[i], z₁[j], z₂[i], z₂[j])
 
           # accumulate because value is always valid
           ns[lag] += 1
@@ -189,7 +189,7 @@ function accumulate(data, pairs, estimator::CarleEstimator, algo::AccumAlgo)
   end
 
   # ordinate function
-  ordfun(Σy, n) = normsum(estimator, Σy, n)
+  ordfun(Σy, n) = accumnorm(estimator, Σy, n)
 
   # bin (or lag) size
   lags = range(δh / 2, stop=maxlag - δh / 2, length=nlags)

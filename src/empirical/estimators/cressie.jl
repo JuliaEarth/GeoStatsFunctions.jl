@@ -19,8 +19,8 @@ function k(n)
   2 * n * n * (n * (n * a + b) + c)
 end
 
-formula(::CressieEstimator, z₁ᵢ, z₁ⱼ, z₂ᵢ, z₂ⱼ) = ((z₁ᵢ - z₁ⱼ) ⋅ (z₂ᵢ - z₂ⱼ))^(1 / 4)
+accumterm(::CressieEstimator, z₁ᵢ, z₁ⱼ, z₂ᵢ, z₂ⱼ) = ((z₁ᵢ - z₁ⱼ) ⋅ (z₂ᵢ - z₂ⱼ))^(1 / 4)
 
-normsum(::CressieEstimator, Σy, n) = Σy^4 / k(n)
+accumnorm(::CressieEstimator, Σy, n) = Σy^4 / k(n)
 
 combine(::CressieEstimator, yα, nα, yβ, nβ) = ((yα * k(nα))^(1 / 4) + (yβ * k(nβ))^(1 / 4))^4 / k(nα + nβ)
