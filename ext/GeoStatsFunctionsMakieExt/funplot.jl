@@ -127,6 +127,7 @@ function funplot!(
   size=1.5,
   maxlag=nothing,
   # empirical options
+  style=:solid,
   pointsize=12,
   showtext=true,
   textsize=12,
@@ -166,7 +167,7 @@ function funplot!(
     end
 
     # visualize function
-    Makie.scatterlines!(ax, hs, fs, color=color, markersize=pointsize, linewidth=size)
+    Makie.scatterlines!(ax, hs, fs, color=color, markersize=pointsize, linewidth=size, linestyle=style)
 
     # visualize text counts
     if showtext

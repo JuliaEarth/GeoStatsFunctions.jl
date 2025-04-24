@@ -16,6 +16,7 @@ Plot the geostatistical function `f` with given `options`.
 
 ## Empirical function options:
 
+* `style`       - style (line style)
 * `pointsize`   - size of points
 * `showtext`    - show text counts
 * `textsize`    - size of text counts
@@ -35,6 +36,16 @@ function funplot end
 
 Mutating version of [`funplot`[@ref] where the figure `fig`
 is updated with the plot of the geostatistical function `f`.
+
+## Examples
+
+```julia
+# initialize figure with Gaussian variogram
+fig = funplot(GaussianVariogram())
+
+# add spherical variogram to figure
+funplot!(fig, SphericalVariogram())
+```
 
 See the documentation of [`funplot`](@ref) for `options`.
 """
@@ -56,6 +67,16 @@ Plot the geostatistical surface `f` with given `options`.
 * `normal` - Normal direction to plane (default to vertical)
 * `nlags`  - Number of lags (default to `20`)
 * `nangs`  - Number of angles (default to `50`)
+
+## Examples
+
+```julia
+# initialize figure with Gaussian variogram
+fig = surfplot(GaussianVariogram())
+
+# add spherical variogram to figure
+surfplot!(fig, SphericalVariogram())
+```
 
 ### Notes
 
