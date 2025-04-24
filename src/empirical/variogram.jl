@@ -164,7 +164,3 @@ function merge(γα::EmpiricalVariogram{ℒ,V,D,E}, γβ::EmpiricalVariogram{ℒ
 
   EmpiricalVariogram(n, x, y, d, e)
 end
-
-mergerule(::MatheronEstimator, yα, nα, yβ, nβ) = (yα * nα + yβ * nβ) / (nα + nβ)
-
-mergerule(::CressieEstimator, yα, nα, yβ, nβ) = ((yα * k(nα))^(1 / 4) + (yβ * k(nβ))^(1 / 4))^4 / k(nα + nβ)
