@@ -147,7 +147,7 @@ function merge(tα::EmpiricalTransiogram{ℒ,V,D,E}, tβ::EmpiricalTransiogram{�
   e = tα.estimator
 
   # merge function for estimator
-  mergefun(yα, nα, yβ, nβ) = combine(e, yα, nα, yβ, nβ)
+  mergefun(yα, nα, yβ, nβ) = mergerule(e, yα, nα, yβ, nβ)
 
   # merge coordinates and bin counts
   n = nα + nβ
@@ -164,3 +164,5 @@ function merge(tα::EmpiricalTransiogram{ℒ,V,D,E}, tβ::EmpiricalTransiogram{�
 
   EmpiricalTransiogram(n, x, Y, d, e)
 end
+
+mergerule(::CarleEstimator, yα, nα, yβ, nβ) = (yα * nα + yβ * nβ) / (nα + nβ)

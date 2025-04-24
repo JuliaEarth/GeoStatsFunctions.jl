@@ -17,5 +17,3 @@ struct CarleEstimator <: Estimator end
 accumterm(::CarleEstimator, z₁ᵢ, z₁ⱼ, z₂ᵢ, z₂ⱼ) = SVector{2,Int}(z₁ᵢ * z₂ⱼ, z₁ᵢ)
 
 accumnorm(::CarleEstimator, Σy, n) = iszero(Σy[2]) ? zero(Float64) : Σy[1] / Σy[2]
-
-combine(::CarleEstimator, yα, nα, yβ, nβ) = (yα * nα + yβ * nβ) / (nα + nβ)

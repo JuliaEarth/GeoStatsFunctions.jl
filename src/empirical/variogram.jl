@@ -151,7 +151,7 @@ function merge(γα::EmpiricalVariogram{ℒ,V,D,E}, γβ::EmpiricalVariogram{ℒ
   e = γα.estimator
 
   # merge function for estimator
-  mergefun(yα, nα, yβ, nβ) = combine(e, yα, nα, yβ, nβ)
+  mergefun(yα, nα, yβ, nβ) = mergerule(e, yα, nα, yβ, nβ)
 
   # merge coordinates and bin counts
   n = nα + nβ
@@ -164,3 +164,7 @@ function merge(γα::EmpiricalVariogram{ℒ,V,D,E}, γβ::EmpiricalVariogram{ℒ
 
   EmpiricalVariogram(n, x, y, d, e)
 end
+
+mergerule(::MatheronEstimator, yα, nα, yβ, nβ) = (yα * nα + yβ * nβ) / (nα + nβ)
+
+mergerule(::CressieEstimator, yα, nα, yβ, nβ) = ((yα * k(nα))^(1 / 4) + (yβ * k(nβ))^(1 / 4))^4 / k(nα + nβ)

@@ -22,5 +22,3 @@ end
 accumterm(::CressieEstimator, z₁ᵢ, z₁ⱼ, z₂ᵢ, z₂ⱼ) = ((z₁ᵢ - z₁ⱼ) ⋅ (z₂ᵢ - z₂ⱼ))^(1 / 4)
 
 accumnorm(::CressieEstimator, Σy, n) = Σy^4 / k(n)
-
-combine(::CressieEstimator, yα, nα, yβ, nβ) = ((yα * k(nα))^(1 / 4) + (yβ * k(nβ))^(1 / 4))^4 / k(nα + nβ)
