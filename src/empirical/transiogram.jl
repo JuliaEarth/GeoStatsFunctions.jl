@@ -41,6 +41,7 @@ struct EmpiricalTransiogram{ℒ<:Len,V,D,E} <: EmpiricalGeoStatsFunction
   counts::Vector{Int}
   abscissas::Vector{ℒ}
   ordinates::Matrix{Vector{V}}
+  headcounts::Matrix{Vector{Int}}
   distance::D
   estimator::E
 end
@@ -71,9 +72,9 @@ function EmpiricalTransiogram(
   estim, algo = estimalgo(𝒟, nlags, maxlag, distance, :carle, algorithm)
 
   # accumulate data with chosen algorithm
-  counts, abscissas, ordinates = accumulate(ℐ, pairs, estim, algo)
+  counts, abscissas, ordinates, headcounts = accumulate(ℐ, pairs, estim, algo)
 
-  EmpiricalTransiogram(counts, abscissas, ordinates, distance, estim)
+  EmpiricalTransiogram(counts, abscissas, ordinates, headcounts, distance, estim)
 end
 
 """
@@ -141,28 +142,28 @@ function merge(tα::EmpiricalTransiogram{ℒ,V,D,E}, tβ::EmpiricalTransiogram{�
   xβ = tβ.abscissas
   Yα = tα.ordinates
   Yβ = tβ.ordinates
+  Cα = tα.headcounts
+  Cβ = tβ.headcounts
 
   # copy distance and estimator
   d = tα.distance
   e = tα.estimator
 
-  # merge function for estimator
-  mergefun(yα, nα, yβ, nβ) = mergerule(e, yα, nα, yβ, nβ)
-
   # merge coordinates and bin counts
   n = nα + nβ
   x = @. (xα * nα + xβ * nβ) / n
-  Y = map(zip(Yα, Yβ)) do (yα, yβ)
-    @. mergefun(yα, nα, yβ, nβ)
+  Y = map(zip(Yα, Cα, Yβ, Cβ)) do (yα, cα, yβ, cβ)
+    @. (yα * cα + yβ * cβ) / (cα + cβ)
+  end
+  C = map(zip(Cα, Cβ)) do (cα, cβ)
+    @. cα + cβ
   end
 
   # adjust empty bins
   x[n .== 0] .= xα[n .== 0]
-  for y in Y
-    y[n .== 0] .= 0
+  for (y, c) in zip(Y, C)
+    y[c .== 0] .= 0
   end
 
-  EmpiricalTransiogram(n, x, Y, d, e)
+  EmpiricalTransiogram(n, x, Y, C, d, e)
 end
-
-mergerule(::CarleEstimator, yα, nα, yβ, nβ) = (yα * nα + yβ * nβ) / (nα + nβ)

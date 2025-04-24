@@ -108,7 +108,7 @@ function accumulate(data, (var₁, var₂), estimator::Estimator, algo::AccumAlg
   ns, xs, ys
 end
 
-function accumulate(data, pairs, estimator::CarleEstimator, algo::AccumAlgo)
+function accumulate(data, pairs, ::CarleEstimator, algo::AccumAlgo)
   # retrieve algorithm parameters
   nlags = algo.nlags
   maxlag = algo.maxlag
@@ -141,13 +141,9 @@ function accumulate(data, pairs, estimator::CarleEstimator, algo::AccumAlgo)
   ns = zeros(Int, nlags)
   Σx = zeros(ℒ, nlags)
 
-  # ordinate sums
-  Σ = map(pairs) do (var₁, var₂)
-    z₁ = get(var₁)
-    z₂ = get(var₂)
-    V = returntype(estimator, z₁, z₂)
-    zeros(V, nlags)
-  end
+  # numerator and denominator sums
+  Σn = map(_ -> zeros(Int, nlags), pairs)
+  Σd = map(_ -> zeros(Int, nlags), pairs)
 
   # loop over pairs of points
   @inbounds for j in 1:nelements(𝒫)
@@ -171,25 +167,19 @@ function accumulate(data, pairs, estimator::CarleEstimator, algo::AccumAlgo)
       # accumulate if lag is valid
       if 0 < lag ≤ nlags
         for (k, (var₁, var₂)) in enumerate(pairs)
-          # retrieve values and sums for pair
-          z₁ = get(var₁)
-          z₂ = get(var₂)
-          Σy = Σ[k]
+          # retrieve indicator variables
+          I₁ = get(var₁)
+          I₂ = get(var₂)
 
-          # evaluate function estimator
-          v = accumterm(estimator, z₁[i], z₁[j], z₂[i], z₂[j])
-
-          # accumulate because value is always valid
+          # accumulate numerator and denominator
           ns[lag] += 1
           Σx[lag] += h
-          Σy[lag] += v
+          Σn[k][lag] += I₁[i] * I₂[j]
+          Σd[k][lag] += I₁[i]
         end
       end
     end
   end
-
-  # ordinate function
-  ordfun(Σy, n) = accumnorm(estimator, Σy, n)
 
   # bin (or lag) size
   lags = range(δh / 2, stop=maxlag - δh / 2, length=nlags)
@@ -199,13 +189,16 @@ function accumulate(data, pairs, estimator::CarleEstimator, algo::AccumAlgo)
   xs[ns .== 0] .= lags[ns .== 0]
 
   # ordinate
-  Y = map(Σ) do Σy
-    ys = @. ordfun(Σy, ns)
-    ys[ns .== 0] .= zero(eltype(ys))
+  Y = map(enumerate(pairs)) do (k, _)
+    ys = Σn[k] ./ Σd[k]
+    ys[Σd[k] .== 0] .= zero(eltype(ys))
     ys
   end
 
-  ns, xs, Y
+  # head count
+  C = Σd
+
+  ns, xs, Y, C
 end
 
 include("algorithms/fullsearch.jl")
