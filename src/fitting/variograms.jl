@@ -53,7 +53,7 @@ function _fit(
   L(θ) = θ[2] ≥ θ[3] ? 0.0 : θ[3] - θ[2]
 
   # penalty for linear constraint (J + λL)
-  λ = sum(yᵢ -> yᵢ^2, y′)
+  λ = sum(abs2, y′)
 
   # maximum range, sill and nugget
   xmax = maximum(x′)
@@ -134,7 +134,7 @@ function _fit(
   L(θ) = θ[1] ≥ 0.0 ? 0.0 : -θ[1] + θ[3] ≥ 0.0 ? 0.0 : -θ[3] + 2.0 ≥ θ[3] ? 0.0 : θ[3] - 2.0
 
   # penalty for linear constraint (J + λL)
-  λ = sum(yᵢ -> yᵢ^2, y′)
+  λ = sum(abs2, y′)
 
   # maximum scaling, nugget and exponent
   ymax = maximum(y′)
@@ -163,13 +163,4 @@ function _fit(
   γ = G(scaling=θ[1] * uy, nugget=θ[2] * uy, exponent=θ[3])
 
   γ, ϵ
-end
-
-_weights(f, x, n) = isnothing(f) ? n / sum(n) : map(xᵢ -> ustrip(f(xᵢ)), x)
-
-function _optimize(J, L, λ, l, u, θₒ)
-  sol = Optim.optimize(θ -> J(θ) + λ * L(θ), l, u, θₒ)
-  ϵ = Optim.minimum(sol)
-  θ = Optim.minimizer(sol)
-  θ, ϵ
 end
