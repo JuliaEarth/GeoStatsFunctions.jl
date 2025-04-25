@@ -109,6 +109,32 @@ end
   csv = CSV.File(joinpath(datadir, "facies5.csv"))
   gtb = georef(csv, ("X", "Y", "Z"))
   t = EmpiricalTransiogram(gtb, "FACIES", maxlag=20, nlags=20)
+
+  # all fits lead to similar proportions
+  τ₁ = GeoStatsFunctions.fit(LinearTransiogram, t)
+  τ₂ = GeoStatsFunctions.fit(SphericalTransiogram, t)
+  τ₃ = GeoStatsFunctions.fit(GaussianTransiogram, t)
+  τ₄ = GeoStatsFunctions.fit(ExponentialTransiogram, t)
+  ps = (0.30, 0.12, 0.12, 0.20, 0.25)
+  @test all(isapprox.(proportions(τ₁), ps, atol=1e-2))
+  @test all(isapprox.(proportions(τ₂), ps, atol=1e-2))
+  @test all(isapprox.(proportions(τ₃), ps, atol=1e-2))
+  @test all(isapprox.(proportions(τ₄), ps, atol=1e-2))
+
+  # fix parameters
+  τ = GeoStatsFunctions.fit(SphericalTransiogram, t, range=12.0u"m")
+  @test isapprox(range(τ), 12.0u"m", atol=1e-3u"m")
+  τ = GeoStatsFunctions.fit(SphericalTransiogram, t, proportions=ntuple(i -> 1 / 5, 5))
+  @test all(isapprox.(proportions(τ), 1 / 5, atol=1e-3))
+
+  # fix maximum parameters
+  τ = GeoStatsFunctions.fit(SphericalTransiogram, t, maxrange=5u"m")
+  @test isapprox(range(τ), 5.0u"m", atol=1e-3u"m")
+  ps = (0.2, 0.1, 0.1, 0.3, 0.25)
+  τ = GeoStatsFunctions.fit(SphericalTransiogram, t, maxproportions=ps)
+  @test all(isapprox.(proportions(τ), ps, atol=1e-1))
+
+  # piecewise linear
   τ = GeoStatsFunctions.fit(PiecewiseLinearTransiogram, t)
   @test τ(0.0u"m") == I(5)
   @test all(x -> 0 < x < 1, τ(5.0u"m"))

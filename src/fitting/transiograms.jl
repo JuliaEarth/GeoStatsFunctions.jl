@@ -2,8 +2,98 @@
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
 
-function _fit(T::Type{<:PiecewiseLinearTransiogram}, t::EmpiricalTransiogram, ::FitAlgo)
+function _fit(
+  T::Type{<:Transiogram},
+  t::EmpiricalTransiogram,
+  algo::WeightedLeastSquares;
+  range=nothing,
+  proportions=nothing,
+  maxrange=nothing,
+  maxproportions=nothing
+)
+  # custom ball of given radius
+  ball(r) = MetricBall(r, t.distance)
+
+  # coordinates of empirical transiogram
+  x = t.abscissas
+  Y = t.ordinates
+  n = t.counts
+
+  # discard invalid bins
+  x = x[n .> 0]
+  Y = [y[n .> 0] for y in Y]
+  n = n[n .> 0]
+
+  # strip units of coordinates
+  ux = unit(eltype(x))
+  x′ = ustrip.(x)
+
+  # strip units of kwargs
+  range′ = isnothing(range) ? range : ustrip(ux, range)
+  maxrange′ = isnothing(maxrange) ? maxrange : ustrip(ux, maxrange)
+
+  # evaluate weights
+  w = _weights(algo.weightfun, x, n)
+
+  # auxiliary variables
+  k = size(Y, 1)
+  V = eltype(first(Y))
+  _ones = ntuple(i -> one(V), k)
+  _zeros = ntuple(i -> zero(V), k)
+
+  # objective function
+  function J(θ)
+    τ = T(ball(θ[1]), _proportions(θ[2:end]))
+    mat(i) = getindex.(Y, i)
+    err(i) = sum(abs2, τ(x′[i]) - mat(i))
+    sum(i -> w[i] * err(i), eachindex(w, x′))
+  end
+
+  # linear constraint (sum(proportions) == 1)
+  L(θ) = abs(sum(θ[2:end]) - 1)
+
+  # penalty for linear constraint (J + λL)
+  λ = sum(y -> sum(abs2, y), Y)
+
+  # maximum range and proportions
+  xmax = maximum(x′)
+  ymax = _ones
+  rmax = isnothing(maxrange′) ? xmax : maxrange′
+  pmax = isnothing(maxproportions) ? ymax : maxproportions
+
+  # initial guess
+  rₒ = isnothing(range′) ? rmax / 3 : range′
+  pₒ = isnothing(proportions) ? 0.95 .* pmax : proportions
+  θₒ = [rₒ, pₒ...]
+
+  # box constraints
+  δ = 1e-8
+  rₗ, rᵤ = isnothing(range′) ? (zero(rmax), rmax) : (range′ - δ, range′ + δ)
+  pₗ, pᵤ = isnothing(proportions) ? (_zeros, pmax) : (proportions .- δ, proportions .+ δ)
+  l = [rₗ, pₗ...]
+  u = [rᵤ, pᵤ...]
+
+  # solve optimization problem
+  θ, ϵ = _optimize(J, L, λ, l, u, θₒ)
+
+  # optimal transiogram (with units)
+  τ = T(ball(θ[1] * ux), proportions=_proportions(θ[2:end]))
+
+  τ, ϵ
+end
+
+function _fit(T::Type{<:PiecewiseLinearTransiogram}, t::EmpiricalTransiogram, ::WeightedLeastSquares)
   τ = T(t.abscissas, t.ordinates)
   ϵ = 0.0
   τ, ϵ
+end
+
+# -----------------
+# HELPER FUNCTIONS
+# -----------------
+
+function _proportions(θ)
+  p = clamp.(θ, 0, 1)
+  s = sum(abs, p)
+  ntuple(i -> p[i] / s, length(p))
 end
