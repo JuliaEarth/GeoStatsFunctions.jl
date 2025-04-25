@@ -17,7 +17,7 @@ to construct an anisotropic model.
 
 Alternatively, use a custom metric `ball`.
 """
-struct GaussianTransiogram{B,P} <: Transiogram
+struct GaussianTransiogram{B,P<:NTuple} <: Transiogram
   ball::B
   proportions::P
 end
