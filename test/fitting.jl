@@ -89,8 +89,6 @@
   @test isapprox(γ.nugget, nₜ, atol=1e-3)
   @test isapprox(γ.scaling, sₜ, atol=1e-3)
   @test isapprox(γ.exponent, eₜ, atol=1e-3)
-
-  # test different settings
   sₜ = 6.54
   nₜ = 1.45
   eₜ = 0.64
@@ -134,9 +132,39 @@ end
   τ = GeoStatsFunctions.fit(SphericalTransiogram, t, maxproportions=ps)
   @test all(isapprox.(proportions(τ), ps, atol=1e-1))
 
+  # matrix-exponential
+  τ = GeoStatsFunctions.fit(MatrixExponentialTransiogram, t)
+  ps = (0.30, 0.12, 0.12, 0.20, 0.25)
+  @test all(isapprox.(proportions(τ), ps, atol=3e-2))
+  τ = GeoStatsFunctions.fit(MatrixExponentialTransiogram, t, range=0.8u"m")
+  @test isapprox(radius(metricball((τ))), 0.8u"m", atol=1e-3u"m")
+  ls = (7.0u"m", 3.0u"m", 2.0u"m", 7.0u"m", 14.0u"m")
+  τ = GeoStatsFunctions.fit(MatrixExponentialTransiogram, t, range=1.0u"m", maxlengths=ls)
+  @test all(isapprox.(meanlengths(τ)[1:2], ls[1:2], atol=1e-3u"m"))
+  @test all(meanlengths(τ)[3:5] .≤ ls[3:5])
+  ps = (0.32, 0.1, 0.1, 0.3, 0.31)
+  τ = GeoStatsFunctions.fit(MatrixExponentialTransiogram, t, maxproportions=ps)
+  @test all(proportions(τ) .≤ ps)
+
   # piecewise linear
   τ = GeoStatsFunctions.fit(PiecewiseLinearTransiogram, t)
   @test τ(0.0u"m") == I(5)
   @test all(x -> 0 < x < 1, τ(5.0u"m"))
   @test all(allequal, eachcol(τ(100.0u"m")))
+
+  # best fit is a matrix-exponential transiogram
+  ps = (0.30, 0.12, 0.12, 0.20, 0.25)
+  τ = GeoStatsFunctions.fit(Transiogram, t)
+  @test τ isa MatrixExponentialTransiogram
+  @test all(isapprox.(proportions(τ), ps, atol=3e-2))
+  τ = GeoStatsFunctions.fit([SphericalTransiogram, MatrixExponentialTransiogram], t)
+  @test τ isa MatrixExponentialTransiogram
+  @test all(isapprox.(proportions(τ), ps, atol=3e-2))
+
+  # make sure convenient methods work
+  ps = (0.30, 0.12, 0.12, 0.20, 0.25)
+  τ₁ = GeoStatsFunctions.fit(MatrixExponentialTransiogram, t, h -> 1 / h)
+  τ₂ = GeoStatsFunctions.fit(Transiogram, t, h -> 1 / h)
+  @test all(isapprox.(proportions(τ₁), ps, atol=3e-2))
+  @test all(isapprox.(proportions(τ₂), ps, atol=3e-2))
 end

@@ -79,7 +79,7 @@ using algorithm `algo` and return the one with minimum error.
 
 ```julia
 julia> fit(Variogram, g)
-julia> fit(Variogram, g, WeightedLeastSquares())
+julia> fit(Variogram, g, h -> 1 / h)
 ```
 """
 function fit(::Type{Variogram}, g::EmpiricalVariogram, algo::FitAlgo=WeightedLeastSquares(); kwargs...)
@@ -94,6 +94,30 @@ function fit(::Type{Variogram}, g::EmpiricalVariogram, algo::FitAlgo=WeightedLea
     SphericalVariogram
   )
   fit(Gs, g, algo; kwargs...)
+end
+
+"""
+    fit(Transiogram, t, algo=WeightedLeastSquares(); kwargs...)
+
+Fit all theoretical `Transiogram` models to empirical transiogram `t`
+using algorithm `algo` and return the one with minimum error.
+
+## Examples
+
+```julia
+julia> fit(Transiogram, t)
+julia> fit(Transiogram, t, h -> 1 / h)
+```
+"""
+function fit(::Type{Transiogram}, t::EmpiricalTransiogram, algo::FitAlgo=WeightedLeastSquares(); kwargs...)
+  Ts = (
+    ExponentialTransiogram,
+    GaussianTransiogram,
+    LinearTransiogram,
+    MatrixExponentialTransiogram,
+    SphericalTransiogram
+  )
+  fit(Ts, t, algo; kwargs...)
 end
 
 # ----------------
