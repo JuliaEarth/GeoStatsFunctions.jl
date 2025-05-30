@@ -131,6 +131,9 @@ include("fitting/transiograms.jl")
 # HELPER FUNCTIONS
 # -----------------
 
+_ustrip(u, x) = x
+_ustrip(u, x::Quantity) = ustrip(u, x)
+
 _weights(f, x, n) = isnothing(f) ? n / sum(n) : map(xᵢ -> ustrip(f(xᵢ)), x)
 
 function _optimize(J, L, λ, l, u, θₒ)

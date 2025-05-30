@@ -29,8 +29,8 @@ function _fit(
   x′ = ustrip.(x)
 
   # strip units of kwargs
-  range′ = isnothing(range) ? range : ustrip(ux, range)
-  maxrange′ = isnothing(maxrange) ? maxrange : ustrip(ux, maxrange)
+  range′ = isnothing(range) ? range : _ustrip(ux, range)
+  maxrange′ = isnothing(maxrange) ? maxrange : _ustrip(ux, maxrange)
 
   # evaluate weights
   w = _weights(algo.weightfun, x, n)
@@ -115,10 +115,10 @@ function _fit(
   x′ = ustrip.(x)
 
   # strip units of kwargs
-  range′ = isnothing(range) ? range : ustrip(ux, range)
-  lengths′ = isnothing(lengths) ? lengths : ustrip.(ux, lengths)
-  maxrange′ = isnothing(maxrange) ? maxrange : ustrip(ux, maxrange)
-  maxlengths′ = isnothing(maxlengths) ? maxlengths : ustrip.(ux, maxlengths)
+  range′ = isnothing(range) ? range : _ustrip(ux, range)
+  lengths′ = isnothing(lengths) ? lengths : _ustrip.(ux, lengths)
+  maxrange′ = isnothing(maxrange) ? maxrange : _ustrip(ux, maxrange)
+  maxlengths′ = isnothing(maxlengths) ? maxlengths : _ustrip.(ux, maxlengths)
 
   # evaluate weights
   w = _weights(algo.weightfun, x, n)

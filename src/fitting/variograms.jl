@@ -33,12 +33,12 @@ function _fit(
   y′ = ustrip.(y)
 
   # strip units of kwargs
-  range′ = isnothing(range) ? range : ustrip(ux, range)
-  sill′ = isnothing(sill) ? sill : ustrip(uy, sill)
-  nugget′ = isnothing(nugget) ? nugget : ustrip(uy, nugget)
-  maxrange′ = isnothing(maxrange) ? maxrange : ustrip(ux, maxrange)
-  maxsill′ = isnothing(maxsill) ? maxsill : ustrip(uy, maxsill)
-  maxnugget′ = isnothing(maxnugget) ? maxnugget : ustrip(uy, maxnugget)
+  range′ = isnothing(range) ? range : _ustrip(ux, range)
+  sill′ = isnothing(sill) ? sill : _ustrip(uy, sill)
+  nugget′ = isnothing(nugget) ? nugget : _ustrip(uy, nugget)
+  maxrange′ = isnothing(maxrange) ? maxrange : _ustrip(ux, maxrange)
+  maxsill′ = isnothing(maxsill) ? maxsill : _ustrip(uy, maxsill)
+  maxnugget′ = isnothing(maxnugget) ? maxnugget : _ustrip(uy, maxnugget)
 
   # evaluate weights
   w = _weights(algo.weightfun, x, n)
@@ -112,11 +112,11 @@ function _fit(
   y′ = ustrip.(y)
 
   # strip units of kwargs
-  scaling′ = isnothing(scaling) ? scaling : ustrip(uy, scaling)
-  nugget′ = isnothing(nugget) ? nugget : ustrip(uy, nugget)
+  scaling′ = isnothing(scaling) ? scaling : _ustrip(uy, scaling)
+  nugget′ = isnothing(nugget) ? nugget : _ustrip(uy, nugget)
   exponent′ = exponent
-  maxscaling′ = isnothing(maxscaling) ? maxscaling : ustrip(uy, maxscaling)
-  maxnugget′ = isnothing(maxnugget) ? maxnugget : ustrip(uy, maxnugget)
+  maxscaling′ = isnothing(maxscaling) ? maxscaling : _ustrip(uy, maxscaling)
+  maxnugget′ = isnothing(maxnugget) ? maxnugget : _ustrip(uy, maxnugget)
   maxexponent′ = maxexponent
 
   # evaluate weights

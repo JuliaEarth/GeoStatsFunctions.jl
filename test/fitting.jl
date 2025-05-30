@@ -34,6 +34,10 @@
   @test isapprox(sill(γ), 0.07, atol=1e-3)
   @test isapprox(nugget(γ), 0.05, atol=1e-3)
 
+  # fix range without units
+  γ = GeoStatsFunctions.fit(GaussianVariogram, g, range=12.0)
+  @test isapprox(range(γ), 12.0u"m", atol=1e-3u"m")
+
   # fix maximum parameters
   γ = GeoStatsFunctions.fit(GaussianVariogram, g, maxrange=5.0u"m")
   @test isapprox(range(γ), 5.0u"m", atol=1e-3u"m")
@@ -41,6 +45,10 @@
   @test isapprox(sill(γ), 0.04, atol=1e-3)
   γ = GeoStatsFunctions.fit(GaussianVariogram, g, maxnugget=0.004)
   @test isapprox(nugget(γ), 0.004, atol=1e-3)
+
+  # fix maximum range without units
+  γ = GeoStatsFunctions.fit(GaussianVariogram, g, maxrange=5.0)
+  @test isapprox(range(γ), 5.0u"m", atol=1e-3u"m")
 
   # best fit is a Gaussian variogram
   γ = GeoStatsFunctions.fit(Variogram, g)
@@ -125,18 +133,28 @@ end
   τ = GeoStatsFunctions.fit(SphericalTransiogram, t, proportions=ntuple(i -> 1 / 5, 5))
   @test all(isapprox.(proportions(τ), 1 / 5, atol=1e-3))
 
+  # fix range without units
+  τ = GeoStatsFunctions.fit(SphericalTransiogram, t, range=12.0)
+  @test isapprox(range(τ), 12.0u"m", atol=1e-3u"m")
+
   # fix maximum parameters
-  τ = GeoStatsFunctions.fit(SphericalTransiogram, t, maxrange=5u"m")
+  τ = GeoStatsFunctions.fit(SphericalTransiogram, t, maxrange=5.0u"m")
   @test isapprox(range(τ), 5.0u"m", atol=1e-3u"m")
   ps = (0.2, 0.1, 0.1, 0.3, 0.25)
   τ = GeoStatsFunctions.fit(SphericalTransiogram, t, maxproportions=ps)
   @test all(isapprox.(proportions(τ), ps, atol=1e-1))
+
+  # fix maximum range without units
+  τ = GeoStatsFunctions.fit(SphericalTransiogram, t, maxrange=5.0)
+  @test isapprox(range(τ), 5.0u"m", atol=1e-3u"m")
 
   # matrix-exponential
   τ = GeoStatsFunctions.fit(MatrixExponentialTransiogram, t)
   ps = (0.30, 0.12, 0.12, 0.20, 0.25)
   @test all(isapprox.(proportions(τ), ps, atol=3e-2))
   τ = GeoStatsFunctions.fit(MatrixExponentialTransiogram, t, range=0.8u"m")
+  @test isapprox(radius(metricball((τ))), 0.8u"m", atol=1e-3u"m")
+  τ = GeoStatsFunctions.fit(MatrixExponentialTransiogram, t, range=0.8)
   @test isapprox(radius(metricball((τ))), 0.8u"m", atol=1e-3u"m")
   ls = (7.0u"m", 3.0u"m", 2.0u"m", 7.0u"m", 14.0u"m")
   τ = GeoStatsFunctions.fit(MatrixExponentialTransiogram, t, range=1.0u"m", maxlengths=ls)
