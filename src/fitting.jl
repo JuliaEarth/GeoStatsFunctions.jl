@@ -110,13 +110,8 @@ julia> fit(Transiogram, t, h -> 1 / h)
 ```
 """
 function fit(::Type{Transiogram}, t::EmpiricalTransiogram, algo::FitAlgo=WeightedLeastSquares(); kwargs...)
-  Ts = (
-    ExponentialTransiogram,
-    GaussianTransiogram,
-    LinearTransiogram,
-    MatrixExponentialTransiogram,
-    SphericalTransiogram
-  )
+  Ts =
+    (ExponentialTransiogram, GaussianTransiogram, LinearTransiogram, MatrixExponentialTransiogram, SphericalTransiogram)
   fit(Ts, t, algo; kwargs...)
 end
 
