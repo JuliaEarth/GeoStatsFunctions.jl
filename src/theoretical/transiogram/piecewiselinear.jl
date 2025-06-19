@@ -30,6 +30,7 @@ struct PiecewiseLinearTransiogram{B<:MetricBall,ℒ<:Len,M} <: Transiogram
   ordinates::Vector{M}
 
   function PiecewiseLinearTransiogram{B,ℒ,M}(ball, abscissas, ordinates) where {B<:MetricBall,ℒ<:Len,M}
+    @assert all(h -> h ≥ zero(h), abscissas) "invalid abscissas for piecewise linear model"
     @assert all(allequal, eachcol(last(ordinates))) "invalid ordinates for piecewise linear model"
     new{B,ℒ,M}(ball, abscissas, ordinates)
   end
