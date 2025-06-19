@@ -86,7 +86,7 @@ function meanlengths(t::PiecewiseLinearTransiogram)
   b = t₁ - h₁ * a
   l = -(b ./ a)
   r = ustrip(maximum(radii(t.ball)))
-  l .* r
+  Tuple(l .* r)
 end
 
 proportions(t::PiecewiseLinearTransiogram) = Tuple(diag(last(t.ordinates)))
