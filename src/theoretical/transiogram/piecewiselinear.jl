@@ -3,13 +3,16 @@
 # ------------------------------------------------------------------
 
 """
-    PiecewiseLinearTransiogram(abscissas, ordinates)
+    PiecewiseLinearTransiogram(ball,  abscissas, ordinates)
 
-A piecewise-linear transiogram model with `abscissas` and matrix `ordinates`.
+A piecewise-linear transiogram model with given metric `ball`,
+`abscissas` and matrix `ordinates`.
 
-    PiecewiseLinearTransiogram(ball, abscissas, ordinates)
+    PiecewiseLinearTransiogram(abscissas, ordinates; range)
+    PiecewiseLinearTransiogram(abscissas, ordinates; ranges, rotation)
 
-Alternatively, use a custom metric `ball`.
+Alternatively, build metric `ball` from single `range` or from
+multiple `ranges` and `rotation` matrix.
 
 ## References
 
@@ -59,15 +62,17 @@ function PiecewiseLinearTransiogram(ball::MetricBall, abscissas::AbstractVector,
   PiecewiseLinearTransiogram{typeof(b),eltype(x),eltype(Y)}(b, x, Y)
 end
 
-function PiecewiseLinearTransiogram(abscissas::AbstractVector, ordinates::AbstractVector)
-  ball = MetricBall(oneunit(eltype(abscissas)))
-  PiecewiseLinearTransiogram(ball, abscissas, ordinates)
-end
+PiecewiseLinearTransiogram(
+  abscissas::AbstractVector,
+  ordinates::AbstractVector;
+  range=1.0,
+  ranges=nothing,
+  rotation=I
+) = PiecewiseLinearTransiogram(rangeball(range, ranges, rotation), abscissas, ordinates)
 
 constructor(::PiecewiseLinearTransiogram) = PiecewiseLinearTransiogram
 
-scale(t::PiecewiseLinearTransiogram, s::Real) =
-  PiecewiseLinearTransiogram(s * t.ball, t.abscissas, t.ordinates)
+scale(t::PiecewiseLinearTransiogram, s::Real) = PiecewiseLinearTransiogram(s * t.ball, t.abscissas, t.ordinates)
 
 proportions(t::PiecewiseLinearTransiogram) = Tuple(diag(last(t.ordinates)))
 
@@ -76,10 +81,10 @@ function (t::PiecewiseLinearTransiogram)(h)
   hs = t.abscissas
   if h′ < first(hs) # left extrapolation
     ((first(hs) - h′) * I + h′ * first(t.ordinates)) / first(hs)
-  elseif h′ > last(hs) # right extrapolation
+  elseif h′ ≥ last(hs) # right extrapolation
     last(t.ordinates)
   else # middle interpolation
-    k = findlast(<(h′), hs)
+    k = findlast(≤(h′), hs)
     ((hs[k + 1] - h′) * t.ordinates[k] + (h′ - hs[k]) * t.ordinates[k + 1]) / (hs[k + 1] - hs[k])
   end
 end
