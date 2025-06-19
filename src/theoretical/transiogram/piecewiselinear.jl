@@ -66,8 +66,7 @@ end
 
 constructor(::PiecewiseLinearTransiogram) = PiecewiseLinearTransiogram
 
-scale(t::PiecewiseLinearTransiogram, s::Real) =
-  PiecewiseLinearTransiogram(s * t.ball, t.abscissas, t.ordinates)
+scale(t::PiecewiseLinearTransiogram, s::Real) = PiecewiseLinearTransiogram(s * t.ball, t.abscissas, t.ordinates)
 
 proportions(t::PiecewiseLinearTransiogram) = Tuple(diag(last(t.ordinates)))
 
