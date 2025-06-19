@@ -73,7 +73,21 @@ PiecewiseLinearTransiogram(
 
 constructor(::PiecewiseLinearTransiogram) = PiecewiseLinearTransiogram
 
+Base.range(t::PiecewiseLinearTransiogram) = maximum(meanlengths(t))
+
 scale(t::PiecewiseLinearTransiogram, s::Real) = PiecewiseLinearTransiogram(s * t.ball, t.abscissas, t.ordinates)
+
+function meanlengths(t::PiecewiseLinearTransiogram)
+  h₁ = t.abscissas[1]
+  h₂ = t.abscissas[2]
+  t₁ = diag(t.ordinates[1])
+  t₂ = diag(t.ordinates[2])
+  a = (t₂ - t₁) / (h₂ - h₁)
+  b = t₁ - h₁ * a
+  l = -(b ./ a)
+  r = ustrip(maximum(radii(t.ball)))
+  l .* r
+end
 
 proportions(t::PiecewiseLinearTransiogram) = Tuple(diag(last(t.ordinates)))
 

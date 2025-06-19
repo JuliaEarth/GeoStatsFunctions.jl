@@ -120,7 +120,7 @@ end
   gtb = georef(csv, ("X", "Y", "Z"))
   t = EmpiricalTransiogram(gtb, "FACIES", maxlag=20, nlags=20)
   τ = GeoStatsFunctions.fit(PiecewiseLinearTransiogram, t)
-  @test range(GeoStatsFunctions.scale(τ, 2)) == 2u"m"
+  @test range(GeoStatsFunctions.scale(τ, 2)) == 2range(τ)
   @test nvariates(τ) == 5
   @test τ(0.0u"m") == I(5)
   @test all(x -> 0 < x < 1, τ(5.0u"m"))
