@@ -119,7 +119,7 @@ end
   csv = CSV.File(joinpath(datadir, "facies5.csv"))
   gtb = georef(csv, ("X", "Y", "Z"))
   t = EmpiricalTransiogram(gtb, "FACIES", maxlag=20, nlags=20)
-  τ = PiecewiseLinearTransiogram(t.abscissas, t.ordinates)
+  τ = GeoStatsFunctions.fit(PiecewiseLinearTransiogram, t)
   @test range(GeoStatsFunctions.scale(τ, 2)) == 2u"m"
   @test nvariates(τ) == 5
   @test τ(0.0u"m") == I(5)
@@ -133,29 +133,15 @@ end
 
   # uniform proportions from zero off-diagonals
   h = [0.5, 1.5, 2.5]
-  d = [1.0, 0.5, 0.0]
-  o = [0.0, 0.5, 1.0]
-  T = [[d] [o]; [o] [d]]
-  τ = PiecewiseLinearTransiogram(h, T)
+  Y = [[1.0 0.0; 0.0 1.0], [0.5 0.5; 0.5 0.5], [0.0 1.0; 1.0 0.0]]
+  τ = PiecewiseLinearTransiogram(h, Y)
   @test proportions(τ) == (0.5, 0.5)
   @test τ(100) == [0.5 0.5; 0.5 0.5]
 
   # non-uniform proportions
-  p1 = 0.7
-  p2 = 0.2
-  p3 = 0.1
   h = [0.5, 1.5, 2.5]
-  T11 = [1.0, 0.5, p1]
-  T21 = [0.0, 0.5, p1]
-  T31 = [0.0, 0.5, p1]
-  T12 = [0.0, 0.5, p2]
-  T22 = [1.0, 0.5, p2]
-  T32 = [0.0, 0.5, p2]
-  T13 = [0.0, 0.5, p3]
-  T23 = [0.0, 0.5, p3]
-  T33 = [1.0, 0.5, p3]
-  T = [[T11] [T12] [T13]; [T21] [T22] [T23]; [T31] [T32] [T33]]
-  τ = PiecewiseLinearTransiogram(h, T)
-  @test all(proportions(τ) .≈ (p1, p2, p3))
-  @test τ(100) ≈ [p1 p2 p3; p1 p2 p3; p1 p2 p3]
+  Y = [[1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0], [0.5 0.5 0.5; 0.5 0.5 0.5; 0.5 0.5 0.5], [0.7 0.2 0.1; 0.7 0.2 0.1; 0.7 0.2 0.1]]
+  τ = PiecewiseLinearTransiogram(h, Y)
+  @test all(proportions(τ) .≈ (0.7, 0.2, 0.1))
+  @test τ(100) ≈ [0.7 0.2 0.1; 0.7 0.2 0.1; 0.7 0.2 0.1]
 end

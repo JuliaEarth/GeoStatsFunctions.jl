@@ -180,8 +180,24 @@ function _fit(
 end
 
 function _fit(T::Type{<:PiecewiseLinearTransiogram}, t::EmpiricalTransiogram, ::WeightedLeastSquares)
-  τ = T(t.abscissas, t.ordinates)
+  # auxiliary variables
+  n = length(t.abscissas)
+  k = size(t.ordinates, 1)
+
+  # abscissa vector
+  x = t.abscissas
+
+  # ordinate matrices
+  Y = map(1:n) do m
+    SMatrix{k,k}(t.ordinates[i, j][m] for i in 1:k, j in 1:k)
+  end
+
+  # theoretical model
+  τ = T(x, Y)
+
+  # zero error
   ϵ = 0.0
+
   τ, ϵ
 end
 

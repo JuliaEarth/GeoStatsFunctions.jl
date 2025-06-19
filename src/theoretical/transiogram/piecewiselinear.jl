@@ -5,8 +5,7 @@
 """
     PiecewiseLinearTransiogram(abscissas, ordinates)
 
-A piecewise-linear transiogram model with `abscissas` and
-matrix `ordinates` obtained from an [`EmpiricalTransiogram`](@ref).
+A piecewise-linear transiogram model with `abscissas` and matrix `ordinates`.
 
     PiecewiseLinearTransiogram(ball, abscissas, ordinates)
 
@@ -26,13 +25,14 @@ struct PiecewiseLinearTransiogram{B<:MetricBall,ℒ<:Len,M} <: Transiogram
   ball::B
   abscissas::Vector{ℒ}
   ordinates::Vector{M}
-  ordinfinity::M
+
+  function PiecewiseLinearTransiogram{B,ℒ,M}(ball, abscissas, ordinates) where {B<:MetricBall,ℒ<:Len,M}
+    @assert all(allequal, eachcol(last(ordinates))) "invalid ordinates for piecewise linear model"
+    new{B,ℒ,M}(ball, abscissas, ordinates)
+  end
 end
 
-function PiecewiseLinearTransiogram(ball::MetricBall, abscissas::AbstractVector, ordinates::AbstractMatrix)
-  n = length(abscissas)
-  m = size(ordinates, 1)
-
+function PiecewiseLinearTransiogram(ball::MetricBall, abscissas::AbstractVector, ordinates::AbstractVector)
   # metric ball
   b = ball
 
@@ -40,25 +40,26 @@ function PiecewiseLinearTransiogram(ball::MetricBall, abscissas::AbstractVector,
   x = float(aslen.(abscissas))
 
   # ordinate matrices
-  Y = map(1:n) do k
-    SMatrix{m,m}(ordinates[i, j][k] for i in 1:m, j in 1:m)
-  end
+  Y = [SMatrix{size(Yᵢ)...}(Yᵢ) for Yᵢ in ordinates]
 
-  # ordinate matrix at infinity
-  yₖ = diag(last(Y))
-  p = if all(iszero, yₖ)
-    # corner case with uniform proportions
-    m⁻¹ = eltype(yₖ)(1 / m)
-    SVector{m}(m⁻¹ for i in 1:m)
+  # proportions from last ordinate matrix
+  Yₙ = last(Y)
+  yₙ = diag(Yₙ)
+  k = length(yₙ)
+  p = if all(iszero, yₙ)
+    k⁻¹ = eltype(yₙ)(1 / k)
+    SVector{k}(k⁻¹ for i in 1:k)
   else
-    normalize(yₖ, 1)
+    normalize(yₙ, 1)
   end
-  Y∞ = SMatrix{m,m}(p[j] for i in 1:m, j in 1:m)
 
-  PiecewiseLinearTransiogram(b, x, Y, Y∞)
+  # replace last ordinate matrix based on proportions
+  Y[end] = SMatrix{k,k}(p[j] for i in 1:k, j in 1:k)
+
+  PiecewiseLinearTransiogram{typeof(b),eltype(x),eltype(Y)}(b, x, Y)
 end
 
-function PiecewiseLinearTransiogram(abscissas::AbstractVector, ordinates::AbstractMatrix)
+function PiecewiseLinearTransiogram(abscissas::AbstractVector, ordinates::AbstractVector)
   ball = MetricBall(oneunit(eltype(abscissas)))
   PiecewiseLinearTransiogram(ball, abscissas, ordinates)
 end
@@ -66,9 +67,9 @@ end
 constructor(::PiecewiseLinearTransiogram) = PiecewiseLinearTransiogram
 
 scale(t::PiecewiseLinearTransiogram, s::Real) =
-  PiecewiseLinearTransiogram(s * t.ball, t.abscissas, t.ordinates, t.ordinfinity)
+  PiecewiseLinearTransiogram(s * t.ball, t.abscissas, t.ordinates)
 
-proportions(t::PiecewiseLinearTransiogram) = Tuple(diag(t.ordinfinity))
+proportions(t::PiecewiseLinearTransiogram) = Tuple(diag(last(t.ordinates)))
 
 function (t::PiecewiseLinearTransiogram)(h)
   h′ = aslen(h)
@@ -76,7 +77,7 @@ function (t::PiecewiseLinearTransiogram)(h)
   if h′ < first(hs) # left extrapolation
     ((first(hs) - h′) * I + h′ * first(t.ordinates)) / first(hs)
   elseif h′ > last(hs) # right extrapolation
-    t.ordinfinity
+    last(t.ordinates)
   else # middle interpolation
     k = findlast(<(h′), hs)
     ((hs[k + 1] - h′) * t.ordinates[k] + (h′ - hs[k]) * t.ordinates[k + 1]) / (hs[k + 1] - hs[k])
