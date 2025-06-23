@@ -90,29 +90,3 @@ function (t::MatrixExponentialTransiogram)(h)
   v = h′ / r′
   exp(v * R)
 end
-
-# -----------------
-# HELPER FUNCTIONS
-# -----------------
-
-function baseratematrix(l, p)
-  nₗ = length(l)
-  nₚ = length(p)
-
-  # add units if necessary
-  lᵤ = aslen.(l)
-
-  # sanity checks
-  if nₗ != nₚ
-    throw(ArgumentError("lengths and proportions must have the same length"))
-  end
-  if !all(pᵢ -> 0 ≤ pᵢ ≤ 1, p)
-    throw(ArgumentError("proportions must be in interval [0, 1]"))
-  end
-  if !(sum(p) ≈ 1)
-    throw(ArgumentError("proportions must add up to unit"))
-  end
-
-  # Eq. 17 and 18 of Carle et al 1998.
-  SMatrix{nₗ,nₗ}(i == j ? -1 / lᵤ[i] : (p[j] / (1 - p[i])) / lᵤ[i] for i in 1:nₗ, j in 1:nₗ)
-end

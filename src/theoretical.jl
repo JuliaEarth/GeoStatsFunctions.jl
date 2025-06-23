@@ -221,6 +221,12 @@ include("theoretical/covariance.jl")
 include("theoretical/transiogram.jl")
 include("theoretical/composite.jl")
 
+# ---------------------
+# THEORETICAL MATRICES
+# ---------------------
+
+include("theoretical/matrices.jl")
+
 # -----------------
 # HELPER FUNCTIONS
 # -----------------
