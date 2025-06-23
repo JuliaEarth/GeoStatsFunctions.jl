@@ -109,6 +109,7 @@ export
   ExponentialTransiogram,
   MatrixExponentialTransiogram,
   PiecewiseLinearTransiogram,
+  CarleTransiogram,
 
   # fitting algorithms
   WeightedLeastSquares,
