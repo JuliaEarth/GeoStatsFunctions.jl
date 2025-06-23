@@ -131,6 +131,6 @@ function Base.show(io::IO, ::MIME"text/plain", t::PiecewiseLinearTransiogram)
   end
   print(ioctx, "├─ abscissas: ")
   _printlnvec(ioctx, t.abscissas, 3)
-  print(ioctx, "├─ ordinates: ")
+  print(ioctx, "└─ ordinates: ")
   _printvec(ioctx, t.ordinates, 3)
 end

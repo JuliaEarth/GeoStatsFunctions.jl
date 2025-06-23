@@ -66,20 +66,20 @@ function _printvec(io, vec::AbstractArray{<:AbstractArray}, n)
   println(io)
   if len > 2n
     for i in 1:n
-      print(io, "│  ├─ ")
+      print(io, "   ├─ ")
       _printlnvec(io, vec[i], n)
     end
-    println(io, "│  ⋮")
+    println(io, "   ⋮")
     for i in (len - n + 1):(len - 1)
-      print(io, "│  ├─ ")
+      print(io, "   ├─ ")
       _printlnvec(io, vec[i], n)
     end
   else
     for i in 1:(len - 1)
-      print(io, "│  ├─ ")
+      print(io, "   ├─ ")
       _printlnvec(io, vec[i], n)
     end
   end
-  print(io, "│  └─ ")
+  print(io, "   └─ ")
   _printvec(io, vec[len], n)
 end
