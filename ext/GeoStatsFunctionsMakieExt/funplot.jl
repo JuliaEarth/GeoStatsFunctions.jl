@@ -32,21 +32,12 @@ function funplot!(
   # lag range starting at 1e-6 to avoid nugget artifact
   hs = range(1e-6 * oneunit(hmax), stop=hmax, length=100)
 
-  # evaluate main function
+  # evaluate function
   F = _eval(f, hs)
 
-  # evaluate base function
-  λ, π, F̂ = if _istransiogram(f)
-    b = metricball(f)
-    λ = meanlengths(f)
-    π = proportions(f)
-    r = ustrip(maximum(radii(b)))
-    f̂ = MatrixExponentialTransiogram(b; lengths=λ ./ r, proportions=π)
-    F̂ = _eval(f̂, hs)
-    λ, π, F̂
-  else
-    nothing, nothing, nothing
-  end
+  # mean lengths and proportions
+  l = _istransiogram(f) ? meanlengths(f) : nothing
+  p = _istransiogram(f) ? proportions(f) : nothing
 
   # aesthetic options
   label = Dict(1 => "1ˢᵗ axis", 2 => "2ⁿᵈ axis", 3 => "3ʳᵈ axis")
@@ -59,18 +50,14 @@ function funplot!(
   for i in 1:n, j in 1:n
     ax = fig.content[I[j, i]]
     for (k, Fₖ) in enumerate(F)
-      # display main function
+      # display function
       Makie.lines!(ax, hs, Fₖ[i, j], color=color, linewidth=size, linestyle=style[k], label=label[k])
       if _istransiogram(f)
         if i == j
           # display mean lengths
-          Makie.lines!(ax, [zero(hmax), λ[i]], [1.0, 0.0], color=:slategray, linewidth=size, linestyle=:dash)
+          Makie.lines!(ax, [zero(hmax), l[i]], [1.0, 0.0], color=:slategray, linewidth=size, linestyle=:dash)
           # display proportions
-          Makie.hlines!(ax, π[i], color=:slategray, linewidth=size, linestyle=:dash)
-        else
-          # display base function
-          F̂ₖ = F̂[k]
-          Makie.lines!(ax, hs, F̂ₖ[i, j], color=:slategray, linewidth=size, linestyle=style[k])
+          Makie.hlines!(ax, p[i], color=:slategray, linewidth=size, linestyle=:dash)
         end
       end
     end
@@ -98,6 +85,19 @@ end
 function _anisoeval(f, hs)
   # auxiliary parameters
   n = nvariates(f)
+
+  # reference point and basis vectors
+  p, v = _anisobasis(f)
+
+  # evaluate along basis vectors
+  map(v) do vⱼ
+    fs = [f(p, p + ustrip(h) * vⱼ) for h in hs]
+    [getindex.(fs, i, j) for i in 1:n, j in 1:n]
+  end
+end
+
+function _anisobasis(f)
+  # auxiliary parameters
   b = metricball(f)
   R = rotation(b)
   r = radii(b)
@@ -112,11 +112,23 @@ function _anisoeval(f, hs)
     R * Vec(ntuple(i -> U(i == j), d))
   end
 
-  # evaluate along basis vectors
-  map(v) do vⱼ
-    fs = [f(p, p + ustrip(h) * vⱼ) for h in hs]
-    [getindex.(fs, i, j) for i in 1:n, j in 1:n]
+  p, v
+end
+
+function _anisobasis(f::CarleTransiogram)
+  # auxiliary parameters
+  d = length(f.rates)
+  U = typeof(range(f))
+
+  # reference point
+  p = Point(ntuple(i -> U(0), d))
+
+  # axis-aligned basis
+  v = ntuple(d) do j
+    Vec(ntuple(i -> U(i == j), d))
   end
+
+  p, v
 end
 
 function funplot!(
