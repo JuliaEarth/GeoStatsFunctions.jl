@@ -106,12 +106,14 @@ end
   # mean lengths with non-unit range
   t = MatrixExponentialTransiogram(range=3.0, lengths=(1.0u"m", 2.0u"m", 3.0u"m"), proportions=(1 / 3, 1 / 3, 1 / 3))
   @test meanlengths(t) == (3.0u"m", 6.0u"m", 9.0u"m")
+  @test range(t) == 9.0u"m"
   t = MatrixExponentialTransiogram(
     ranges=(2.0, 1.0),
     lengths=(1.0u"m", 2.0u"m", 3.0u"m"),
     proportions=(1 / 3, 1 / 3, 1 / 3)
   )
   @test meanlengths(t) == (2.0u"m", 4.0u"m", 6.0u"m")
+  @test range(t) == 6.0u"m"
 end
 
 @testset "PiecewiseLinearTransiogram" begin
@@ -154,6 +156,8 @@ end
   Y = [[1.0 0.0; 0.0 1.0], [0.5 0.5; 0.5 0.5], [0.0 1.0; 1.0 0.0]]
   τ = PiecewiseLinearTransiogram(h, Y, ranges=(3.0, 2.0, 1.0))
   @test !isisotropic(τ)
+  @test meanlengths(τ) == (7.5u"m", 7.5u"m")
+  @test range(τ) == 7.5u"m"
   @test τ(Point(0, 0, 0), Point(1, 0, 0)) ≈ [1.0 0.0; 0.0 1.0]
   @test τ(Point(0, 0, 0), Point(0, 1, 0)) ≈ [1.0 0.0; 0.0 1.0]
   @test τ(Point(0, 0, 0), Point(0, 0, 1)) ≈ [0.75 0.25; 0.25 0.75]
