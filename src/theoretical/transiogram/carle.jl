@@ -54,12 +54,16 @@ CarleTransiogram(rates::AbstractMatrix...) = CarleTransiogram(rates)
 
 constructor(::CarleTransiogram) = CarleTransiogram
 
-function metricball(t::CarleTransiogram)
+function isisotropic(t::CarleTransiogram)
   R̃ = t.rates
   N = length(R̃)
-  j = argmax(meanlengths(t))
-  MetricBall(ntuple(i -> 1 / -diag(R̃[i])[j], N))
+  l = ntuple(N) do i
+    1 ./ -diag(R̃[i])
+  end
+  allequal(l)
 end
+
+metricball(t::CarleTransiogram) = MetricBall(1u"m")
 
 Base.range(t::CarleTransiogram) = maximum(meanlengths(t))
 

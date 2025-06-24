@@ -158,3 +158,41 @@ end
   @test τ(Point(0, 0, 0), Point(0, 1, 0)) ≈ [1.0 0.0; 0.0 1.0]
   @test τ(Point(0, 0, 0), Point(0, 0, 1)) ≈ [0.75 0.25; 0.25 0.75]
 end
+
+@testset "CarleTransiogram" begin
+  # anisotropic model from lengths and proportions
+  l = (3.0u"m", 2.0u"m", 1.0u"m")
+  p = (1 / 3, 1 / 3, 1 / 3)
+  Rx = GeoStatsFunctions.baseratematrix(10 .* l, p)
+  Ry = GeoStatsFunctions.baseratematrix(10 .* l, p)
+  Rz = GeoStatsFunctions.baseratematrix(l, p)
+  τ = CarleTransiogram(Rx, Ry, Rz)
+  @test !isisotropic(τ)
+  @test metricball(τ) == MetricBall(1.0u"m")
+  @test meanlengths(τ) == 10 .* l
+  @test range(τ) == 30.0u"m"
+  @test τ(Point(0, 0, 0), Point(0, 0, 0)) == 1.0 * I(3)
+  @test τ(Point(0, 0, 0), Point(1, 0, 0)) == τ(Point(0, 0, 0), Point(0, 1, 0))
+  @test τ(Point(0, 0, 0), Point(1, 0, 0)) != τ(Point(0, 0, 0), Point(0, 0, 1))
+
+  # isotropic models from single rate matrix
+  τ = CarleTransiogram(Rx, Rx, Rx)
+  @test isisotropic(τ)
+  @test metricball(τ) == MetricBall(1.0u"m")
+  @test meanlengths(τ) == 10 .* l
+  @test range(τ) == 30.0u"m"
+  τ = CarleTransiogram(Rz, Rz, Rz)
+  @test isisotropic(τ)
+  @test metricball(τ) == MetricBall(1.0u"m")
+  @test meanlengths(τ) == l
+  @test range(τ) == 3.0u"m"
+
+  # anisotropic 2D model
+  τ = CarleTransiogram(Rx, Rz)
+  @test !isisotropic(τ)
+  @test metricball(τ) == MetricBall(1.0u"m")
+  @test meanlengths(τ) == 10 .* l
+  @test range(τ) == 30.0u"m"
+  @test τ(Point(0, 0), Point(0, 0)) == 1.0 * I(3)
+  @test τ(Point(0, 0), Point(1, 0)) != τ(Point(0, 0), Point(0, 1))
+end
