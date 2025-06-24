@@ -81,7 +81,12 @@ Base.range(t::MatrixExponentialTransiogram) = maximum(meanlengths(t))
 
 scale(t::MatrixExponentialTransiogram, s::Real) = MatrixExponentialTransiogram(s * t.ball, t.rate)
 
-meanlengths(t::MatrixExponentialTransiogram) = Tuple(1 ./ -diag(t.rate)) .* ustrip(maximum(radii(t.ball)))
+function meanlengths(t::MatrixExponentialTransiogram)
+  r = maximum(radii(t.ball))
+  l = 1 ./ -diag(t.rate)
+  u = unit(eltype(l))
+  Tuple(ustrip(u, r) * l)
+end
 
 proportions(t::MatrixExponentialTransiogram) = Tuple(normalize(diag(t(100range(t))), 1))
 

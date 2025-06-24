@@ -78,6 +78,7 @@ Base.range(t::PiecewiseLinearTransiogram) = maximum(meanlengths(t))
 scale(t::PiecewiseLinearTransiogram, s::Real) = PiecewiseLinearTransiogram(s * t.ball, t.abscissas, t.ordinates)
 
 function meanlengths(t::PiecewiseLinearTransiogram)
+  r = maximum(radii(t.ball))
   h₁ = t.abscissas[1]
   h₂ = t.abscissas[2]
   t₁ = diag(t.ordinates[1])
@@ -85,8 +86,8 @@ function meanlengths(t::PiecewiseLinearTransiogram)
   a = (t₂ - t₁) / (h₂ - h₁)
   b = t₁ - h₁ * a
   l = -(b ./ a)
-  r = ustrip(maximum(radii(t.ball)))
-  Tuple(l .* r)
+  u = unit(eltype(l))
+  Tuple(ustrip(u, r) * l)
 end
 
 proportions(t::PiecewiseLinearTransiogram) = Tuple(diag(last(t.ordinates)))
