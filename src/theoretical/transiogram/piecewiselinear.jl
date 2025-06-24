@@ -93,15 +93,23 @@ end
 proportions(t::PiecewiseLinearTransiogram) = Tuple(diag(last(t.ordinates)))
 
 function (t::PiecewiseLinearTransiogram)(h)
-  h′ = aslen(h)
+  # abscissas and ordinates
   hs = t.abscissas
-  if h′ < first(hs) # left extrapolation
-    ((first(hs) - h′) * I + h′ * first(t.ordinates)) / first(hs)
-  elseif h′ ≥ last(hs) # right extrapolation
-    last(t.ordinates)
+  ts = t.ordinates
+
+  # normalize lag distance
+  r = radius(t.ball)
+  h′, r′ = unitless(h, r)
+  h̄ = (h′ / r′) * unit(r)
+
+  # piecewise interpolation
+  if h̄ < first(hs) # left extrapolation
+    ((first(hs) - h̄) * I + h̄ * first(ts)) / first(hs)
+  elseif h̄ ≥ last(hs) # right extrapolation
+    last(ts)
   else # middle interpolation
-    k = findlast(≤(h′), hs)
-    ((hs[k + 1] - h′) * t.ordinates[k] + (h′ - hs[k]) * t.ordinates[k + 1]) / (hs[k + 1] - hs[k])
+    k = findlast(≤(h̄), hs)
+    ((hs[k + 1] - h̄) * ts[k] + (h̄ - hs[k]) * ts[k + 1]) / (hs[k + 1] - hs[k])
   end
 end
 
