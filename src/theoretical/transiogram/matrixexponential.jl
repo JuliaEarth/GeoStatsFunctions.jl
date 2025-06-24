@@ -32,6 +32,8 @@ MatrixExponentialTransiogram(lengths=(3.0, 2.0, 1.0), proportions=(1/3, 1/3, 1/3
 MatrixExponentialTransiogram(ranges=(2.0, 1.0))
 ```
 
+See also [`CarleTransiogram`](@ref).
+
 ## References
 
 * Carle, S.F. & Fogg, G.E. 1996. [Transition probability-based
