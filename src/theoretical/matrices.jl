@@ -33,6 +33,6 @@ function baseratematrix(l, p)
     throw(ArgumentError("proportions must add up to unit"))
   end
 
-  # Eq. 17 and 18 of Carle et al 1998.
+  # Eq. 17 and 18 of Carle et al 1998
   SMatrix{nₗ,nₗ}(i == j ? -1 / lᵤ[i] : (p[j] / (1 - p[i])) / lᵤ[i] for i in 1:nₗ, j in 1:nₗ)
 end

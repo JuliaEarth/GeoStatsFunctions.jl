@@ -55,10 +55,10 @@ CarleTransiogram(rates::AbstractMatrix...) = CarleTransiogram(rates)
 constructor(::CarleTransiogram) = CarleTransiogram
 
 function isisotropic(t::CarleTransiogram)
-  R̃ = t.rates
-  N = length(R̃)
+  R = t.rates
+  N = length(R)
   l = ntuple(N) do i
-    1 ./ -diag(R̃[i])
+    1 ./ -diag(R[i])
   end
   allequal(l)
 end
@@ -70,10 +70,10 @@ Base.range(t::CarleTransiogram) = maximum(meanlengths(t))
 scale(t::CarleTransiogram, s::Real) = CarleTransiogram(ntuple(i -> t.rates[i] / s, length(t.rates)))
 
 function meanlengths(t::CarleTransiogram)
-  R̃ = t.rates
-  N = length(R̃)
+  R = t.rates
+  N = length(R)
   l = ntuple(N) do i
-    1 ./ -diag(R̃[i])
+    1 ./ -diag(R[i])
   end
   Tuple(max.(l...))
 end
@@ -81,21 +81,30 @@ end
 proportions(t::CarleTransiogram) = Tuple(normalize(diag(t(100range(t))), 1))
 
 function (t::CarleTransiogram)(p₁::Point, p₂::Point)
+  # lag vector and norm
   h⃗ = p₂ - p₁
   h = norm(h⃗)
-  R̃ = t.rates
-  k = size(first(R̃), 1)
+
+  # number of levels and proportions
+  R = t.rates
+  k = size(first(R), 1)
+  p = diag(exp(100h * first(R)))
 
   # handle corner case 
   iszero(h) && return SMatrix{k,k}(one(h) * I(k))
 
-  # rate matrix along direction h⃗
-  r(i, j) = √sum(abs2, h⃗[n] * R̃[n][i, j] for n in eachindex(h⃗))
-  R = SMatrix{k,k}(r(i, j) for i in 1:k, j in 1:k) / h
+  # Eq. 22 of Carle et al 1998
+  w(i, j, n) = h⃗[n] ≥ zero(h⃗[n]) ? R[n][i, j] : (p[j] / p[i]) * R[n][j, i]
+  r(i, j) = √sum(abs2, h⃗[n] * w(i, j, n) for n in eachindex(h⃗))
 
-  # normalized transition matrix
-  T = exp(h * R)
-  T ./ sum(T, dims=2)
+  # Eq. 20 and 21 of Carle et al 1998
+  A = SMatrix{k-1,k-1}(i == j ? -r(i, j) : r(i, j) for i in 1:k-1, j in 1:k-1) / h
+  b = -sum(p[1:k-1] .* A, dims=1) / p[k]
+  c = -sum([A; b], dims=2)
+  Rₕ = [[A; b] c]
+
+  # transition matrix
+  exp(h * Rₕ)
 end
 
 function (t::CarleTransiogram)(h)
