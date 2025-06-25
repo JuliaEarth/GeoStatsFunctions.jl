@@ -62,6 +62,11 @@ end
 
 CarleTransiogram(rates::AbstractMatrix...) = CarleTransiogram(rates)
 
+function CarleTransiogram()
+  R = baseratematrix((1.0, 1.0), (0.5, 0.5))
+  CarleTransiogram(R, R, R)
+end
+
 constructor(::CarleTransiogram) = CarleTransiogram
 
 function isisotropic(t::CarleTransiogram)

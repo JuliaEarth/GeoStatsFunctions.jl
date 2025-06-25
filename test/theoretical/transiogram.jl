@@ -199,4 +199,10 @@ end
   @test range(τ) == 30.0u"m"
   @test τ(Point(0, 0), Point(0, 0)) == 1.0 * I(3)
   @test τ(Point(0, 0), Point(1, 0)) != τ(Point(0, 0), Point(0, 1))
+
+  # default 3D isotropic model
+  τ = CarleTransiogram()
+  @test isisotropic(τ)
+  @test meanlengths(τ) == (1.0u"m", 1.0u"m")
+  @test proportions(τ) == (0.5, 0.5)
 end
