@@ -98,8 +98,8 @@ function (t::CarleTransiogram)(p₁::Point, p₂::Point)
   r(i, j) = √sum(abs2, h⃗[n] * w(i, j, n) for n in eachindex(h⃗))
 
   # Eq. 20 and 21 of Carle et al 1998
-  A = SMatrix{k-1,k-1}(i == j ? -r(i, j) : r(i, j) for i in 1:k-1, j in 1:k-1) / h
-  b = -sum(p[1:k-1] .* A, dims=1) / p[k]
+  A = SMatrix{k - 1,k - 1}(i == j ? -r(i, j) : r(i, j) for i in 1:(k - 1), j in 1:(k - 1)) / h
+  b = -sum(p[1:(k - 1)] .* A, dims=1) / p[k]
   c = -sum([A; b], dims=2)
   Rₕ = [[A; b] c]
 
