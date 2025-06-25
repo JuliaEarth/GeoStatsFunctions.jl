@@ -94,8 +94,8 @@ function (t::CarleTransiogram)(p₁::Point, p₂::Point)
   iszero(h) && return SMatrix{k,k}(one(h) * I(k))
 
   # Eq. 22 of Carle et al 1998
-  w(i, j, n) = h⃗[n] ≥ zero(h⃗[n]) ? R[n][i, j] : (p[j] / p[i]) * R[n][j, i]
-  r(i, j) = √sum(abs2, h⃗[n] * w(i, j, n) for n in eachindex(h⃗))
+  w(i, j, d) = h⃗[d] ≥ zero(h⃗[d]) ? R[d][i, j] : (p[j] / p[i]) * R[d][j, i]
+  r(i, j) = √sum(abs2, h⃗[d] * w(i, j, d) for d in eachindex(h⃗))
 
   # Eq. 20 and 21 of Carle et al 1998
   A = SMatrix{k - 1,k - 1}(i == j ? -r(i, j) : r(i, j) for i in 1:(k - 1), j in 1:(k - 1)) / h
