@@ -31,13 +31,12 @@ function surfplot!(
 )
   # auxiliary parameters
   n = nvariates(f)
-  b = metricball(f)
-  r = radii(b)
-  U = eltype(r)
+  m = _ncoords(f)
+  U = typeof(range(f))
 
   # basis for plane
   if isnothing(normal)
-    if length(r) == 3
+    if m == 3
       d = 3
       u⃗ = Vec(U(1), U(0), U(0))
       v⃗ = Vec(U(0), U(1), U(0))
@@ -49,7 +48,6 @@ function surfplot!(
   else
     n⃗ = Vec(normal)
     d = length(n⃗)
-    m = length(r)
     @assert d == m "normal vector is not compatible with given function"
     @assert d == 3 "normal vector must have 3 coordinates"
     u⃗, v⃗ = householderbasis(n⃗)
@@ -95,6 +93,9 @@ function surfplot!(
   end
   fig
 end
+
+_ncoords(f) = length(radii(metricball(f)))
+_ncoords(::CarleTransiogram{N}) where {N} = N
 
 function surfplot!(
   fig::Makie.Figure,
