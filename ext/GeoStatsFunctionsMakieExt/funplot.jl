@@ -115,17 +115,16 @@ function _anisobasis(f)
   p, v
 end
 
-function _anisobasis(f::CarleTransiogram)
+function _anisobasis(f::CarleTransiogram{N}) where {N}
   # auxiliary parameters
-  d = length(f.rates)
   U = typeof(range(f))
 
   # reference point
-  p = Point(ntuple(i -> U(0), d))
+  p = Point(ntuple(i -> U(0), N))
 
   # axis-aligned basis
-  v = ntuple(d) do j
-    Vec(ntuple(i -> U(i == j), d))
+  v = ntuple(N) do j
+    Vec(ntuple(i -> U(i == j), N))
   end
 
   p, v
