@@ -34,20 +34,30 @@ See also [`MatrixExponentialTransiogram`](@ref).
 * Carle et al 1998. [Conditional Simulation of Hydrofacies Architecture:
   A Transition Probability/Markov Approach](https://doi.org/10.2110/sepmcheg.01.147)
 """
-struct CarleTransiogram{N,R<:StaticMatrix} <: Transiogram
+struct CarleTransiogram{N,R<:StaticMatrix,P<:NTuple} <: Transiogram
   rates::NTuple{N,R}
+  proportions::P
 
-  function CarleTransiogram{N,R}(rates) where {N,R<:StaticMatrix}
+  function CarleTransiogram{N,R,P}(rates, proportions) where {N,R<:StaticMatrix,P<:NTuple}
     @assert allequal(size(rate) for rate in rates) "transition rate matrices must have equal size"
     @assert allequal(size(first(rates))) "transition rate matrices must be square"
-    new(rates)
+    @assert all(p -> 0 ≤ p ≤ 1, proportions) "proportions must be in [0, 1] interval"
+    @assert sum(proportions) ≈ 1 "proportions must sum up to one"
+    new(rates, proportions)
   end
 end
 
 function CarleTransiogram(rates::Tuple)
+  # convert rates to unitful static matrices
   srates = ntuple(i -> SMatrix{size(rates[i])...}(rates[i]), length(rates))
   urates = ntuple(i -> asinvlen.(srates[i]), length(srates))
-  CarleTransiogram{length(urates),eltype(urates)}(urates)
+
+  # proportions from first rate matrix
+  R = first(urates)
+  r = maximum(1 ./ -diag(R))
+  props = Tuple(diag(exp(100r * R)))
+
+  CarleTransiogram{length(urates),eltype(urates),typeof(props)}(urates, props)
 end
 
 CarleTransiogram(rates::AbstractMatrix...) = CarleTransiogram(rates)
@@ -78,7 +88,7 @@ function meanlengths(t::CarleTransiogram)
   Tuple(max.(l...))
 end
 
-proportions(t::CarleTransiogram) = Tuple(normalize(diag(t(100range(t))), 1))
+proportions(t::CarleTransiogram) = t.proportions
 
 function (t::CarleTransiogram)(p₁::Point, p₂::Point)
   # lag vector and norm
@@ -88,17 +98,17 @@ function (t::CarleTransiogram)(p₁::Point, p₂::Point)
   # number of levels and proportions
   R = t.rates
   k = size(first(R), 1)
-  p = diag(exp(100h * first(R)))
+  p = t.proportions
 
   # handle corner case 
   iszero(h) && return SMatrix{k,k}(one(h) * I(k))
 
   # Eq. 22 of Carle et al 1998
   w(i, j, d) = h⃗[d] ≥ zero(h⃗[d]) ? R[d][i, j] : (p[j] / p[i]) * R[d][j, i]
-  r(i, j) = √sum(abs2, h⃗[d] * w(i, j, d) for d in eachindex(h⃗))
+  r(i, j) = ((i == j) ? -1 : 1) * √sum(abs2, h⃗[d] * w(i, j, d) for d in eachindex(h⃗))
 
   # Eq. 20 and 21 of Carle et al 1998
-  A = SMatrix{k - 1,k - 1}(i == j ? -r(i, j) : r(i, j) for i in 1:(k - 1), j in 1:(k - 1)) / h
+  A = SMatrix{k - 1,k - 1}(r(i, j) for i in 1:(k - 1), j in 1:(k - 1)) / h
   b = -sum(p[1:(k - 1)] .* A, dims=1) / p[k]
   c = -sum([A; b], dims=2)
   Rₕ = [[A; b] c]
@@ -108,9 +118,9 @@ function (t::CarleTransiogram)(p₁::Point, p₂::Point)
 end
 
 function (t::CarleTransiogram)(h)
-  R̃ = t.rates
-  N = length(R̃)
-  j = argmax(i -> maximum(1 ./ -diag(R̃[i])), 1:N)
+  R = t.rates
+  N = length(R)
+  j = argmax(i -> maximum(1 ./ -diag(R[i])), 1:N)
   p₁ = Point(ntuple(i -> zero(h), N))
   p₂ = Point(ntuple(i -> i == j ? h : zero(h), N))
   t(p₁, p₂)
