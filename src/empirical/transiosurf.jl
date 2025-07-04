@@ -35,7 +35,7 @@ function EmpiricalTransiogramSurface(
   @assert nangs > 1 "nangs must be greater than one"
 
   # deterministic results
-  rng = MersenneTwister(123)
+  rng = Xoshiro(123)
 
   Dim = embeddim(domain(data))
 
