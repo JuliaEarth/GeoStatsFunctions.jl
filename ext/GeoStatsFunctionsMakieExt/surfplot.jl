@@ -89,7 +89,7 @@ function surfplot!(
   for i in 1:n, j in 1:n
     ax = fig.content[I[j, i]]
     Zᵢⱼ = getindex.(Z, i, j)
-    Makie.surface!(ax, θs, ustrip.(rs), ustrip.(Zᵢⱼ), colormap=colormap, shading=Makie.NoShading)
+    Makie.surface!(ax, θs, ustrip.(rs), ustrip.(Zᵢⱼ), colormap=colormap, shading=false)
   end
   fig
 end
@@ -149,7 +149,7 @@ function surfplot!(
     # transpose for plotting
     Z = transpose(Z)
 
-    Makie.surface!(ax, θs, ustrip.(rs), ustrip.(Z), colormap=colormap, shading=Makie.NoShading)
+    Makie.surface!(ax, θs, ustrip.(rs), ustrip.(Z), colormap=colormap, shading=false)
   end
   fig
 end
