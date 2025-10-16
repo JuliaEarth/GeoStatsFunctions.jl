@@ -182,7 +182,7 @@ function funplot!(
 
     # visualize text counts
     if showtext
-      Makie.text!(ax, hs, fs, text=string.(ns), fontsize=textsize)
+      Makie.annotation!(ax, hs, fs, text=string.(ns), fontsize=textsize)
     end
   end
   fig
