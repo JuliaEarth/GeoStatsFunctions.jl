@@ -27,7 +27,7 @@ function funplot!(
   maxlag=nothing
 )
   # maximum lag
-  hmax = isnothing(maxlag) ? _maxlag(f) : _addunit(maxlag, u"m")
+  hmax = isnothing(maxlag) ? _maxlag(f) : GeoStatsFunctions.aslen(maxlag)
 
   # lag range starting at 1e-6 to avoid nugget artifact
   hs = range(1e-6 * oneunit(hmax), stop=hmax, length=100)
@@ -159,7 +159,7 @@ function funplot!(
     ns = f.counts
 
     # retrieve maximum lag
-    hmax = isnothing(maxlag) ? _maxlag(f) : _addunit(maxlag, u"m")
+    hmax = isnothing(maxlag) ? _maxlag(f) : GeoStatsFunctions.aslen(maxlag)
 
     # discard empty bins
     hs = hs[ns .> 0]

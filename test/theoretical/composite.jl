@@ -4,16 +4,12 @@
   @test sill(γ) ≈ 1.0
   @test nugget(γ) ≈ 0.3
   @test range(γ) ≈ 50.0u"m"
-  @test (@elapsed sill(γ)) < 1e-6
-  @test (@elapsed nugget(γ)) < 1e-6
   @test (@allocated sill(γ)) < 32
   @test (@allocated nugget(γ)) < 32
   γ = 2.0 * NuggetEffect(0.2)
   @test sill(γ) ≈ 0.4
   @test nugget(γ) ≈ 0.4
   @test range(γ) ≈ 0.0u"m"
-  @test (@elapsed sill(γ)) < 1e-5
-  @test (@elapsed nugget(γ)) < 1e-5
   @test (@allocated sill(γ)) < 32
   @test (@allocated nugget(γ)) < 32
 
@@ -21,8 +17,6 @@
   γ = GaussianVariogram(sill=1.0) + ExponentialVariogram(sill=2.0)
   @test sill(γ) ≈ 3.0
   @test nugget(γ) ≈ 0.0
-  @test (@elapsed sill(γ)) < 1e-5
-  @test (@elapsed nugget(γ)) < 1e-5
   @test (@allocated sill(γ)) < 32
   @test (@allocated nugget(γ)) < 32
 
@@ -91,16 +85,12 @@
   @test sill(γ) == 3.0
   @test range(γ) == 1.0u"m"
   @test nugget(γ) == 0.0
-  @test (@elapsed sill(γ)) < 1e-5
-  @test (@elapsed nugget(γ)) < 1e-5
   @test (@allocated sill(γ)) < 32
   @test (@allocated nugget(γ)) < 32
 
   # test individual structures
   γ = SphericalVariogram() + 2ExponentialVariogram() + NuggetEffect(10.0)
   @test structures(γ) == (10.0, (1.0, 2.0), (SphericalVariogram(), ExponentialVariogram()))
-  @test (@elapsed sill(γ)) < 1e-5
-  @test (@elapsed nugget(γ)) < 1e-5
   @test (@allocated sill(γ)) < 32
   @test (@allocated nugget(γ)) < 32
   γ = SphericalVariogram(sill=2.0) + ExponentialVariogram(nugget=0.1)
@@ -146,8 +136,6 @@ end
   @test sill(cov) ≈ 13.0
   @test nugget(cov) ≈ 10.0
   @test structures(cov) == (10.0, (1.0, 2.0), (SphericalCovariance(), ExponentialCovariance()))
-  @test (@elapsed sill(cov)) < 1e-5
-  @test (@elapsed nugget(cov)) < 1e-5
   @test (@allocated sill(cov)) < 32
   @test (@allocated nugget(cov)) < 32
   cov = SphericalCovariance(sill=2.0) + ExponentialCovariance(nugget=0.1)

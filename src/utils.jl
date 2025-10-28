@@ -13,9 +13,6 @@ asinvlen(x::Number) = x * u"m^-1"
 asinvlen(x::InvLen) = x
 asinvlen(::Quantity) = throw(ArgumentError("invalid units, please check the documentation"))
 
-addunit(x::Number, u) = x * u
-addunit(::Quantity, _) = throw(ArgumentError("invalid units, please check the documentation"))
-
 unitless(a::Number, b::Quantity) = a, ustrip(b)
 function unitless(a::Quantity, b::Quantity)
   u = Unitful.promote_unit(unit(a), unit(b))

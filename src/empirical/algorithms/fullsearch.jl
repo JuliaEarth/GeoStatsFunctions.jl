@@ -15,7 +15,7 @@ struct FullSearchAccum{ℒ<:Len,D} <: AccumAlgo
   FullSearchAccum(nlags, maxlag::ℒ, distance::D) where {ℒ<:Len,D} = new{float(ℒ),D}(nlags, maxlag, distance)
 end
 
-FullSearchAccum(nlags, maxlag, distance) = FullSearchAccum(nlags, addunit(maxlag, u"m"), distance)
+FullSearchAccum(nlags, maxlag, distance) = FullSearchAccum(nlags, aslen(maxlag), distance)
 
 neighfun(::FullSearchAccum, pset) = j -> (j + 1):nelements(pset)
 

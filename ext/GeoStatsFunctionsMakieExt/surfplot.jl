@@ -60,7 +60,7 @@ function surfplot!(
   dir(θ) = cos(θ) * u⃗ + sin(θ) * v⃗
 
   # maximum lag
-  hmax = isnothing(maxlag) ? _maxlag(f) : _addunit(maxlag, u"m")
+  hmax = isnothing(maxlag) ? _maxlag(f) : GeoStatsFunctions.aslen(maxlag)
 
   # polar radius
   rs = range(1e-6 * oneunit(hmax), stop=hmax, length=nlags)
@@ -117,7 +117,7 @@ function surfplot!(
   zs = f.zs
 
   # maximum lag
-  hmax = isnothing(maxlag) ? _maxlag(f) : _addunit(maxlag, u"m")
+  hmax = isnothing(maxlag) ? _maxlag(f) : GeoStatsFunctions.aslen(maxlag)
 
   # exploit symmetry
   if issymmetric(f)

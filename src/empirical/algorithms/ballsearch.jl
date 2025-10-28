@@ -15,7 +15,7 @@ struct BallSearchAccum{ℒ<:Len,D} <: AccumAlgo
   BallSearchAccum(nlags, maxlag::ℒ, distance::D) where {ℒ<:Len,D} = new{float(ℒ),D}(nlags, maxlag, distance)
 end
 
-BallSearchAccum(nlags, maxlag, distance) = BallSearchAccum(nlags, addunit(maxlag, u"m"), distance)
+BallSearchAccum(nlags, maxlag, distance) = BallSearchAccum(nlags, aslen(maxlag), distance)
 
 function neighfun(algo::BallSearchAccum, pset)
   ball = MetricBall(algo.maxlag, algo.distance)
