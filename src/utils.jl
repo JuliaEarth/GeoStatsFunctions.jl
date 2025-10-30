@@ -5,13 +5,13 @@
 const Len{T} = Quantity{T,u"𝐋"}
 const InvLen{T} = Quantity{T,u"𝐋^-1"}
 
-aslen(x::Number) = x * u"m"
 aslen(x::Len) = x
-aslen(::Quantity) = throw(ArgumentError("invalid units, please check the documentation"))
+aslen(x::Number) = x * u"m"
+aslen(::Quantity) = throw(ArgumentError("invalid length unit"))
 
-asinvlen(x::Number) = x * u"m^-1"
 asinvlen(x::InvLen) = x
-asinvlen(::Quantity) = throw(ArgumentError("invalid units, please check the documentation"))
+asinvlen(x::Number) = x * u"m^-1"
+asinvlen(::Quantity) = throw(ArgumentError("invalid length unit"))
 
 unitless(a::Number, b::Quantity) = a, ustrip(b)
 function unitless(a::Quantity, b::Quantity)
