@@ -46,6 +46,34 @@ include("plotting.jl")
 
 include("precompile.jl")
 
+function __init__()
+  # register error hint for visualization functions
+  # since this is a recurring issue for new users
+  Base.Experimental.register_error_hint(MethodError) do io, exc, argtypes, kwargs
+    if exc.f == funplot || exc.f == funplot! || exc.f == surfplot || exc.f == surfplot!
+      if isnothing(Base.get_extension(GeoStatsFunctions, :GeoStatsFunctionsMakieExt))
+        print(
+          io,
+          """
+
+          Did you import a Makie.jl backend (e.g., GLMakie.jl, CairoMakie.jl) for visualization?
+
+          """
+        )
+        printstyled(
+          io,
+          """
+          julia> using GeoStatsFunctions
+          julia> import GLMakie # or CairoMakie, WGLMakie, etc.
+          """,
+          color=:cyan,
+          bold=true
+        )
+      end
+    end
+  end
+end
+
 export
   # empirical functions
   EmpiricalGeoStatsFunction,
