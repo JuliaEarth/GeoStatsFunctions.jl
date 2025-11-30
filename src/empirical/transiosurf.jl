@@ -46,7 +46,7 @@ function EmpiricalTransiogramSurface(
   elseif Dim == 3
     subset = partition(rng, data, PlanePartition(normal; tol=ptol))
     planes = collect(subset)
-    u, v = householderbasis(normal)
+    u, v = Meshes.householderbasis(normal)
   else
     throw(ArgumentError("transiogram surface only supported in 2D or 3D"))
   end

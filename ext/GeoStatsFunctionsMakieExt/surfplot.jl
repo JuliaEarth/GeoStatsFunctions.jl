@@ -50,7 +50,7 @@ function surfplot!(
     d = length(n⃗)
     @assert d == m "normal vector is not compatible with given function"
     @assert d == 3 "normal vector must have 3 coordinates"
-    u⃗, v⃗ = householderbasis(n⃗)
+    u⃗, v⃗ = Meshes.householderbasis(n⃗)
   end
 
   # reference point
