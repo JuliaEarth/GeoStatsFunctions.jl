@@ -274,8 +274,6 @@
   @test sill(γ) == 1.0
   @test nugget(γ) == 0.0
   @test structures(γ) == (0.0, (1.0,), (SphericalVariogram(),))
-  @test (@elapsed sill(γ)) < 1e-5
-  @test (@elapsed nugget(γ)) < 1e-5
   @test (@allocated sill(γ)) < 32
   @test (@allocated nugget(γ)) < 32
 

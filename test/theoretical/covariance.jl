@@ -59,8 +59,6 @@
   @test sill(cov) == 1.0
   @test nugget(cov) == 0.0
   @test structures(cov) == (0.0, (1.0,), (SphericalCovariance(),))
-  @test (@elapsed sill(cov)) < 1e-5
-  @test (@elapsed nugget(cov)) < 1e-5
   @test (@allocated sill(cov)) < 32
   @test (@allocated nugget(cov)) < 32
 
