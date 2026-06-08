@@ -132,7 +132,7 @@ _ustrip(u, x::Quantity) = ustrip(u, x)
 _weights(f, x, n) = isnothing(f) ? n / sum(n) : map(xᵢ -> ustrip(f(xᵢ)), x)
 
 function _optimize(J, L, λ, l, u, θₒ)
-  s = Optim.optimize(θ -> J(θ) + λ * L(θ), l, u, θₒ)
+  s = Optim.optimize(θ -> J(θ) + λ * L(θ), l, u, θₒ, LBFGSB())
   ϵ = Optim.minimum(s)
   θ = Optim.minimizer(s)
   θ, ϵ
