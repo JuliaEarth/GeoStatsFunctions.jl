@@ -2,33 +2,24 @@
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
 
-function surfplot(gp::GridPos, f; labels=nothing, kwargs...)
+function surfplot(f; labels=nothing, kwargs...)
   # variable names
   n = nvariates(f)
   l = isnothing(labels) ? (1:n) : labels
 
-  layout = get_layout(gp)
-
-  # initialize polar axis grid
+  # initialize figure
+  fig = Makie.Figure()
   for i in 1:n, j in 1:n
     title = n > 1 ? "$(l[i]) → $(l[j])" : ""
-    Makie.PolarAxis(layout[i, j], title=title)
+    ax = Makie.PolarAxis(fig[i, j], title=title)
   end
 
   # fill figure with plots
-  surfplot!(gp, f; kwargs...)
-
-  gp
-end
-
-function surfplot(f; figure=(;), kwargs...)
-  fig = Makie.Figure(; figure...)
-  surfplot(fig, f; kwargs...)
-  fig
+  surfplot!(fig, f; kwargs...)
 end
 
 function surfplot!(
-  gp::GridPos,
+  fig::Makie.Figure,
   f::GeoStatsFunction;
   # common options
   colormap=:viridis,
@@ -94,20 +85,20 @@ function surfplot!(
   rs = [zero(eltype(rs)); rs]
   Z = [Z[:, 1:1] Z]
 
-  layout = get_layout(gp)
+  I = LinearIndices((n, n))
   for i in 1:n, j in 1:n
-    ax = Makie.content(layout[i, j])
+    ax = fig.content[I[j, i]]
     Zᵢⱼ = getindex.(Z, i, j)
     Makie.surface!(ax, θs, ustrip.(rs), ustrip.(Zᵢⱼ), colormap=colormap, shading=false)
   end
-  gp
+  fig
 end
 
 _ncoords(f) = length(radii(metricball(f)))
 _ncoords(::CarleTransiogram{N}) where {N} = N
 
 function surfplot!(
-  gp::GridPos,
+  fig::Makie.Figure,
   f::EmpiricalGeoStatsSurface;
   # common options
   colormap=:viridis,
@@ -141,9 +132,9 @@ function surfplot!(
   # hide hole at center
   rs = [zero(eltype(rs)); rs]
 
-  layout = get_layout(gp)
+  I = LinearIndices((n, n))
   for i in 1:n, j in 1:n
-    ax = Makie.content(layout[i, j])
+    ax = fig.content[I[j, i]]
 
     # values in matrix form
     Zᵢⱼ = _istransiogram(f) ? getindex.(zs, i, j) : zs
@@ -160,5 +151,5 @@ function surfplot!(
 
     Makie.surface!(ax, θs, ustrip.(rs), ustrip.(Z), colormap=colormap, shading=false)
   end
-  gp
+  fig
 end
