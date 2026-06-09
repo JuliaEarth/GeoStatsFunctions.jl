@@ -14,8 +14,8 @@ import Makie
 import GeoStatsFunctions: funplot, funplot!
 import GeoStatsFunctions: surfplot, surfplot!
 
+include("utils.jl")
 include("funplot.jl")
 include("surfplot.jl")
-include("utils.jl")
 
 end

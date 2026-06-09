@@ -14,3 +14,18 @@ _istransiogram(f) = false
 _istransiogram(t::Transiogram) = true
 _istransiogram(t::EmpiricalTransiogram) = true
 _istransiogram(t::EmpiricalTransiogramSurface) = true
+
+const GridPos = Union{Makie.Figure, Makie.GridLayout, Makie.GridPosition, Makie.GridSubposition}
+
+function get_layout(gp::Makie.Figure)
+  gp.layout
+end
+
+function get_layout(gp::Makie.GridLayout)
+  gp
+end
+
+function get_layout(gp::Union{Makie.GridPosition, Makie.GridSubposition})
+  Makie.GridLayout(gp)
+end
+

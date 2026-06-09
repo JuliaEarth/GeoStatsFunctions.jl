@@ -2,24 +2,33 @@
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
 
-function funplot(f; labels=nothing, kwargs...)
+function funplot(gp::GridPos, f; labels=nothing, kwargs...)
   # variable names
   n = nvariates(f)
   l = isnothing(labels) ? (1:n) : labels
 
-  # initialize figure
-  fig = Makie.Figure()
+  layout = get_layout(gp)
+
+  # initialize axis grid
   for i in 1:n, j in 1:n
     title = n > 1 ? "$(l[i]) → $(l[j])" : ""
-    Makie.Axis(fig[i, j], title=title)
+    Makie.Axis(layout[i, j], title=title)
   end
 
   # fill figure with plots
-  funplot!(fig, f; kwargs...)
+  funplot!(gp, f; kwargs...)
+
+  gp
+end
+
+function funplot(f; figure=(;), kwargs...)
+  fig = Makie.Figure(; figure...)
+  funplot(fig, f; kwargs...)
+  fig
 end
 
 function funplot!(
-  fig::Makie.Figure,
+  gp::GridPos,
   f::GeoStatsFunction;
   # common options
   color=:teal,
@@ -46,9 +55,9 @@ function funplot!(
   # add plots to axes
   d = length(F)
   n = nvariates(f)
-  I = LinearIndices((n, n))
+  layout = get_layout(gp)
   for i in 1:n, j in 1:n
-    ax = fig.content[I[j, i]]
+    ax = Makie.content(layout[i, j])
     for (k, Fₖ) in enumerate(F)
       # display function
       Makie.lines!(ax, hs, Fₖ[i, j], color=color, linewidth=size, linestyle=style[k], label=label[k])
@@ -64,7 +73,7 @@ function funplot!(
     position = (i == j) && isbanded(f) ? :rt : :rb
     d > 1 && Makie.axislegend(ax, position=position)
   end
-  fig
+  gp
 end
 
 _eval(f, hs) = isisotropic(f) ? _isoeval(f, hs) : _anisoeval(f, hs)
@@ -131,7 +140,7 @@ function _anisobasis(f::CarleTransiogram{N}) where {N}
 end
 
 function funplot!(
-  fig::Makie.Figure,
+  gp::GridPos,
   f::EmpiricalGeoStatsFunction;
   # common options
   color=:slategray,
@@ -147,11 +156,11 @@ function funplot!(
 )
   # number of variables
   n = nvariates(f)
-  I = LinearIndices((n, n))
+  layout = get_layout(gp)
 
   # add plots to axes
   for i in 1:n, j in 1:n
-    ax = fig.content[I[j, i]]
+    ax = Makie.content(layout[i, j])
 
     # retrieve coordinates and counts
     hs = f.abscissas
@@ -185,5 +194,6 @@ function funplot!(
       Makie.annotation!(ax, hs, fs, text=string.(ns), fontsize=textsize)
     end
   end
-  fig
+  gp
 end
+
