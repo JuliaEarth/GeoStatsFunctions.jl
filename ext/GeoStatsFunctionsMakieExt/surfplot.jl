@@ -6,20 +6,34 @@ function surfplot(f; labels=nothing, kwargs...)
   # variable names
   n = nvariates(f)
   l = isnothing(labels) ? (1:n) : labels
-
   # initialize figure
   fig = Makie.Figure()
   for i in 1:n, j in 1:n
     title = n > 1 ? "$(l[i]) → $(l[j])" : ""
-    ax = Makie.PolarAxis(fig[i, j], title=title)
+    Makie.PolarAxis(fig[i, j], title=title)
   end
-
   # fill figure with plots
-  surfplot!(fig, f; kwargs...)
+  surfplot!(fig.layout, f; kwargs...)
+  fig
+end
+
+function surfplot(pos, f; labels=nothing, kwargs...)
+  # variable names
+  n = nvariates(f)
+  l = isnothing(labels) ? (1:n) : labels
+  # initialize figure
+  layout = _layout(pos)
+  for i in 1:n, j in 1:n
+    title = n > 1 ? "$(l[i]) → $(l[j])" : ""
+    Makie.PolarAxis(layout[i, j], title=title)
+  end
+  # fill figure with plots
+  surfplot!(layout, f; kwargs...)
+  pos
 end
 
 function surfplot!(
-  fig::Makie.Figure,
+  layout::Makie.GridLayout,
   f::GeoStatsFunction;
   # common options
   colormap=:viridis,
@@ -85,20 +99,19 @@ function surfplot!(
   rs = [zero(eltype(rs)); rs]
   Z = [Z[:, 1:1] Z]
 
-  I = LinearIndices((n, n))
   for i in 1:n, j in 1:n
-    ax = fig.content[I[j, i]]
+    ax = Makie.content(layout[i, j])
     Zᵢⱼ = getindex.(Z, i, j)
     Makie.surface!(ax, θs, ustrip.(rs), ustrip.(Zᵢⱼ), colormap=colormap, shading=false)
   end
-  fig
+  layout
 end
 
 _ncoords(f) = length(radii(metricball(f)))
 _ncoords(::CarleTransiogram{N}) where {N} = N
 
 function surfplot!(
-  fig::Makie.Figure,
+  layout::Makie.GridLayout,
   f::EmpiricalGeoStatsSurface;
   # common options
   colormap=:viridis,
@@ -132,9 +145,8 @@ function surfplot!(
   # hide hole at center
   rs = [zero(eltype(rs)); rs]
 
-  I = LinearIndices((n, n))
   for i in 1:n, j in 1:n
-    ax = fig.content[I[j, i]]
+    ax = Makie.content(layout[i, j])
 
     # values in matrix form
     Zᵢⱼ = _istransiogram(f) ? getindex.(zs, i, j) : zs
@@ -151,5 +163,5 @@ function surfplot!(
 
     Makie.surface!(ax, θs, ustrip.(rs), ustrip.(Z), colormap=colormap, shading=false)
   end
-  fig
+  layout
 end

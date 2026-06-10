@@ -13,27 +13,27 @@ function funplot(f; labels=nothing, kwargs...)
     Makie.Axis(fig[i, j], title=title)
   end
   # fill figure with plots
-  funplot!(fig, f; kwargs...)
+  funplot!(fig.layout, f; kwargs...)
   fig
 end
 
-function funplot(gp::GridPos, f; labels=nothing, kwargs...)
+function funplot(pos, f; labels=nothing, kwargs...)
   # variable names
   n = nvariates(f)
   l = isnothing(labels) ? (1:n) : labels
   # initialize figure
-  layout = _layout(gp)
+  layout = _layout(pos)
   for i in 1:n, j in 1:n
     title = n > 1 ? "$(l[i]) → $(l[j])" : ""
     Makie.Axis(layout[i, j], title=title)
   end
   # fill figure with plots
   funplot!(layout, f; kwargs...)
-  gp
+  pos
 end
 
 function funplot!(
-  layout::Union{Makie.Figure, Makie.GridLayout},
+  layout::Makie.GridLayout,
   f::GeoStatsFunction;
   # common options
   color=:teal,
@@ -55,10 +55,8 @@ function funplot!(
   # add plots to axes
   d = length(F)
   n = nvariates(f)
-  gl = layout isa Makie.Figure ? layout.layout : layout
-  I = LinearIndices((n, n))
   for i in 1:n, j in 1:n
-    ax = gl.content[I[j, i]].content
+    ax = Makie.content(layout[i, j])
     for (k, Fₖ) in enumerate(F)
       Makie.lines!(ax, hs, Fₖ[i, j], color=color, linewidth=size, linestyle=style[k], label=label[k])
       if _istransiogram(f)
@@ -115,7 +113,7 @@ function _anisobasis(f::CarleTransiogram{N}) where {N}
 end
 
 function funplot!(
-  layout::Union{Makie.Figure, Makie.GridLayout},
+  layout::Makie.GridLayout,
   f::EmpiricalGeoStatsFunction;
   # common options
   color=:slategray,
@@ -128,17 +126,23 @@ function funplot!(
   showhist=true,
   histcolor=:slategray
 )
+  # number of variables
   n = nvariates(f)
-  gl = layout isa Makie.Figure ? layout.layout : layout
-  I = LinearIndices((n, n))
+  # add plots to axes
   for i in 1:n, j in 1:n
-    ax = gl.content[I[j, i]].content
+    ax = Makie.content(layout[i, j])
+    # retrieve coordinates and counts
     hs = f.abscissas
     fs = _istransiogram(f) ? f.ordinates[i, j] : f.ordinates
     ns = f.counts
     hmax = isnothing(maxlag) ? _maxlag(f) : GeoStatsFunctions.aslen(maxlag)
-    hs = hs[ns .> 0]; fs = fs[ns .> 0]; ns = ns[ns .> 0]
-    ns = ns[hs .≤ hmax]; fs = fs[hs .≤ hmax]; hs = hs[hs .≤ hmax]
+    hs = hs[ns .> 0]
+    fs = fs[ns .> 0]
+    ns = ns[ns .> 0]
+    # discard above maximum lag
+    ns = ns[hs .≤ hmax]
+    fs = fs[hs .≤ hmax]
+    hs = hs[hs .≤ hmax]
     if showhist
       ms = ns * (maximum(fs) / maximum(ns)) / 10
       Makie.barplot!(ax, hs, ms, color=histcolor, alpha=0.3, gap=0.0)

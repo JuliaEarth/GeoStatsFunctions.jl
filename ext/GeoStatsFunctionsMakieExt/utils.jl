@@ -15,8 +15,6 @@ _istransiogram(t::Transiogram) = true
 _istransiogram(t::EmpiricalTransiogram) = true
 _istransiogram(t::EmpiricalTransiogramSurface) = true
 
-const GridPos = Union{Makie.Figure, Makie.GridLayout, Makie.GridPosition, Makie.GridSubposition}
-
 _layout(fig::Makie.Figure) = fig.layout
 _layout(gl::Makie.GridLayout) = gl
 _layout(gp::Makie.GridPosition) = Makie.GridLayout(gp)
