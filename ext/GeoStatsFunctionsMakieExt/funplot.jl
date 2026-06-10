@@ -4,24 +4,30 @@
 
 function funplot(f; labels=nothing, kwargs...)
   fig = Makie.Figure()
+  # variable names
   n = nvariates(f)
   l = isnothing(labels) ? (1:n) : labels
+  # initialize figure
   for i in 1:n, j in 1:n
     title = n > 1 ? "$(l[i]) → $(l[j])" : ""
     Makie.Axis(fig[i, j], title=title)
   end
+  # fill figure with plots
   funplot!(fig, f; kwargs...)
   fig
 end
 
 function funplot(gp::GridPos, f; labels=nothing, kwargs...)
+  # variable names
   n = nvariates(f)
   l = isnothing(labels) ? (1:n) : labels
+  # initialize figure
   layout = _layout(gp)
   for i in 1:n, j in 1:n
     title = n > 1 ? "$(l[i]) → $(l[j])" : ""
     Makie.Axis(layout[i, j], title=title)
   end
+  # fill figure with plots
   funplot!(layout, f; kwargs...)
   gp
 end
@@ -29,17 +35,24 @@ end
 function funplot!(
   layout::Union{Makie.Figure, Makie.GridLayout},
   f::GeoStatsFunction;
+  # common options
   color=:teal,
   size=1.5,
   maxlag=nothing
 )
+  # maximum lag
   hmax = isnothing(maxlag) ? _maxlag(f) : GeoStatsFunctions.aslen(maxlag)
+  # lag range starting at 1e-6 to avoid nugget artifact
   hs = range(1e-6 * oneunit(hmax), stop=hmax, length=100)
+  # evaluate function
   F = _eval(f, hs)
+  # mean lengths and proportions
   l = _istransiogram(f) ? meanlengths(f) : nothing
   p = _istransiogram(f) ? proportions(f) : nothing
+  # aesthetic options
   label = Dict(1 => "1ˢᵗ axis", 2 => "2ⁿᵈ axis", 3 => "3ʳᵈ axis")
   style = Dict(1 => :solid, 2 => :dash, 3 => :dot)
+  # add plots to axes
   d = length(F)
   n = nvariates(f)
   gl = layout isa Makie.Figure ? layout.layout : layout
@@ -104,6 +117,7 @@ end
 function funplot!(
   layout::Union{Makie.Figure, Makie.GridLayout},
   f::EmpiricalGeoStatsFunction;
+  # common options
   color=:slategray,
   size=1.5,
   maxlag=nothing,
