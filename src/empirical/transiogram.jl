@@ -62,7 +62,7 @@ function EmpiricalTransiogram(
   𝒮 = georef(𝒯, [centroid(𝒟, i) for i in 1:nelements(𝒟)])
 
   # transiograms are estimated based on indicators
-  ℐ = 𝒮 |> OneHot(var)
+  ℐ = 𝒮 |> Select(var) |> OneHot(var)
 
   # pairs of indicator variables
   ivars = ℐ |> values |> Tables.columns |> Tables.columnnames
