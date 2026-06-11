@@ -3,15 +3,17 @@
 # ------------------------------------------------------------------
 
 function funplot(f; labels=nothing, kwargs...)
-  fig = Makie.Figure()
   # variable names
   n = nvariates(f)
   l = isnothing(labels) ? (1:n) : labels
+
   # initialize figure
+  fig = Makie.Figure()
   for i in 1:n, j in 1:n
     title = n > 1 ? "$(l[i]) → $(l[j])" : ""
     Makie.Axis(fig[i, j], title=title)
   end
+
   # fill figure with plots
   funplot!(fig.layout, f; kwargs...)
   fig
@@ -21,12 +23,14 @@ function funplot(pos, f; labels=nothing, kwargs...)
   # variable names
   n = nvariates(f)
   l = isnothing(labels) ? (1:n) : labels
+
   # initialize figure
   layout = _layout(pos)
   for i in 1:n, j in 1:n
     title = n > 1 ? "$(l[i]) → $(l[j])" : ""
     Makie.Axis(layout[i, j], title=title)
   end
+
   # fill figure with plots
   funplot!(layout, f; kwargs...)
   pos
@@ -42,16 +46,21 @@ function funplot!(
 )
   # maximum lag
   hmax = isnothing(maxlag) ? _maxlag(f) : GeoStatsFunctions.aslen(maxlag)
+
   # lag range starting at 1e-6 to avoid nugget artifact
   hs = range(1e-6 * oneunit(hmax), stop=hmax, length=100)
+
   # evaluate function
   F = _eval(f, hs)
+
   # mean lengths and proportions
   l = _istransiogram(f) ? meanlengths(f) : nothing
   p = _istransiogram(f) ? proportions(f) : nothing
+
   # aesthetic options
   label = Dict(1 => "1ˢᵗ axis", 2 => "2ⁿᵈ axis", 3 => "3ʳᵈ axis")
   style = Dict(1 => :solid, 2 => :dash, 3 => :dot)
+
   # add plots to axes
   d = length(F)
   n = nvariates(f)
@@ -86,6 +95,7 @@ function _isoeval(f, hs)
 
   # reshape result
   Fᵢₛₒ = [getindex.(fs, i, j) for i in 1:n, j in 1:n]
+
   [Fᵢₛₒ]
 end
 
@@ -136,26 +146,39 @@ function funplot!(
 )
   # number of variables
   n = nvariates(f)
+
   # add plots to axes
   for i in 1:n, j in 1:n
     ax = Makie.content(layout[i, j])
+
     # retrieve coordinates and counts
     hs = f.abscissas
     fs = _istransiogram(f) ? f.ordinates[i, j] : f.ordinates
     ns = f.counts
+
+    # retrieve maximum lag
     hmax = isnothing(maxlag) ? _maxlag(f) : GeoStatsFunctions.aslen(maxlag)
+
+    # discard empty bins
     hs = hs[ns .> 0]
     fs = fs[ns .> 0]
     ns = ns[ns .> 0]
+
     # discard above maximum lag
     ns = ns[hs .≤ hmax]
     fs = fs[hs .≤ hmax]
     hs = hs[hs .≤ hmax]
+
+    # visualize histogram
     if showhist
       ms = ns * (maximum(fs) / maximum(ns)) / 10
       Makie.barplot!(ax, hs, ms, color=histcolor, alpha=0.3, gap=0.0)
     end
+
+    # visualize function
     Makie.scatterlines!(ax, hs, fs, color=color, markersize=pointsize, linewidth=size, linestyle=style)
+
+    # visualize text counts
     if showtext
       Makie.annotation!(ax, hs, fs, text=string.(ns), fontsize=textsize)
     end
