@@ -58,10 +58,13 @@ function funplot!(
   for i in 1:n, j in 1:n
     ax = Makie.content(layout[i, j])
     for (k, Fₖ) in enumerate(F)
+      # display function
       Makie.lines!(ax, hs, Fₖ[i, j], color=color, linewidth=size, linestyle=style[k], label=label[k])
       if _istransiogram(f)
         if i == j
+          # display mean lengths
           Makie.lines!(ax, [zero(hmax), l[i]], [1.0, 0.0], color=:slategray, linewidth=size, linestyle=:dash)
+          # display proportions
           Makie.hlines!(ax, p[i], color=:slategray, linewidth=size, linestyle=:dash)
         end
       end
@@ -75,8 +78,13 @@ end
 _eval(f, hs) = isisotropic(f) ? _isoeval(f, hs) : _anisoeval(f, hs)
 
 function _isoeval(f, hs)
+  # auxiliary parameters
   n = nvariates(f)
+
+  # evaluate all lags
   fs = f.(hs)
+
+  # reshape result
   Fᵢₛₒ = [getindex.(fs, i, j) for i in 1:n, j in 1:n]
   [Fᵢₛₒ]
 end
