@@ -227,5 +227,5 @@ end
     4.89058e-7 2.49436e-7 1.22495e-7 7.51e-5 3.11797e-5 2.31542e-6 -0.000109456
   ]
   τ = CarleTransiogram(Rx, Ry, Rz)
-  @test sum(proportions(τ)) ≈ 1 atol=1e-2
+  @test sum(proportions(τ)) ≈ 1 atol = 1e-2
 end
