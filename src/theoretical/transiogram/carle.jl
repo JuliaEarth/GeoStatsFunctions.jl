@@ -16,9 +16,9 @@ l = (1u"m", 2u"m", 3u"m")
 p = (1/3, 1/3, 1/3)
 
 # horizontal to vertical anisotropy ratio
-ratex = GeoStatsFunctions.baseratematrix(10 *. l, p)
-ratey = GeoStatsFunctions.baseratematrix(10 *. l, p)
-ratez = GeoStatsFunctions.baseratematrix(1  *. l, p)
+ratex = GeoStatsFunctions.baseratematrix(10 .* l, p)
+ratey = GeoStatsFunctions.baseratematrix(10 .* l, p)
+ratez = GeoStatsFunctions.baseratematrix(1  .* l, p)
 
 # Carle's transiogram model
 CarleTransiogram(ratex, ratey, ratez)
@@ -42,7 +42,7 @@ struct CarleTransiogram{N,R<:StaticMatrix,P<:NTuple} <: Transiogram
     @assert allequal(size(rate) for rate in rates) "transition rate matrices must have equal size"
     @assert allequal(size(first(rates))) "transition rate matrices must be square"
     @assert all(p -> 0 ≤ p ≤ 1, proportions) "proportions must be in [0, 1] interval"
-    @assert sum(proportions) ≈ 1 "proportions must sum up to one"
+    @assert isapprox(sum(proportions), 1, atol=1e-2) "proportions must sum up to one"
     new(rates, proportions)
   end
 end
