@@ -90,7 +90,7 @@ function meanlengths(t::CarleTransiogram)
   l = ntuple(N) do i
     1 ./ -diag(R[i])
   end
-  Tuple(max.(l...))
+  Tuple(isone(N) ? first(l) : max.(l...))
 end
 
 proportions(t::CarleTransiogram) = t.proportions

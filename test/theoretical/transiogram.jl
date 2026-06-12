@@ -228,4 +228,11 @@ end
   ]
   τ = CarleTransiogram(Rx, Ry, Rz)
   @test sum(proportions(τ)) ≈ 1 atol = 1e-2
+
+  # meanlenghts with single rate matrix
+  l = (3.0u"m", 2.0u"m", 1.0u"m")
+  p = (1 / 3, 1 / 3, 1 / 3)
+  R = GeoStatsFunctions.baseratematrix(l, p)
+  τ = CarleTransiogram(R)
+  @test meanlengths(τ) == (3.0u"m", 2.0u"m", 1.0u"m")
 end
