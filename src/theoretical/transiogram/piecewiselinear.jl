@@ -57,8 +57,9 @@ function PiecewiseLinearTransiogram(ball::MetricBall, abscissas::AbstractVector,
     normalize(yₙ, 1)
   end
 
-  # replace last ordinate matrix based on proportions
-  Y[end] = SMatrix{k,k}(p[j] for i in 1:k, j in 1:k)
+  # push additional ordinate matrix based on proportions
+  push!(x, x[end] + (x[end] - x[end - 1]))
+  push!(Y, SMatrix{k,k}(p[j] for i in 1:k, j in 1:k))
 
   PiecewiseLinearTransiogram{typeof(b),eltype(x),eltype(Y)}(b, x, Y)
 end
