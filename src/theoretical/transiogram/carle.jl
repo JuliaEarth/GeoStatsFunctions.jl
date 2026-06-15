@@ -43,7 +43,7 @@ struct CarleTransiogram{N,R<:StaticMatrix,P<:NTuple} <: Transiogram
     @assert allequal(size(first(rates))) "transition rate matrices must be square"
     @assert all(p -> 0 ≤ p ≤ 1, proportions) "proportions must be in [0, 1] interval"
     @assert isapprox(sum(proportions), 1, atol=1e-2) "proportions must sum up to one"
-    new(rates, proportions)
+    new(rates, proportions ./ sum(proportions))
   end
 end
 
