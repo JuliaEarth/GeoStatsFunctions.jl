@@ -55,8 +55,8 @@ function CarleTransiogram(rates::Tuple)
   # proportions from first rate matrix
   R = first(urates)
   r = maximum(1 ./ -diag(R))
-  props = Tuple(diag(exp(100r * R)))
-  props = props ./ sum(props)
+  p = Tuple(diag(exp(100r * R)))
+  props = p ./ sum(p)
 
   CarleTransiogram{length(urates),eltype(urates),typeof(props)}(urates, props)
 end
