@@ -42,8 +42,8 @@ struct CarleTransiogram{N,R<:StaticMatrix,P<:NTuple} <: Transiogram
     @assert allequal(size(rate) for rate in rates) "transition rate matrices must have equal size"
     @assert allequal(size(first(rates))) "transition rate matrices must be square"
     @assert all(p -> 0 ≤ p ≤ 1, proportions) "proportions must be in [0, 1] interval"
-    @assert isapprox(sum(proportions), 1, atol=1e-2) "proportions must sum up to one"
-    new(rates, proportions ./ sum(proportions))
+    @assert sum(proportions) ≈ 1 "proportions must sum up to one"
+    new(rates, proportions)
   end
 end
 
@@ -56,6 +56,7 @@ function CarleTransiogram(rates::Tuple)
   R = first(urates)
   r = maximum(1 ./ -diag(R))
   props = Tuple(diag(exp(100r * R)))
+  props = props ./ sum(props)
 
   CarleTransiogram{length(urates),eltype(urates),typeof(props)}(urates, props)
 end
