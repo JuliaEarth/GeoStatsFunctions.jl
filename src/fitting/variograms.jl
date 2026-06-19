@@ -70,9 +70,9 @@ function _fit(
 
   # box constraints
   δ = 1e-8
-  rₗ, rᵤ = isnothing(range′) ? (zero(rmax), rmax) : (range′ - δ, range′ + δ)
-  sₗ, sᵤ = isnothing(sill′) ? (zero(smax), smax) : (sill′ - δ, sill′ + δ)
-  nₗ, nᵤ = isnothing(nugget′) ? (zero(nmax), nmax) : (nugget′ - δ, nugget′ + δ)
+  rₗ, rᵤ = isnothing(range′) ? (zero(rmax) + δ, rmax) : (range′ - δ, range′ + δ)
+  sₗ, sᵤ = isnothing(sill′) ? (zero(smax) + δ, smax) : (sill′ - δ, sill′ + δ)
+  nₗ, nᵤ = isnothing(nugget′) ? (zero(nmax) + δ, nmax) : (nugget′ - δ, nugget′ + δ)
   l = [rₗ, sₗ, nₗ]
   u = [rᵤ, sᵤ, nᵤ]
 
@@ -150,9 +150,9 @@ function _fit(
 
   # box constraints
   δ = 1e-8
-  sₗ, sᵤ = isnothing(scaling′) ? (zero(smax), smax) : (scaling′ - δ, scaling′ + δ)
-  nₗ, nᵤ = isnothing(nugget′) ? (zero(nmax), nmax) : (nugget′ - δ, nugget′ + δ)
-  eₗ, eᵤ = isnothing(exponent′) ? (zero(emax), emax) : (exponent′ - δ, exponent′ + δ)
+  sₗ, sᵤ = isnothing(scaling′) ? (zero(smax) + δ, smax) : (scaling′ - δ, scaling′ + δ)
+  nₗ, nᵤ = isnothing(nugget′) ? (zero(nmax) + δ, nmax) : (nugget′ - δ, nugget′ + δ)
+  eₗ, eᵤ = isnothing(exponent′) ? (zero(emax) + δ, emax) : (exponent′ - δ, exponent′ + δ)
   l = [sₗ, nₗ, eₗ]
   u = [sᵤ, nᵤ, eᵤ]
 
