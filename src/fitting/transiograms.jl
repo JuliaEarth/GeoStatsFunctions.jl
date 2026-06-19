@@ -71,7 +71,7 @@ function _fit(
   # box constraints
   δ = 1e-8
   rₗ, rᵤ = isnothing(range′) ? (zero(rmax), rmax) : (range′ - δ, range′ + δ)
-  pₗ, pᵤ = isnothing(proportions) ? (_zeros, pmax) : (proportions .- δ, proportions .+ δ)
+  pₗ, pᵤ = isnothing(proportions) ? (_zeros .+ δ, pmax) : (proportions .- δ, proportions .+ δ)
   l = [rₗ, pₗ...]
   u = [rᵤ, pᵤ...]
 
@@ -162,8 +162,8 @@ function _fit(
   # box constraints
   δ = 1e-8
   rₗ, rᵤ = isnothing(range′) ? (zero(rmax), rmax) : (range′ - δ, range′ + δ)
-  lₗ, lᵤ = isnothing(lengths′) ? (_zeros, lmax) : (lengths′ .- δ, lengths′ .+ δ)
-  pₗ, pᵤ = isnothing(proportions) ? (_zeros, pmax) : (proportions .- δ, proportions .+ δ)
+  lₗ, lᵤ = isnothing(lengths′) ? (_zeros .+ δ, lmax) : (lengths′ .- δ, lengths′ .+ δ)
+  pₗ, pᵤ = isnothing(proportions) ? (_zeros .+ δ, pmax) : (proportions .- δ, proportions .+ δ)
   l = [rₗ, lₗ..., pₗ...]
   u = [rᵤ, lᵤ..., pᵤ...]
 
