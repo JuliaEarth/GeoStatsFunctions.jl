@@ -9,6 +9,7 @@ function funplot(f; kwargs...)
   for i in 1:n, j in 1:n
     Makie.Axis(fig[i, j])
   end
+  Makie.linkaxes!(fig.content...)
 
   # fill figure with plots
   funplot!(fig, f; kwargs...)
