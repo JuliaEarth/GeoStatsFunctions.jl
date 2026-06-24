@@ -2,16 +2,12 @@
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
 
-function funplot(f; labels=nothing, kwargs...)
-  # variable names
-  n = nvariates(f)
-  l = isnothing(labels) ? (1:n) : labels
-
+function funplot(f; kwargs...)
   # initialize figure
+  n = nvariates(f)
   fig = Makie.Figure()
   for i in 1:n, j in 1:n
-    title = n > 1 ? "$(l[i]) → $(l[j])" : ""
-    Makie.Axis(fig[i, j], title=title)
+    Makie.Axis(fig[i, j])
   end
 
   # fill figure with plots
@@ -23,11 +19,15 @@ function funplot!(
   f::GeoStatsFunction;
   # common options
   color=:teal,
-  size=1.5,
-  maxlag=nothing
+  linewidth=1.5,
+  maxlag=nothing,
+  names=nothing
 )
   # maximum lag
   hmax = isnothing(maxlag) ? _maxlag(f) : GeoStatsFunctions.aslen(maxlag)
+
+  # variable names
+  vars = isnothing(names) ? (1:nvariates(f)) : names
 
   # lag range starting at 1e-6 to avoid nugget artifact
   hs = range(1e-6 * oneunit(hmax), stop=hmax, length=100)
@@ -41,7 +41,7 @@ function funplot!(
 
   # aesthetic options
   label = Dict(1 => "1ˢᵗ axis", 2 => "2ⁿᵈ axis", 3 => "3ʳᵈ axis")
-  style = Dict(1 => :solid, 2 => :dash, 3 => :dot)
+  linestyle = Dict(1 => :solid, 2 => :dash, 3 => :dot)
 
   # add plots to axes
   d = length(F)
@@ -49,21 +49,24 @@ function funplot!(
   I = LinearIndices((n, n))
   for i in 1:n, j in 1:n
     ax = fig.content[I[j, i]]
+    ax.title = n > 1 ? "$(vars[i]) → $(vars[j])" : ""
+    ax.xlabel = i == n ? "lag distance [$(unit(hmax))]" : ""
     for (k, Fₖ) in enumerate(F)
       # display function
-      Makie.lines!(ax, hs, Fₖ[i, j], color=color, linewidth=size, linestyle=style[k], label=label[k])
+      Makie.lines!(ax, ustrip.(hs), Fₖ[i, j]; color, linewidth, linestyle=linestyle[k], label=label[k])
       if _istransiogram(f)
         if i == j
           # display mean lengths
-          Makie.lines!(ax, [zero(hmax), l[i]], [1.0, 0.0], color=:slategray, linewidth=size, linestyle=:dash)
+          Makie.lines!(ax, ustrip.([zero(hmax), l[i]]), [1.0, 0.0]; color=:slategray, linewidth, linestyle=:dash)
           # display proportions
-          Makie.hlines!(ax, p[i], color=:slategray, linewidth=size, linestyle=:dash)
+          Makie.hlines!(ax, p[i]; color=:slategray, linewidth, linestyle=:dash)
         end
       end
     end
     position = (i == j) && isbanded(f) ? :rt : :rb
     d > 1 && Makie.axislegend(ax, position=position)
   end
+
   fig
 end
 
@@ -135,31 +138,35 @@ function funplot!(
   f::EmpiricalGeoStatsFunction;
   # common options
   color=:slategray,
-  size=1.5,
+  linewidth=1.5,
   maxlag=nothing,
+  names=nothing,
   # empirical options
-  style=:solid,
+  linestyle=:solid,
   pointsize=12,
   showtext=true,
   textsize=12,
   showhist=true,
   histcolor=:slategray
 )
-  # number of variables
-  n = nvariates(f)
-  I = LinearIndices((n, n))
+  # maximum lag
+  hmax = isnothing(maxlag) ? _maxlag(f) : GeoStatsFunctions.aslen(maxlag)
+
+  # variable names
+  vars = isnothing(names) ? (1:nvariates(f)) : names
 
   # add plots to axes
+  n = nvariates(f)
+  I = LinearIndices((n, n))
   for i in 1:n, j in 1:n
     ax = fig.content[I[j, i]]
+    ax.title = n > 1 ? "$(vars[i]) → $(vars[j])" : ""
+    ax.xlabel = i == n ? "lag distance [$(unit(hmax))]" : ""
 
     # retrieve coordinates and counts
     hs = f.abscissas
     fs = _istransiogram(f) ? f.ordinates[i, j] : f.ordinates
     ns = f.counts
-
-    # retrieve maximum lag
-    hmax = isnothing(maxlag) ? _maxlag(f) : GeoStatsFunctions.aslen(maxlag)
 
     # discard empty bins
     hs = hs[ns .> 0]
@@ -174,16 +181,17 @@ function funplot!(
     # visualize histogram
     if showhist
       ms = ns * (maximum(fs) / maximum(ns)) / 10
-      Makie.barplot!(ax, hs, ms, color=histcolor, alpha=0.3, gap=0.0)
+      Makie.barplot!(ax, ustrip.(hs), ms; color=histcolor, alpha=0.3, gap=0.0)
     end
 
     # visualize function
-    Makie.scatterlines!(ax, hs, fs, color=color, markersize=pointsize, linewidth=size, linestyle=style)
+    Makie.scatterlines!(ax, ustrip.(hs), fs; color, markersize=pointsize, linewidth, linestyle)
 
     # visualize text counts
     if showtext
-      Makie.annotation!(ax, hs, fs, text=string.(ns), fontsize=textsize)
+      Makie.annotation!(ax, ustrip.(hs), fs; text=string.(ns), fontsize=textsize)
     end
   end
+
   fig
 end

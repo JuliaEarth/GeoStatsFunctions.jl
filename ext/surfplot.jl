@@ -2,16 +2,12 @@
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
 
-function surfplot(f; labels=nothing, kwargs...)
-  # variable names
-  n = nvariates(f)
-  l = isnothing(labels) ? (1:n) : labels
-
+function surfplot(f; kwargs...)
   # initialize figure
+  n = nvariates(f)
   fig = Makie.Figure()
   for i in 1:n, j in 1:n
-    title = n > 1 ? "$(l[i]) → $(l[j])" : ""
-    ax = Makie.PolarAxis(fig[i, j], title=title)
+    Makie.PolarAxis(fig[i, j])
   end
 
   # fill figure with plots
@@ -24,17 +20,21 @@ function surfplot!(
   # common options
   colormap=:viridis,
   maxlag=nothing,
+  names=nothing,
   # geometric options
   normal=nothing,
   nlags=20,
   nangs=50
 )
-  # auxiliary parameters
-  n = nvariates(f)
-  m = _ncoords(f)
-  U = typeof(range(f))
+  # maximum lag
+  hmax = isnothing(maxlag) ? _maxlag(f) : GeoStatsFunctions.aslen(maxlag)
+
+  # variable names
+  vars = isnothing(names) ? (1:nvariates(f)) : names
 
   # basis for plane
+  m = _ncoords(f)
+  U = typeof(range(f))
   if isnothing(normal)
     if m == 3
       d = 3
@@ -59,9 +59,6 @@ function surfplot!(
   # direction vector as a function of polar angle
   dir(θ) = cos(θ) * u⃗ + sin(θ) * v⃗
 
-  # maximum lag
-  hmax = isnothing(maxlag) ? _maxlag(f) : GeoStatsFunctions.aslen(maxlag)
-
   # polar radius
   rs = range(1e-6 * oneunit(hmax), stop=hmax, length=nlags)
 
@@ -81,16 +78,22 @@ function surfplot!(
     Z = [Z; Z]
   end
 
-  # hide hole at center
-  rs = [zero(eltype(rs)); rs]
-  Z = [Z[:, 1:1] Z]
-
+  # add plots to axes
+  n = nvariates(f)
   I = LinearIndices((n, n))
   for i in 1:n, j in 1:n
     ax = fig.content[I[j, i]]
+    ax.title = n > 1 ? "$(vars[i]) → $(vars[j])" : ""
+
+    # values in matrix form
     Zᵢⱼ = getindex.(Z, i, j)
-    Makie.surface!(ax, θs, ustrip.(rs), ustrip.(Zᵢⱼ), colormap=colormap, shading=false)
+
+    # compute contour levels
+    levels = quantile(Zᵢⱼ, range(0, 1, length=20))
+
+    Makie.contour!(ax, θs, ustrip.(rs), ustrip.(Zᵢⱼ); colormap, levels, labels=true)
   end
+
   fig
 end
 
@@ -102,10 +105,14 @@ function surfplot!(
   f::EmpiricalGeoStatsSurface;
   # common options
   colormap=:viridis,
-  maxlag=nothing
+  maxlag=nothing,
+  names=nothing
 )
-  # auxiliary parameters
-  n = nvariates(f)
+  # maximum lag
+  hmax = isnothing(maxlag) ? _maxlag(f) : GeoStatsFunctions.aslen(maxlag)
+
+  # variable names
+  vars = isnothing(names) ? (1:nvariates(f)) : names
 
   # polar radius
   rs = f.rs
@@ -115,9 +122,6 @@ function surfplot!(
 
   # function values
   zs = f.zs
-
-  # maximum lag
-  hmax = isnothing(maxlag) ? _maxlag(f) : GeoStatsFunctions.aslen(maxlag)
 
   # exploit symmetry
   if issymmetric(f)
@@ -129,12 +133,12 @@ function surfplot!(
   is = findall(≤(hmax), rs)
   rs = rs[is]
 
-  # hide hole at center
-  rs = [zero(eltype(rs)); rs]
-
+  # add plots to axes
+  n = nvariates(f)
   I = LinearIndices((n, n))
   for i in 1:n, j in 1:n
     ax = fig.content[I[j, i]]
+    ax.title = n > 1 ? "$(vars[i]) → $(vars[j])" : ""
 
     # values in matrix form
     Zᵢⱼ = _istransiogram(f) ? getindex.(zs, i, j) : zs
@@ -143,13 +147,14 @@ function surfplot!(
     # discard above maximum lag
     Z = Z[is, :]
 
-    # hide hole at center
-    Z = [Z[1:1, :]; Z]
-
     # transpose for plotting
     Z = transpose(Z)
 
-    Makie.surface!(ax, θs, ustrip.(rs), ustrip.(Z), colormap=colormap, shading=false)
+    # compute contour levels
+    levels = quantile(Z, range(0, 1, length=20))
+
+    Makie.contour!(ax, θs, ustrip.(rs), ustrip.(Z); colormap, levels, labels=true)
   end
+
   fig
 end

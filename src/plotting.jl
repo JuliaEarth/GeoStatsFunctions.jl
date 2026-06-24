@@ -9,14 +9,14 @@ Plot the geostatistical function `f` with given `options`.
 
 ## Common options:
 
-* `color`  - color
-* `size`   - size (line width)
-* `maxlag` - maximum lag
-* `labels` - variable names
+* `color`     - color of function graph
+* `linewidth` - line width of function graph
+* `maxlag`    - maximum lag distance
+* `names`     - variable names
 
 ## Empirical function options:
 
-* `style`       - style (line style)
+* `linestyle`   - line style of function graph
 * `pointsize`   - size of points
 * `showtext`    - show text counts
 * `textsize`    - size of text counts
@@ -60,7 +60,7 @@ Plot the geostatistical surface `f` with given `options`.
 
 * `colormap` - Color map
 * `maxlag`   - maximum lag
-* `labels`   - variable names
+* `names`    - variable names
 
 ## Theoretical function options
 

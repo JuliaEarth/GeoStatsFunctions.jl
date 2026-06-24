@@ -8,6 +8,7 @@ using GeoStatsFunctions
 using Meshes
 using Unitful
 using LinearAlgebra
+using Statistics
 
 import Makie
 
