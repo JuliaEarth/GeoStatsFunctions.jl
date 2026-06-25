@@ -9,7 +9,7 @@ using TableTransforms
 
 @setup_workload begin
   # synthetic data
-  d = georef((z=[sin(i/2) + sin(j/2) for i in 1:50, j in 1:50],))
+  d = georef((z=[sin(i / 2) + sin(j / 2) for i in 1:50, j in 1:50],))
   c = d |> Indicator("z", k=2) |> Select(1 => "z")
 
   # empirical variograms and transiograms
