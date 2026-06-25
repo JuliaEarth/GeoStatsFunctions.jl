@@ -44,7 +44,7 @@ function _fit(
   # objective function
   function J(θ)
     b = ball(θ[1])
-    p = _proportions(θ[2:end])
+    p = _normalize(θ[2:end])
     τ = T(b, proportions=p)
     mat(i) = getindex.(Y, i)
     err(i) = sum(abs2, τ(x′[i]) - mat(i))
@@ -59,14 +59,13 @@ function _fit(
 
   # maximum range and proportions
   xmax = maximum(x′)
-  ymax = _ones
   rmax = isnothing(maxrange′) ? xmax : maxrange′
-  pmax = isnothing(maxproportions) ? ymax : maxproportions
+  pmax = isnothing(maxproportions) ? _ones : maxproportions
 
   # initial guess
   rₒ = isnothing(range′) ? rmax / 3 : range′
   pₒ = isnothing(proportions) ? 0.95 .* pmax : proportions
-  θₒ = [rₒ, pₒ...]
+  θₒ = [rₒ, _normalize(pₒ)...]
 
   # box constraints
   δ = 1e-8
@@ -80,7 +79,7 @@ function _fit(
 
   # optimal transiogram (with units)
   b = ball(θ[1] * ux)
-  p = _proportions(θ[2:end])
+  p = _normalize(θ[2:end])
   τ = T(b, proportions=p)
 
   τ, ϵ
@@ -132,8 +131,8 @@ function _fit(
   # objective function
   function J(θ)
     b = ball(θ[1])
-    l = _lengths(θ[2:(k + 1)])
-    p = _proportions(θ[(k + 2):end])
+    l = _tuple(θ[2:(k + 1)])
+    p = _normalize(θ[(k + 2):end])
     τ = T(b, lengths=l, proportions=p)
     mat(i) = getindex.(Y, i)
     err(i) = sum(abs2, τ(x′[i]) - mat(i))
@@ -148,16 +147,15 @@ function _fit(
 
   # maximum range, proportions and lengths
   xmax = maximum(x′)
-  ymax = _ones
   rmax = isnothing(maxrange′) ? xmax : maxrange′
   lmax = isnothing(maxlengths′) ? ntuple(i -> xmax, k) : maxlengths′
-  pmax = isnothing(maxproportions) ? ymax : maxproportions
+  pmax = isnothing(maxproportions) ? _ones : maxproportions
 
   # initial guess
   rₒ = isnothing(range′) ? rmax / 3 : range′
   lₒ = isnothing(lengths′) ? lmax ./ 3 : lengths′
   pₒ = isnothing(proportions) ? 0.95 .* pmax : proportions
-  θₒ = [rₒ, lₒ..., pₒ...]
+  θₒ = [rₒ, lₒ..., _normalize(pₒ)...]
 
   # box constraints
   δ = 1e-8
@@ -172,8 +170,8 @@ function _fit(
 
   # optimal transiogram (with units)
   b = ball(θ[1] * ux)
-  l = _lengths(θ[2:(k + 1)] * ux)
-  p = _proportions(θ[(k + 2):end])
+  l = _tuple(θ[2:(k + 1)] * ux)
+  p = _normalize(θ[(k + 2):end])
   τ = T(b, lengths=l, proportions=p)
 
   τ, ϵ
@@ -205,10 +203,10 @@ end
 # HELPER FUNCTIONS
 # -----------------
 
-function _proportions(θ)
-  p = clamp.(θ, 0, 1)
-  s = sum(abs, p)
-  ntuple(i -> p[i] / s, length(p))
+function _normalize(p)
+  c = clamp.(p, 0, 1)
+  s = sum(abs, c)
+  ntuple(i -> c[i] / s, length(c))
 end
 
-_lengths(θ) = ntuple(i -> θ[i], length(θ))
+_tuple(θ) = ntuple(i -> θ[i], length(θ))
