@@ -69,8 +69,8 @@ function _fit(
   θₒ = [rₒ, sₒ, nₒ]
 
   # box constraints
-  δ = 1e-8
-  rₗ, rᵤ = isnothing(range′) ? (zero(rmax), rmax) : (range′ - δ, range′ + δ)
+  δ = oftype(rmax, 1e-8)
+  rₗ, rᵤ = isnothing(range′) ? (δ, rmax) : (range′ - δ, range′ + δ)
   sₗ, sᵤ = isnothing(sill′) ? (zero(smax), smax) : (sill′ - δ, sill′ + δ)
   nₗ, nᵤ = isnothing(nugget′) ? (zero(nmax), nmax) : (nugget′ - δ, nugget′ + δ)
   l = [rₗ, sₗ, nₗ]
@@ -149,8 +149,8 @@ function _fit(
   θₒ = [sₒ, nₒ, eₒ]
 
   # box constraints
-  δ = 1e-8
-  sₗ, sᵤ = isnothing(scaling′) ? (zero(smax), smax) : (scaling′ - δ, scaling′ + δ)
+  δ = oftype(smax, 1e-8)
+  sₗ, sᵤ = isnothing(scaling′) ? (δ, smax) : (scaling′ - δ, scaling′ + δ)
   nₗ, nᵤ = isnothing(nugget′) ? (zero(nmax), nmax) : (nugget′ - δ, nugget′ + δ)
   eₗ, eᵤ = isnothing(exponent′) ? (zero(emax), emax) : (exponent′ - δ, exponent′ + δ)
   l = [sₗ, nₗ, eₗ]
