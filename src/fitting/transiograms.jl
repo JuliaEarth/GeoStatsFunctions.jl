@@ -51,19 +51,17 @@ function _fit(
   # maximum range
   rmax = isnothing(maxrange′) ? maximum(x′) : maxrange′
 
-  # initial guess and box constraints for the range
+  # box constraints (logits are unconstrained, proportions are recovered via softmax)
   δ = oftype(rmax, 1e-8)
-  rₒ = isnothing(range′) ? rmax / 3 : range′
   rₗ, rᵤ = isnothing(range′) ? (δ, rmax) : (range′, range′ + δ)
-
-  # logits are unconstrained, proportions are recovered via softmax
-  λₒ = ntuple(i -> oftype(rₒ, 0.0), m)
-  λₗ = ntuple(i -> oftype(rₗ, -Inf), m)
-  λᵤ = ntuple(i -> oftype(rᵤ, Inf), m)
-
-  θₒ = isnothing(proportions) ? [rₒ, λₒ...] : [rₒ]
+  λₗ, λᵤ = ntuple(i -> oftype(rₗ, -Inf), m), ntuple(i -> oftype(rᵤ, Inf), m)
   l = isnothing(proportions) ? [rₗ, λₗ...] : [rₗ]
   u = isnothing(proportions) ? [rᵤ, λᵤ...] : [rᵤ]
+
+  # initial guess
+  rₒ = isnothing(range′) ? rmax / 3 : range′
+  λₒ = ntuple(i -> oftype(rₒ, 0.0), m)
+  θₒ = isnothing(proportions) ? [rₒ, λₒ...] : [rₒ]
 
   # solve optimization problem
   θ, ϵ = _optimize(J, l, u, θₒ)
@@ -132,29 +130,22 @@ function _fit(
   rmax = isnothing(maxrange′) ? xmax : maxrange′
   lmax = isnothing(maxlengths′) ? ntuple(i -> xmax, k) : maxlengths′
 
-  # initial guess and box constraints for the range and lengths
+  # box constraints (logits are unconstrained, proportions are recovered via softmax)
   δ = oftype(rmax, 1e-8)
-  rₒ = isnothing(range′) ? rmax / 3 : range′
-  lₒ = isnothing(lengths′) ? lmax ./ 3 : lengths′
   rₗ, rᵤ = isnothing(range′) ? (δ, rmax) : (range′, range′ + δ)
   lₗ, lᵤ = isnothing(lengths′) ? (ntuple(i -> δ, k), lmax) : (lengths′, lengths′ .+ δ)
-
-  # logits are unconstrained, proportions are recovered via softmax
-  λₗ = ntuple(i -> oftype(rₗ, -Inf), m)
-  λᵤ = ntuple(i -> oftype(rᵤ, Inf), m)
-
-  # collect all box constraints for range, lengths and logits
+  λₗ, λᵤ = ntuple(i -> oftype(rₗ, -Inf), m), ntuple(i -> oftype(rᵤ, Inf), m)
   l = isnothing(proportions) ? [rₗ, lₗ..., λₗ...] : [rₗ, lₗ...]
   u = isnothing(proportions) ? [rᵤ, lᵤ..., λᵤ...] : [rᵤ, lᵤ...]
 
-  # the matrix-exponential misfit is non-convex, so a single start can land in
-  # a poor local minimum. Run a small deterministic multistart that varies the
-  # free blocks (length scale and proportion logits) and keep the best fit.
-  lstarts = isnothing(lengths′) ? [s .* lmax for s in (0.1, 0.25, 0.5, 0.75, 0.9)] : [lₒ]
-  λstarts = isnothing(proportions) ? [ntuple(c -> b * (c - m / 2), m) for b in (-1.0, 0.0, 1.0)] : [()]
-  starts = [[rₒ, lₒ..., λₒ...] for lₒ in lstarts for λₒ in λstarts]
-  sols = [_optimize(J, l, u, θₒ) for θₒ in starts]
-  θ, ϵ = sols[argmin(last.(sols))]
+  # initial guess
+  rₒ = isnothing(range′) ? rmax / 3 : range′
+  lₒ = isnothing(lengths′) ? lmax ./ 3 : lengths′
+  λₒ = ntuple(i -> oftype(rₒ, 0.0), m)
+  θₒ = isnothing(proportions) ? [rₒ, lₒ..., λₒ...] : [rₒ, lₒ...]
+
+  # solve optimization problem
+  θ, ϵ = _optimize(J, l, u, θₒ)
 
   # optimal transiogram (with units)
   bopt = ball(θ[1] * ux)
