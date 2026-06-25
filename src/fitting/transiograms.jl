@@ -49,21 +49,21 @@ function _fit(
   end
 
   # maximum range
-  xmax = maximum(x′)
-  rmax = isnothing(maxrange′) ? xmax : maxrange′
+  rmax = isnothing(maxrange′) ? maximum(x′) : maxrange′
 
   # initial guess and box constraints for the range
-  # strictly positive floor: a zero range makes the model singular (h / range)
+  δ = oftype(rmax, 1e-8)
   rₒ = isnothing(range′) ? rmax / 3 : range′
-  δ = 1e-8
-  rₗ, rᵤ = isnothing(range′) ? (oftype(rmax, δ), rmax) : (range′ - δ, range′ + δ)
+  rₗ, rᵤ = isnothing(range′) ? (δ, rmax) : (range′ - δ, range′ + δ)
 
-  # logits are unconstrained; proportions are recovered via softmax
-  θₒ, l, u = if isnothing(proportions)
-    ([rₒ, zeros(m)...], [rₗ, ntuple(i -> -Inf, m)...], [rᵤ, ntuple(i -> Inf, m)...])
-  else
-    ([rₒ], [rₗ], [rᵤ])
-  end
+  # logits are unconstrained, proportions are recovered via softmax
+  lₒ = ntuple(i -> oftype(rₒ, 0.0), m)
+  lₗ = ntuple(i -> oftype(rₗ, -Inf), m)
+  lᵤ = ntuple(i -> oftype(rᵤ, Inf), m)
+
+  θₒ = isnothing(proportions) ? [rₒ, lₒ...] : [rₒ]
+  l = isnothing(proportions) ? [rₗ, lₗ...] : [rₗ]
+  u = isnothing(proportions) ? [rᵤ, lᵤ...] : [rᵤ]
 
   # solve optimization problem
   θ, ϵ = _optimize(J, l, u, θₒ)
@@ -132,12 +132,10 @@ function _fit(
   lmax = isnothing(maxlengths′) ? ntuple(i -> xmax, k) : maxlengths′
 
   # initial guess and box constraints for the range and lengths
+  δ = oftype(rmax, 1e-8)
   rₒ = isnothing(range′) ? rmax / 3 : range′
   lₒ = isnothing(lengths′) ? lmax ./ 3 : lengths′
-  δ = 1e-8
-  # strictly positive floors: a zero range (h / range) or a zero mean length
-  # (−1/0 in the base rate matrix) makes the matrix exponential singular
-  rₗ, rᵤ = isnothing(range′) ? (oftype(rmax, δ), rmax) : (range′ - δ, range′ + δ)
+  rₗ, rᵤ = isnothing(range′) ? (δ, rmax) : (range′ - δ, range′ + δ)
   lₗ, lᵤ = isnothing(lengths′) ? (ntuple(i -> δ, k), lmax) : (lengths′ .- δ, lengths′ .+ δ)
 
   # box constraints (logits are unconstrained; proportions via softmax)
