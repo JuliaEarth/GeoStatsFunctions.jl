@@ -69,8 +69,9 @@ function _fit(
   θ, ϵ = _optimize(J, l, u, θₒ)
 
   # optimal transiogram (with units)
-  p = isnothing(proportions) ? _softmax(θ[2:end]) : proportions
-  τ = T(ball(θ[1] * ux), proportions=p)
+  bopt = ball(θ[1] * ux)
+  popt = isnothing(proportions) ? _softmax(θ[2:end]) : proportions
+  τ = T(bopt, proportions=popt)
 
   τ, ϵ
 end
@@ -151,8 +152,8 @@ function _fit(
   # free blocks (length scale and proportion logits) and keep the best fit.
   lstarts = isnothing(lengths′) ? [s .* lmax for s in (0.1, 0.25, 0.5, 0.75, 0.9)] : [lₒ]
   λstarts = isnothing(proportions) ? [ntuple(c -> b * (c - m / 2), m) for b in (-1.0, 0.0, 1.0)] : [()]
-  starts = [[rₒ, ls..., λs...] for ls in lstarts for λs in λstarts]
-  sols = [_optimize(J, l, u, θₛ) for θₛ in starts]
+  starts = [[rₒ, lₒ..., λₒ...] for lₒ in lstarts for λₒ in λstarts]
+  sols = [_optimize(J, l, u, θₒ) for θₒ in starts]
   θ, ϵ = sols[argmin(last.(sols))]
 
   # optimal transiogram (with units)
