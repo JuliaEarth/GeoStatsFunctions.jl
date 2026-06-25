@@ -62,12 +62,6 @@ function _fit(
   smax = isnothing(maxsill′) ? ymax : maxsill′
   nmax = isnothing(maxnugget′) ? ymax : maxnugget′
 
-  # initial guess
-  rₒ = isnothing(range′) ? rmax / 3 : range′
-  sₒ = isnothing(sill′) ? 0.95 * smax : sill′
-  nₒ = isnothing(nugget′) ? 0.01 * smax : nugget′
-  θₒ = [rₒ, sₒ, nₒ]
-
   # box constraints
   δ = oftype(rmax, 1e-8)
   rₗ, rᵤ = isnothing(range′) ? (δ, rmax) : (range′, range′ + δ)
@@ -75,6 +69,12 @@ function _fit(
   nₗ, nᵤ = isnothing(nugget′) ? (zero(nmax), nmax) : (nugget′, nugget′ + δ)
   l = [rₗ, sₗ, nₗ]
   u = [rᵤ, sᵤ, nᵤ]
+
+  # initial guess
+  rₒ = isnothing(range′) ? rmax / 3 : range′
+  sₒ = isnothing(sill′) ? 0.95 * smax : sill′
+  nₒ = isnothing(nugget′) ? 0.01 * smax : nugget′
+  θₒ = [rₒ, sₒ, nₒ]
 
   # solve optimization problem
   θ, ϵ = _optimize(J, L, λ, l, u, θₒ)
@@ -142,12 +142,6 @@ function _fit(
   nmax = isnothing(maxnugget′) ? ymax : maxnugget′
   emax = isnothing(maxexponent′) ? 2.0 : maxexponent′
 
-  # initial guess
-  sₒ = isnothing(scaling′) ? smax / 3 : scaling′
-  nₒ = isnothing(nugget′) ? 0.01 * nmax : nugget′
-  eₒ = isnothing(exponent′) ? 0.95 * emax : exponent′
-  θₒ = [sₒ, nₒ, eₒ]
-
   # box constraints
   δ = oftype(smax, 1e-8)
   sₗ, sᵤ = isnothing(scaling′) ? (δ, smax) : (scaling′, scaling′ + δ)
@@ -155,6 +149,12 @@ function _fit(
   eₗ, eᵤ = isnothing(exponent′) ? (zero(emax), emax) : (exponent′, exponent′ + δ)
   l = [sₗ, nₗ, eₗ]
   u = [sᵤ, nᵤ, eᵤ]
+
+  # initial guess
+  sₒ = isnothing(scaling′) ? smax / 3 : scaling′
+  nₒ = isnothing(nugget′) ? 0.01 * nmax : nugget′
+  eₒ = isnothing(exponent′) ? 0.95 * emax : exponent′
+  θₒ = [sₒ, nₒ, eₒ]
 
   # solve optimization problem
   θ, ϵ = _optimize(J, L, λ, l, u, θₒ)
