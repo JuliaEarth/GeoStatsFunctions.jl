@@ -147,7 +147,7 @@ function _fit(
     # solve optimization problem
     _optimize(J, l, u, θₒ)
   end
-  θ, ϵ = findmin(last, sols)
+  θ, ϵ = argmin(last, sols)
 
   # optimal transiogram (with units)
   p = isnothing(proportions) ? _softmax(θ[(k + 2):end]) : proportions
