@@ -54,7 +54,7 @@ function _fit(
   # initial guess and box constraints for the range
   δ = oftype(rmax, 1e-8)
   rₒ = isnothing(range′) ? rmax / 3 : range′
-  rₗ, rᵤ = isnothing(range′) ? (δ, rmax) : (range′ - δ, range′ + δ)
+  rₗ, rᵤ = isnothing(range′) ? (δ, rmax) : (range′, range′ + δ)
 
   # logits are unconstrained, proportions are recovered via softmax
   λₒ = ntuple(i -> oftype(rₒ, 0.0), m)
@@ -136,8 +136,8 @@ function _fit(
   δ = oftype(rmax, 1e-8)
   rₒ = isnothing(range′) ? rmax / 3 : range′
   lₒ = isnothing(lengths′) ? lmax ./ 3 : lengths′
-  rₗ, rᵤ = isnothing(range′) ? (δ, rmax) : (range′ - δ, range′ + δ)
-  lₗ, lᵤ = isnothing(lengths′) ? (ntuple(i -> δ, k), lmax) : (lengths′ .- δ, lengths′ .+ δ)
+  rₗ, rᵤ = isnothing(range′) ? (δ, rmax) : (range′, range′ + δ)
+  lₗ, lᵤ = isnothing(lengths′) ? (ntuple(i -> δ, k), lmax) : (lengths′, lengths′ .+ δ)
 
   # logits are unconstrained, proportions are recovered via softmax
   λₗ = ntuple(i -> oftype(rₗ, -Inf), m)
