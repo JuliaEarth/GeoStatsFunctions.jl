@@ -191,15 +191,12 @@ end
 # HELPER FUNCTIONS
 # -----------------
 
-# proportions on the probability simplex from `k - 1` free logits `θ`. The
-# last category is pinned to logit zero to remove the softmax shift
-# degeneracy. The result is strictly positive and sums to one by
-# construction, so no box constraints or normalization penalty are needed and
-# the objective remains smooth and finite everywhere.
 function _softmax(θ)
-  e = ntuple(i -> i ≤ length(θ) ? exp(θ[i]) : one(eltype(θ)), length(θ) + 1)
+  T = eltype(θ)
+  n = length(θ)
+  e = ntuple(i -> i ≤ n ? exp(θ[i]) : one(T), n + 1)
   s = sum(e)
-  ntuple(i -> e[i] / s, length(e))
+  ntuple(i -> e[i] / s, n + 1)
 end
 
 _lengths(θ) = ntuple(i -> θ[i], length(θ))
