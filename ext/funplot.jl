@@ -22,7 +22,10 @@ function funplot!(
   color=:teal,
   linewidth=1.5,
   maxlag=nothing,
-  names=nothing
+  names=nothing,
+  # theoretical options
+  showmeanlengths=false,
+  showproportions=true
 )
   # maximum lag
   hmax = isnothing(maxlag) ? _maxlag(f) : GeoStatsFunctions.aslen(maxlag)
@@ -57,10 +60,14 @@ function funplot!(
       Makie.lines!(ax, ustrip.(hs), Fₖ[i, j]; color, linewidth, linestyle=linestyle[k], label=label[k])
       if _istransiogram(f)
         if i == j
-          # display mean lengths
-          Makie.lines!(ax, ustrip.([zero(hmax), l[i]]), [1.0, 0.0]; color=:slategray, linewidth, linestyle=:dash)
-          # display proportions
-          Makie.hlines!(ax, p[i]; color=:slategray, linewidth, linestyle=:dash)
+          if showmeanlengths
+            # display mean lengths
+            Makie.lines!(ax, ustrip.([zero(hmax), l[i]]), [1.0, 0.0]; color=:slategray, linewidth, linestyle=:dash)
+          end
+          if showproportions
+            # display proportions
+            Makie.hlines!(ax, p[i]; color=:slategray, linewidth, linestyle=:dash)
+          end
         end
       end
     end

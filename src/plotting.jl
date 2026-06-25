@@ -14,6 +14,11 @@ Plot the geostatistical function `f` with given `options`.
 * `maxlag`    - maximum lag distance
 * `names`     - variable names
 
+### Theoretical function options:
+
+* `showmeanlengths` - show mean lengths
+* `showproportions` - show proportions
+
 ## Empirical function options:
 
 * `linestyle`   - line style of function graph
