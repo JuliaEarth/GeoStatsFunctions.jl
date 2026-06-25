@@ -1,6 +1,6 @@
 name = "GeoStatsFunctions"
 uuid = "6771c435-bc22-4842-b0c3-41852a255103"
-version = "0.13.0"
+version = "0.13.1"
 authors = ["Júlio Hoffimann <julio.hoffimann@gmail.com> and contributors"]
 
 [deps]
