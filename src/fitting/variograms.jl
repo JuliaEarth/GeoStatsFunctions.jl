@@ -77,7 +77,7 @@ function _fit(
   θₒ = [rₒ, sₒ, nₒ]
 
   # solve optimization problem
-  θ, ϵ = _optimize(J, L, λ, l, u, θₒ)
+  θ, ϵ = _optimize(θ -> J(θ) + λ * L(θ), l, u, θₒ)
 
   # optimal variogram (with units)
   γ = G(ball(θ[1] * ux), sill=θ[2] * uy, nugget=θ[3] * uy)
@@ -157,7 +157,7 @@ function _fit(
   θₒ = [sₒ, nₒ, eₒ]
 
   # solve optimization problem
-  θ, ϵ = _optimize(J, L, λ, l, u, θₒ)
+  θ, ϵ = _optimize(θ -> J(θ) + λ * L(θ), l, u, θₒ)
 
   # optimal variogram (with units)
   γ = G(scaling=θ[1] * uy, nugget=θ[2] * uy, exponent=θ[3])
