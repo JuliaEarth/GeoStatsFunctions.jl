@@ -40,8 +40,9 @@ function _fit(
 
   # objective function (θ = [range, logits...])
   function J(θ)
+    b = ball(θ[1])
     p = isnothing(proportions) ? _softmax(θ[2:end]) : proportions
-    τ = T(ball(θ[1]), proportions=p)
+    τ = T(b, proportions=p)
     mat(i) = getindex.(Y, i)
     err(i) = sum(abs2, τ(x′[i]) - mat(i))
     sum(i -> w[i] * err(i), eachindex(w, x′))
@@ -54,8 +55,8 @@ function _fit(
   δ = oftype(rmax, 1e-8)
   rₗ, rᵤ = isnothing(range′) ? (δ, rmax) : (range′, range′ + δ)
   λₗ, λᵤ = ntuple(i -> oftype(rₗ, -Inf), m), ntuple(i -> oftype(rᵤ, Inf), m)
-  l = isnothing(proportions) ? [rₗ, λₗ...] : [rₗ]
-  u = isnothing(proportions) ? [rᵤ, λᵤ...] : [rᵤ]
+  θₗ = isnothing(proportions) ? [rₗ, λₗ...] : [rₗ]
+  θᵤ = isnothing(proportions) ? [rᵤ, λᵤ...] : [rᵤ]
 
   # initial guess
   rₒ = isnothing(range′) ? rmax / 3 : range′
@@ -63,11 +64,12 @@ function _fit(
   θₒ = isnothing(proportions) ? [rₒ, λₒ...] : [rₒ]
 
   # solve optimization problem
-  θ, ϵ = _optimize(J, l, u, θₒ)
+  θ, ϵ = _optimize(J, θₗ, θᵤ, θₒ)
 
   # optimal transiogram (with units)
+  b = ball(θ[1] * ux)
   p = isnothing(proportions) ? _softmax(θ[2:end]) : proportions
-  τ = T(ball(θ[1] * ux), proportions=p)
+  τ = T(b, proportions=p)
 
   τ, ϵ
 end
@@ -114,8 +116,10 @@ function _fit(
 
   # objective function (θ = [range, lengths..., logits...])
   function J(θ)
+    b = ball(θ[1])
+    l = _lengths(θ[2:(k + 1)])
     p = isnothing(proportions) ? _softmax(θ[(k + 2):end]) : proportions
-    τ = T(ball(θ[1]), lengths=_lengths(θ[2:(k + 1)]), proportions=p)
+    τ = T(b, lengths=l, proportions=p)
     mat(i) = getindex.(Y, i)
     err(i) = sum(abs2, τ(x′[i]) - mat(i))
     sum(i -> w[i] * err(i), eachindex(w, x′))
@@ -131,27 +135,29 @@ function _fit(
   rₗ, rᵤ = isnothing(range′) ? (δ, rmax) : (range′, range′ + δ)
   lₗ, lᵤ = isnothing(lengths′) ? (ntuple(i -> δ, k), lmax) : (lengths′, lengths′ .+ δ)
   λₗ, λᵤ = ntuple(i -> oftype(rₗ, -Inf), m), ntuple(i -> oftype(rᵤ, Inf), m)
-  l = isnothing(proportions) ? [rₗ, lₗ..., λₗ...] : [rₗ, lₗ...]
-  u = isnothing(proportions) ? [rᵤ, lᵤ..., λᵤ...] : [rᵤ, lᵤ...]
+  θₗ = isnothing(proportions) ? [rₗ, lₗ..., λₗ...] : [rₗ, lₗ...]
+  θᵤ = isnothing(proportions) ? [rᵤ, lᵤ..., λᵤ...] : [rᵤ, lᵤ...]
 
   # the matrix-exponential misfit is non-convex, so a single start can land in
   # a poor local minimum. Run a small deterministic multistart that varies the
-  # free blocks (length scale and proportion logits) and keep the best fit.
+  # free blocks (lengths and proportion logits) and keep the best fit.
   rₒ = isnothing(range′) ? rmax / 3 : range′
   ls = isnothing(lengths′) ? [α .* lmax for α in (0.1, 0.25, 0.5, 0.75, 0.9)] : [lengths′]
-  λs = [ntuple(i -> oftype(rₒ, 0.0), m)]
-  sols = map(Iterators.product(ls, λs)) do (lₒ, λₒ)
+  λₒ = ntuple(i -> oftype(rₒ, 0.0), m)
+  sols = map(ls) do lₒ
     # initial guess
     θₒ = isnothing(proportions) ? [rₒ, lₒ..., λₒ...] : [rₒ, lₒ...]
 
     # solve optimization problem
-    _optimize(J, l, u, θₒ)
+    _optimize(J, θₗ, θᵤ, θₒ)
   end
   θ, ϵ = argmin(last, sols)
 
   # optimal transiogram (with units)
+  b = ball(θ[1] * ux)
+  l = _lengths(θ[2:(k + 1)] * ux)
   p = isnothing(proportions) ? _softmax(θ[(k + 2):end]) : proportions
-  τ = T(ball(θ[1] * ux), lengths=_lengths(θ[2:(k + 1)] * ux), proportions=p)
+  τ = T(b, lengths=l, proportions=p)
 
   τ, ϵ
 end

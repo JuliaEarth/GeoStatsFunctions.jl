@@ -67,8 +67,8 @@ function _fit(
   rₗ, rᵤ = isnothing(range′) ? (δ, rmax) : (range′, range′ + δ)
   sₗ, sᵤ = isnothing(sill′) ? (zero(smax), smax) : (sill′, sill′ + δ)
   nₗ, nᵤ = isnothing(nugget′) ? (zero(nmax), nmax) : (nugget′, nugget′ + δ)
-  l = [rₗ, sₗ, nₗ]
-  u = [rᵤ, sᵤ, nᵤ]
+  θₗ = [rₗ, sₗ, nₗ]
+  θᵤ = [rᵤ, sᵤ, nᵤ]
 
   # initial guess
   rₒ = isnothing(range′) ? rmax / 3 : range′
@@ -77,7 +77,7 @@ function _fit(
   θₒ = [rₒ, sₒ, nₒ]
 
   # solve optimization problem
-  θ, ϵ = _optimize(θ -> J(θ) + λ * L(θ), l, u, θₒ)
+  θ, ϵ = _optimize(θ -> J(θ) + λ * L(θ), θₗ, θᵤ, θₒ)
 
   # optimal variogram (with units)
   γ = G(ball(θ[1] * ux), sill=θ[2] * uy, nugget=θ[3] * uy)
@@ -147,8 +147,8 @@ function _fit(
   sₗ, sᵤ = isnothing(scaling′) ? (δ, smax) : (scaling′, scaling′ + δ)
   nₗ, nᵤ = isnothing(nugget′) ? (zero(nmax), nmax) : (nugget′, nugget′ + δ)
   eₗ, eᵤ = isnothing(exponent′) ? (zero(emax), emax) : (exponent′, exponent′ + δ)
-  l = [sₗ, nₗ, eₗ]
-  u = [sᵤ, nᵤ, eᵤ]
+  θₗ = [sₗ, nₗ, eₗ]
+  θᵤ = [sᵤ, nᵤ, eᵤ]
 
   # initial guess
   sₒ = isnothing(scaling′) ? smax / 3 : scaling′
@@ -157,7 +157,7 @@ function _fit(
   θₒ = [sₒ, nₒ, eₒ]
 
   # solve optimization problem
-  θ, ϵ = _optimize(θ -> J(θ) + λ * L(θ), l, u, θₒ)
+  θ, ϵ = _optimize(θ -> J(θ) + λ * L(θ), θₗ, θᵤ, θₒ)
 
   # optimal variogram (with units)
   γ = G(scaling=θ[1] * uy, nugget=θ[2] * uy, exponent=θ[3])
