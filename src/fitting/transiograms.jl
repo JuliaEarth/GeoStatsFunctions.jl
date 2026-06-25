@@ -57,13 +57,13 @@ function _fit(
   rₗ, rᵤ = isnothing(range′) ? (δ, rmax) : (range′ - δ, range′ + δ)
 
   # logits are unconstrained, proportions are recovered via softmax
-  lₒ = ntuple(i -> oftype(rₒ, 0.0), m)
-  lₗ = ntuple(i -> oftype(rₗ, -Inf), m)
-  lᵤ = ntuple(i -> oftype(rᵤ, Inf), m)
+  λₒ = ntuple(i -> oftype(rₒ, 0.0), m)
+  λₗ = ntuple(i -> oftype(rₗ, -Inf), m)
+  λᵤ = ntuple(i -> oftype(rᵤ, Inf), m)
 
-  θₒ = isnothing(proportions) ? [rₒ, lₒ...] : [rₒ]
-  l = isnothing(proportions) ? [rₗ, lₗ...] : [rₗ]
-  u = isnothing(proportions) ? [rᵤ, lᵤ...] : [rᵤ]
+  θₒ = isnothing(proportions) ? [rₒ, λₒ...] : [rₒ]
+  l = isnothing(proportions) ? [rₗ, λₗ...] : [rₗ]
+  u = isnothing(proportions) ? [rᵤ, λᵤ...] : [rᵤ]
 
   # solve optimization problem
   θ, ϵ = _optimize(J, l, u, θₒ)
@@ -138,26 +138,28 @@ function _fit(
   rₗ, rᵤ = isnothing(range′) ? (δ, rmax) : (range′ - δ, range′ + δ)
   lₗ, lᵤ = isnothing(lengths′) ? (ntuple(i -> δ, k), lmax) : (lengths′ .- δ, lengths′ .+ δ)
 
-  # box constraints (logits are unconstrained; proportions via softmax)
-  lb, ub = if isnothing(proportions)
-    ([rₗ, lₗ..., ntuple(i -> -Inf, m)...], [rᵤ, lᵤ..., ntuple(i -> Inf, m)...])
-  else
-    ([rₗ, lₗ...], [rᵤ, lᵤ...])
-  end
+  # logits are unconstrained, proportions are recovered via softmax
+  λₗ = ntuple(i -> oftype(rₗ, -Inf), m)
+  λᵤ = ntuple(i -> oftype(rᵤ, Inf), m)
+
+  # collect all box constraints for range, lengths and logits
+  l = isnothing(proportions) ? [rₗ, lₗ..., λₗ...] : [rₗ, lₗ...]
+  u = isnothing(proportions) ? [rᵤ, lᵤ..., λᵤ...] : [rᵤ, lᵤ...]
 
   # the matrix-exponential misfit is non-convex, so a single start can land in
   # a poor local minimum. Run a small deterministic multistart that varies the
   # free blocks (length scale and proportion logits) and keep the best fit.
-  lstarts = isnothing(lengths′) ? [lmax .* s for s in (0.1, 0.25, 0.5, 0.9)] : [lₒ]
-  zstarts = isnothing(proportions) ? [ntuple(c -> b * (c - m / 2), m) for b in (-1.0, 0.0, 1.0)] : [()]
-  starts = [[rₒ, ls..., zs...] for ls in lstarts for zs in zstarts]
-  sols = [_optimize(J, lb, ub, θₛ) for θₛ in starts]
+  lstarts = isnothing(lengths′) ? [s .* lmax for s in (0.1, 0.25, 0.5, 0.75, 0.9)] : [lₒ]
+  λstarts = isnothing(proportions) ? [ntuple(c -> b * (c - m / 2), m) for b in (-1.0, 0.0, 1.0)] : [()]
+  starts = [[rₒ, ls..., λs...] for ls in lstarts for λs in λstarts]
+  sols = [_optimize(J, l, u, θₛ) for θₛ in starts]
   θ, ϵ = sols[argmin(last.(sols))]
 
   # optimal transiogram (with units)
-  l = _lengths(θ[2:(k + 1)] * ux)
-  p = isnothing(proportions) ? _softmax(θ[(k + 2):end]) : proportions
-  τ = T(ball(θ[1] * ux), lengths=l, proportions=p)
+  bopt = ball(θ[1] * ux)
+  lopt = _lengths(θ[2:(k + 1)] * ux)
+  popt = isnothing(proportions) ? _softmax(θ[(k + 2):end]) : proportions
+  τ = T(bopt, lengths=lopt, proportions=popt)
 
   τ, ϵ
 end
