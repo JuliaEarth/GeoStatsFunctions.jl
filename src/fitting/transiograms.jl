@@ -62,17 +62,17 @@ function _fit(
   rmax = isnothing(maxrange′) ? xmax : maxrange′
   pmax = isnothing(maxproportions) ? _ones : maxproportions
 
-  # initial guess
-  rₒ = isnothing(range′) ? rmax / 3 : range′
-  pₒ = isnothing(proportions) ? 0.95 .* pmax : proportions
-  θₒ = [rₒ, _normalize(pₒ)...]
-
   # box constraints
   δ = 1e-8
   rₗ, rᵤ = isnothing(range′) ? (zero(rmax), rmax) : (range′ - δ, range′ + δ)
   pₗ, pᵤ = isnothing(proportions) ? (_zeros .+ δ, pmax) : (proportions .- δ, proportions .+ δ)
   l = [rₗ, pₗ...]
   u = [rᵤ, pᵤ...]
+
+  # initial guess
+  rₒ = isnothing(range′) ? rmax / 3 : range′
+  pₒ = isnothing(proportions) ? (pₗ .+ pᵤ) ./ 2 : proportions
+  θₒ = [rₒ, pₒ...]
 
   # solve optimization problem
   θ, ϵ = _optimize(J, L, λ, l, u, θₒ)
@@ -151,12 +151,6 @@ function _fit(
   lmax = isnothing(maxlengths′) ? ntuple(i -> xmax, k) : maxlengths′
   pmax = isnothing(maxproportions) ? _ones : maxproportions
 
-  # initial guess
-  rₒ = isnothing(range′) ? rmax / 3 : range′
-  lₒ = isnothing(lengths′) ? lmax ./ 3 : lengths′
-  pₒ = isnothing(proportions) ? 0.95 .* pmax : proportions
-  θₒ = [rₒ, lₒ..., _normalize(pₒ)...]
-
   # box constraints
   δ = 1e-8
   rₗ, rᵤ = isnothing(range′) ? (zero(rmax), rmax) : (range′ - δ, range′ + δ)
@@ -164,6 +158,12 @@ function _fit(
   pₗ, pᵤ = isnothing(proportions) ? (_zeros .+ δ, pmax) : (proportions .- δ, proportions .+ δ)
   l = [rₗ, lₗ..., pₗ...]
   u = [rᵤ, lᵤ..., pᵤ...]
+
+  # initial guess
+  rₒ = isnothing(range′) ? rmax / 3 : range′
+  lₒ = isnothing(lengths′) ? lmax ./ 3 : lengths′
+  pₒ = isnothing(proportions) ? (pₗ .+ pᵤ) ./ 2 : proportions
+  θₒ = [rₒ, lₒ..., pₒ...]
 
   # solve optimization problem
   θ, ϵ = _optimize(J, L, λ, l, u, θₒ)
