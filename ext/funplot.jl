@@ -54,15 +54,15 @@ function funplot!(
   for i in 1:n, j in 1:n
     ax = fig.content[I[j, i]]
     ax.title = n > 1 ? "$(vars[i]) → $(vars[j])" : ""
-    ax.xlabel = i == n ? "lag distance [$(unit(hmax))]" : ""
+    ax.xlabel = i == n ? "lag distance [m]" : ""
     for (k, Fₖ) in enumerate(F)
       # display function
-      Makie.lines!(ax, ustrip.(hs), Fₖ[i, j]; color, linewidth, linestyle=linestyle[k], label=label[k])
+      Makie.lines!(ax, ustrip.(u"m", hs), Fₖ[i, j]; color, linewidth, linestyle=linestyle[k], label=label[k])
       if _istransiogram(f)
         if i == j
           if showmeanlengths
             # display mean lengths
-            Makie.lines!(ax, ustrip.([zero(hmax), l[i]]), [1.0, 0.0]; color=:slategray, linewidth, linestyle=:dash)
+            Makie.lines!(ax, ustrip.(u"m", [zero(hmax), l[i]]), [1.0, 0.0]; color=:slategray, linewidth, linestyle=:dash)
           end
           if showproportions
             # display proportions
@@ -169,7 +169,7 @@ function funplot!(
   for i in 1:n, j in 1:n
     ax = fig.content[I[j, i]]
     ax.title = n > 1 ? "$(vars[i]) → $(vars[j])" : ""
-    ax.xlabel = i == n ? "lag distance [$(unit(hmax))]" : ""
+    ax.xlabel = i == n ? "lag distance [m]" : ""
 
     # retrieve coordinates and counts
     hs = f.abscissas
@@ -189,15 +189,15 @@ function funplot!(
     # visualize histogram
     if showhist
       ms = ns * (maximum(fs) / maximum(ns)) / 10
-      Makie.barplot!(ax, ustrip.(hs), ms; color=histcolor, alpha=0.3, gap=0.0)
+      Makie.barplot!(ax, ustrip.(u"m", hs), ms; color=histcolor, alpha=0.3, gap=0.0)
     end
 
     # visualize function
-    Makie.scatterlines!(ax, ustrip.(hs), fs; color, markersize=pointsize, linewidth, linestyle)
+    Makie.scatterlines!(ax, ustrip.(u"m", hs), fs; color, markersize=pointsize, linewidth, linestyle)
 
     # visualize text counts
     if showtext
-      Makie.annotation!(ax, ustrip.(hs), fs; text=string.(ns), fontsize=textsize)
+      Makie.annotation!(ax, ustrip.(u"m", hs), fs; text=string.(ns), fontsize=textsize)
     end
   end
 

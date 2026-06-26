@@ -91,7 +91,7 @@ function surfplot!(
     # compute contour levels
     levels = quantile(Zᵢⱼ, range(0, 1, length=20))
 
-    Makie.contour!(ax, θs, ustrip.(rs), ustrip.(Zᵢⱼ); colormap, levels, labels=true)
+    Makie.contour!(ax, θs, ustrip.(u"m", rs), ustrip.(Zᵢⱼ); colormap, levels, labels=true)
   end
 
   fig
@@ -153,7 +153,7 @@ function surfplot!(
     # compute contour levels
     levels = quantile(Z, range(0, 1, length=20))
 
-    Makie.contour!(ax, θs, ustrip.(rs), ustrip.(Z); colormap, levels, labels=true)
+    Makie.contour!(ax, θs, ustrip.(u"m", rs), ustrip.(Z); colormap, levels, labels=true)
   end
 
   fig
