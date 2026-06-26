@@ -62,7 +62,14 @@ function funplot!(
         if i == j
           if showmeanlengths
             # display mean lengths
-            Makie.lines!(ax, ustrip.(u"m", [zero(hmax), l[i]]), [1.0, 0.0]; color=:slategray, linewidth, linestyle=:dash)
+            Makie.lines!(
+              ax,
+              ustrip.(u"m", [zero(hmax), l[i]]),
+              [1.0, 0.0];
+              color=:slategray,
+              linewidth,
+              linestyle=:dash
+            )
           end
           if showproportions
             # display proportions
