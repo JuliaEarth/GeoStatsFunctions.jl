@@ -2,12 +2,15 @@
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
 
-function funplot(f; kwargs...)
+function funplot(f; names=nothing, kwargs...)
   # initialize figure
   n = nvariates(f)
+  v = isnothing(names) ? (1:n) : names
   fig = Makie.Figure()
   for i in 1:n, j in 1:n
-    Makie.Axis(fig[i, j])
+    ax = Makie.Axis(fig[i, j])
+    ax.title = n > 1 ? "$(v[i]) → $(v[j])" : ""
+    ax.xlabel = i == n ? "lag distance [m]" : ""
   end
   Makie.linkaxes!(fig.content...)
 
@@ -22,16 +25,12 @@ function funplot!(
   color=:teal,
   linewidth=1.5,
   maxlag=nothing,
-  names=nothing,
   # theoretical options
   showmeanlengths=false,
   showproportions=true
 )
   # maximum lag
   hmax = isnothing(maxlag) ? _maxlag(f) : GeoStatsFunctions.aslen(maxlag)
-
-  # variable names
-  vars = isnothing(names) ? (1:nvariates(f)) : names
 
   # lag range starting at 1e-6 to avoid nugget artifact
   hs = range(1e-6 * oneunit(hmax), stop=hmax, length=100)
@@ -53,8 +52,6 @@ function funplot!(
   I = LinearIndices((n, n))
   for i in 1:n, j in 1:n
     ax = fig.content[I[j, i]]
-    ax.title = n > 1 ? "$(vars[i]) → $(vars[j])" : ""
-    ax.xlabel = i == n ? "lag distance [m]" : ""
     for (k, Fₖ) in enumerate(F)
       # display function
       Makie.lines!(ax, ustrip.(u"m", hs), Fₖ[i, j]; color, linewidth, linestyle=linestyle[k], label=label[k])
@@ -155,7 +152,6 @@ function funplot!(
   color=:slategray,
   linewidth=1.5,
   maxlag=nothing,
-  names=nothing,
   # empirical options
   linestyle=:solid,
   pointsize=12,
@@ -167,16 +163,11 @@ function funplot!(
   # maximum lag
   hmax = isnothing(maxlag) ? _maxlag(f) : GeoStatsFunctions.aslen(maxlag)
 
-  # variable names
-  vars = isnothing(names) ? (1:nvariates(f)) : names
-
   # add plots to axes
   n = nvariates(f)
   I = LinearIndices((n, n))
   for i in 1:n, j in 1:n
     ax = fig.content[I[j, i]]
-    ax.title = n > 1 ? "$(vars[i]) → $(vars[j])" : ""
-    ax.xlabel = i == n ? "lag distance [m]" : ""
 
     # retrieve coordinates and counts
     hs = f.abscissas

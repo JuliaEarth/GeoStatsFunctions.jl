@@ -2,12 +2,14 @@
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
 
-function surfplot(f; kwargs...)
+function surfplot(f; names=nothing, kwargs...)
   # initialize figure
   n = nvariates(f)
+  v = isnothing(names) ? (1:n) : names
   fig = Makie.Figure()
   for i in 1:n, j in 1:n
-    Makie.PolarAxis(fig[i, j])
+    ax = Makie.PolarAxis(fig[i, j])
+    ax.title = n > 1 ? "$(v[i]) → $(v[j])" : ""
   end
 
   # fill figure with plots
@@ -20,7 +22,6 @@ function surfplot!(
   # common options
   colormap=:viridis,
   maxlag=nothing,
-  names=nothing,
   # geometric options
   normal=nothing,
   nlags=20,
@@ -28,9 +29,6 @@ function surfplot!(
 )
   # maximum lag
   hmax = isnothing(maxlag) ? _maxlag(f) : GeoStatsFunctions.aslen(maxlag)
-
-  # variable names
-  vars = isnothing(names) ? (1:nvariates(f)) : names
 
   # basis for plane
   m = _ncoords(f)
@@ -83,7 +81,6 @@ function surfplot!(
   I = LinearIndices((n, n))
   for i in 1:n, j in 1:n
     ax = fig.content[I[j, i]]
-    ax.title = n > 1 ? "$(vars[i]) → $(vars[j])" : ""
 
     # values in matrix form
     Zᵢⱼ = getindex.(Z, i, j)
@@ -105,14 +102,10 @@ function surfplot!(
   f::EmpiricalGeoStatsSurface;
   # common options
   colormap=:viridis,
-  maxlag=nothing,
-  names=nothing
+  maxlag=nothing
 )
   # maximum lag
   hmax = isnothing(maxlag) ? _maxlag(f) : GeoStatsFunctions.aslen(maxlag)
-
-  # variable names
-  vars = isnothing(names) ? (1:nvariates(f)) : names
 
   # polar radius
   rs = f.rs
@@ -138,7 +131,6 @@ function surfplot!(
   I = LinearIndices((n, n))
   for i in 1:n, j in 1:n
     ax = fig.content[I[j, i]]
-    ax.title = n > 1 ? "$(vars[i]) → $(vars[j])" : ""
 
     # values in matrix form
     Zᵢⱼ = _istransiogram(f) ? getindex.(zs, i, j) : zs
