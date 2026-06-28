@@ -3,11 +3,11 @@
 # ------------------------------------------------------------------
 
 """
-    EmpiricalVariogram(data, var₁, var₂=var₁; [options])
+    EmpiricalVariogram(geotable, var₁, var₂=var₁; [options])
 
 Computes the empirical (a.k.a. experimental) omnidirectional
 (cross-)variogram for variables `var₁` and `var₂` stored in
-geospatial `data`.
+the `geotable`.
 
 ## Options
 
@@ -15,22 +15,21 @@ geospatial `data`.
   * maxlag    - maximum lag in length units (default to 1/2 of minimum side of bounding box)
   * distance  - custom distance function (default to `Euclidean` distance)
   * estimator - variogram estimator (default to `:matheron` estimator)
-  * algorithm - accumulation algorithm (default to `:ball`)
+  * lagsearch - lag search method (default to `:ball`)
 
 Available estimators:
 
   * `:matheron` - simple estimator based on squared differences
   * `:cressie`  - robust estimator based on 4th power of differences
 
-Available algorithms:
+Available lag search methods:
 
-  * `:full` - loop over all pairs of points in the data
-  * `:ball` - loop over all points inside maximum lag ball
+  * `:full` - loop over all pairs of points available
+  * `:ball` - loop over all points within maximum lag
 
-All implemented algorithms produce the exact same result.
-The `:ball` algorithm is considerably faster when the
-maximum lag is much smaller than the bounding box of
-the domain of the data.
+All implemented lag search methods produce the exact same result.
+The `:ball` method is considerably faster when the maximum lag is
+much smaller than the bounding box of the domain.
 
 See also: [`DirectionalVariogram`](@ref), [`PlanarVariogram`](@ref),
 [`EmpiricalVariogramSurface`](@ref).
@@ -62,20 +61,29 @@ function EmpiricalVariogram(
   maxlag=defaultmaxlag(data),
   distance=Euclidean(),
   estimator=:matheron,
-  algorithm=:ball
+  lagsearch=:ball
 )
   # retrieve table and domain
-  𝒯 = values(data)
-  𝒟 = domain(data)
+  tab = values(data)
+  dom = domain(data)
 
-  # empirical estimators are defined on point sets
-  𝒮 = georef(𝒯, [centroid(𝒟, i) for i in 1:nelements(𝒟)])
+  # estimators are defined on point sets
+  pset = georef(tab, [centroid(dom, i) for i in 1:nelements(dom)])
 
-  # retrieve estimator and algorithm
-  estim, algo = estimalgo(𝒟, nlags, maxlag, distance, estimator, algorithm)
+  # define variogram estimator
+  estim = if Symbol(estimator) == :matheron
+    MatheronEstimator()
+  elseif Symbol(estimator) == :cressie
+    CressieEstimator()
+  else
+    throw(ArgumentError("invalid estimator"))
+  end
 
-  # accumulate data with chosen algorithm
-  counts, abscissas, ordinates = accumulate(𝒮, (var₁, var₂), estim, algo)
+  # define lag search method
+  lsearch = lagsearchmethod(dom, nlags, maxlag, distance, Symbol(lagsearch))
+
+  # perform estimation
+  counts, abscissas, ordinates = accumulate(pset, (var₁, var₂), estim, lsearch)
 
   EmpiricalVariogram(counts, abscissas, ordinates, distance, estim)
 end

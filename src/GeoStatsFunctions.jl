@@ -40,10 +40,13 @@ include("empirical.jl")
 # theoretical functions
 include("theoretical.jl")
 
-# misc operations
+# fitting routines
 include("fitting.jl")
+
+# plot recipes
 include("plotting.jl")
 
+# precompile workloads
 include("precompile.jl")
 
 function __init__()

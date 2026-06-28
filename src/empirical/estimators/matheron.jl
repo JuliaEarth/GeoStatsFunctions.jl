@@ -7,7 +7,7 @@
 
 Matheron's variogram estimator.
 """
-struct MatheronEstimator <: Estimator end
+struct MatheronEstimator <: VariogramEstimator end
 
 accumterm(::MatheronEstimator, z₁ᵢ, z₁ⱼ, z₂ᵢ, z₂ⱼ) = (z₁ᵢ - z₁ⱼ) ⋅ (z₂ᵢ - z₂ⱼ)
 

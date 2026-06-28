@@ -15,7 +15,7 @@
 
   # empirical variogram on integer coordinates
   sdata = georef((z=ones(3),), [(1, 0, 0), (0, 1, 0), (0, 0, 1)])
-  g = EmpiricalVariogram(sdata, :z, nlags=2, maxlag=2, algorithm=:full)
+  g = EmpiricalVariogram(sdata, :z, nlags=2, maxlag=2)
   @test g.abscissas ≈ [1 / 2, √2] * u"m"
   @test g.ordinates[2] == 0.0
   @test g.counts == [0, 3]
@@ -27,11 +27,11 @@
   @test g.abscissas == [0.1, 0.3, 0.5, 0.7, 0.9] * u"m"
   @test all(iszero, g.counts)
 
-  # accumulation algorithms give the same result
+  # lag search methods give the same result
   rng = StableRNG(123)
   sdata = georef((z=rand(rng, 1000),), rand(rng, Point, 1000))
-  g₁ = EmpiricalVariogram(sdata, :z, maxlag=0.01, algorithm=:full)
-  g₂ = EmpiricalVariogram(sdata, :z, maxlag=0.01, algorithm=:ball)
+  g₁ = EmpiricalVariogram(sdata, :z, maxlag=0.01, lagsearch=:full)
+  g₂ = EmpiricalVariogram(sdata, :z, maxlag=0.01, lagsearch=:ball)
   @test isequal(g₁.abscissas, g₂.abscissas)
   @test isequal(g₁.ordinates, g₂.ordinates)
   @test isequal(g₁.counts, g₂.counts)
@@ -39,12 +39,12 @@
   # custom distance is recorded
   rng = StableRNG(123)
   sdata = georef((z=rand(rng, 2),), [Point(LatLon(0.0, 0.0)), Point(LatLon(0.0, 90.0))])
-  g = EmpiricalVariogram(sdata, :z, distance=Haversine(6371.0), algorithm=:full)
+  g = EmpiricalVariogram(sdata, :z, distance=Haversine(6371.0), lagsearch=:full)
   @test g.distance == Haversine(6371.0)
 
   # test variography with compositional data
   data = georef((z=rand(Composition{3}, 100),), rand(Point, 100))
-  g = EmpiricalVariogram(data, :z, maxlag=1.0, algorithm=:full)
+  g = EmpiricalVariogram(data, :z, maxlag=1.0)
   @test all(≥(0u"m"), g.abscissas)
   @test all(≥(0), g.ordinates)
   @test all(≥(0), g.counts)

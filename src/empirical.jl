@@ -7,9 +7,8 @@
 # --------------------------
 
 include("empirical/matrices.jl")
+include("empirical/lagsearch.jl")
 include("empirical/estimators.jl")
-include("empirical/algorithms.jl")
-include("empirical/estimalgo.jl")
 
 # -----------------------------
 # END-USER TYPES AND FUNCTIONS

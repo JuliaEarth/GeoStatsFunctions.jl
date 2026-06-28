@@ -3,28 +3,26 @@
 # ------------------------------------------------------------------
 
 """
-    EmpiricalTransiogram(data, var; [options])
+    EmpiricalTransiogram(geotable, var; [options])
 
 Computes the empirical (a.k.a. experimental) omnidirectional
-transiogram for categorical variable `var` stored in geospatial
-`data`.
+transiogram for categorical variable `var` stored in the `geotable`.
 
 ## Options
 
   * nlags     - number of lags (default to `20`)
   * maxlag    - maximum lag in length units (default to 1/2 of minimum side of bounding box)
   * distance  - custom distance function (default to `Euclidean` distance)
-  * algorithm - accumulation algorithm (default to `:ball`)
+  * lagsearch - lag search method (default to `:ball`)
 
-Available algorithms:
+Available lag search methods:
 
-  * `:full` - loop over all pairs of points in the data
-  * `:ball` - loop over all points inside maximum lag ball
+  * `:full` - loop over all pairs of points available
+  * `:ball` - loop over all points within maximum lag
 
-All implemented algorithms produce the exact same result.
-The `:ball` algorithm is considerably faster when the
-maximum lag is much smaller than the bounding box of
-the domain of the data.
+All implemented lag search methods produce the exact same result.
+The `:ball` method is considerably faster when the maximum lag is
+much smaller than the bounding box of the domain.
 
 See also: [`DirectionalTransiogram`](@ref), [`PlanarTransiogram`](@ref),
 [`EmpiricalTransiogramSurface`](@ref).
@@ -52,27 +50,30 @@ function EmpiricalTransiogram(
   nlags=20,
   maxlag=defaultmaxlag(data),
   distance=Euclidean(),
-  algorithm=:ball
+  lagsearch=:ball
 )
   # retrieve table and domain
-  𝒯 = values(data)
-  𝒟 = domain(data)
+  tab = values(data)
+  dom = domain(data)
 
   # empirical estimators are defined on point sets
-  𝒮 = georef(𝒯, [centroid(𝒟, i) for i in 1:nelements(𝒟)])
+  pset = georef(tab, [centroid(dom, i) for i in 1:nelements(dom)])
 
   # transiograms are estimated based on indicators
-  ℐ = 𝒮 |> Select(var) |> OneHot(var)
+  itb = pset |> Select(var) |> OneHot(var)
 
   # pairs of indicator variables
-  ivars = ℐ |> values |> Tables.columns |> Tables.columnnames
+  ivars = itb |> values |> Tables.columns |> Tables.columnnames
   pairs = Iterators.product(ivars, ivars) |> collect
 
-  # retrieve estimator and algorithm
-  estim, algo = estimalgo(𝒟, nlags, maxlag, distance, :carle, algorithm)
+  # define transiogram estimator
+  estim = CarleEstimator()
 
-  # accumulate data with chosen algorithm
-  counts, abscissas, ordinates, headcounts = accumulate(ℐ, pairs, estim, algo)
+  # define lag search method
+  lsearch = lagsearchmethod(dom, nlags, maxlag, distance, Symbol(lagsearch))
+
+  # perform estimation
+  counts, abscissas, ordinates, headcounts = accumulate(itb, pairs, estim, lsearch)
 
   EmpiricalTransiogram(counts, abscissas, ordinates, headcounts, distance, estim)
 end
