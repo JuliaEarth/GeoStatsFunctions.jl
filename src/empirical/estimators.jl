@@ -25,7 +25,7 @@ returntype(e::VariogramEstimator, z₁, z₂) = typeof(accumterm(e, z₁[1], z�
 include("estimators/matheron.jl")
 include("estimators/cressie.jl")
 
-function accumulate(geotable, (var₁, var₂), e::VariogramEstimator, lagsearch::LagSearchMethod)
+function estimate(geotable, (var₁, var₂), e::VariogramEstimator, lagsearch::LagSearchMethod)
   # lag search parameters
   nlags, maxlag, distance = params(lagsearch)
 
@@ -131,7 +131,7 @@ abstract type TransiogramEstimator <: FunctionEstimator end
 
 include("estimators/carle.jl")
 
-function accumulate(geotable, pairs, ::CarleEstimator, lagsearch::LagSearchMethod)
+function estimate(geotable, pairs, ::CarleEstimator, lagsearch::LagSearchMethod)
   # lag search parameters
   nlags, maxlag, distance = params(lagsearch)
 

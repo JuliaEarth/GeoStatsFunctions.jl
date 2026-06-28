@@ -66,7 +66,7 @@ function EmpiricalTransiogram(
   lsearch = lagsearchmethod(domain(idata), nlags, maxlag, distance, Symbol(lagsearch))
 
   # perform estimation
-  counts, abscissas, ordinates, headcounts = accumulate(idata, pairs, estim, lsearch)
+  counts, abscissas, ordinates, headcounts = estimate(idata, pairs, estim, lsearch)
 
   EmpiricalTransiogram(counts, abscissas, ordinates, headcounts, distance, estim)
 end

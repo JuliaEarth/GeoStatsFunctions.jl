@@ -76,7 +76,7 @@ function EmpiricalVariogram(
   lsearch = lagsearchmethod(domain(data), nlags, maxlag, distance, Symbol(lagsearch))
 
   # perform estimation
-  counts, abscissas, ordinates = accumulate(data, (var₁, var₂), estim, lsearch)
+  counts, abscissas, ordinates = estimate(data, (var₁, var₂), estim, lsearch)
 
   EmpiricalVariogram(counts, abscissas, ordinates, distance, estim)
 end
