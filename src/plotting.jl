@@ -3,6 +3,39 @@
 # ------------------------------------------------------------------
 
 """
+    hscatter(geotable, var₁, var₂; [options])
+
+h-scatter plot of `geotable` for pair of variables
+`var₁` and `var₂`. All available `options` will be
+documented below upon loading a Makie.jl backend.
+
+## Examples
+
+```julia
+# h-scatter of z vs. z at lag 1.0
+hscatter(geotable, "z", "z", lag=1.0)
+
+# h-scatter of z vs. w at lag 2.0
+hscatter(geotable, "z", "w", lag=2.0)
+```
+
+### Notes
+
+This function will only work in the presence of
+a Makie.jl backend via package extensions in
+Julia v1.9 or later versions of the language.
+"""
+function hscatter end
+
+"""
+    hscatter!(geotable, var₁, var₂; [options])
+
+Mutating version of [`hscatter`[@ref]. Please check
+the documentation there for available `options`.
+"""
+function hscatter! end
+
+"""
     funplot(f; [options])
 
 Plot the geostatistical function `f` with given `options`.

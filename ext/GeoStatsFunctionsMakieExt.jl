@@ -7,6 +7,7 @@ module GeoStatsFunctionsMakieExt
 using GeoStatsFunctions
 using Meshes
 using Unitful
+using Distances
 using LinearAlgebra
 using Statistics
 
@@ -14,11 +15,13 @@ import Makie
 
 import GeoStatsFunctions: funplot, funplot!
 import GeoStatsFunctions: surfplot, surfplot!
+import GeoStatsFunctions: hscatter, hscatter!
 
 # source code
 include("utils.jl")
 include("funplot.jl")
 include("surfplot.jl")
+include("hscatter.jl")
 
 # precompile workloads
 include("precompile.jl")
