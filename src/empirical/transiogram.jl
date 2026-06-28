@@ -52,28 +52,21 @@ function EmpiricalTransiogram(
   distance=Euclidean(),
   lagsearch=:ball
 )
-  # retrieve table and domain
-  tab = values(data)
-  dom = domain(data)
-
-  # empirical estimators are defined on point sets
-  pset = georef(tab, [centroid(dom, i) for i in 1:nelements(dom)])
-
   # transiograms are estimated based on indicators
-  itb = pset |> Select(var) |> OneHot(var)
+  idata = data |> Select(var) |> OneHot(var)
 
   # pairs of indicator variables
-  ivars = itb |> values |> Tables.columns |> Tables.columnnames
+  ivars = idata |> values |> Tables.columns |> Tables.columnnames
   pairs = Iterators.product(ivars, ivars) |> collect
 
   # define transiogram estimator
   estim = CarleEstimator()
 
   # define lag search method
-  lsearch = lagsearchmethod(dom, nlags, maxlag, distance, Symbol(lagsearch))
+  lsearch = lagsearchmethod(domain(idata), nlags, maxlag, distance, Symbol(lagsearch))
 
   # perform estimation
-  counts, abscissas, ordinates, headcounts = accumulate(itb, pairs, estim, lsearch)
+  counts, abscissas, ordinates, headcounts = accumulate(idata, pairs, estim, lsearch)
 
   EmpiricalTransiogram(counts, abscissas, ordinates, headcounts, distance, estim)
 end

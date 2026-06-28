@@ -63,13 +63,6 @@ function EmpiricalVariogram(
   estimator=:matheron,
   lagsearch=:ball
 )
-  # retrieve table and domain
-  tab = values(data)
-  dom = domain(data)
-
-  # estimators are defined on point sets
-  pset = georef(tab, [centroid(dom, i) for i in 1:nelements(dom)])
-
   # define variogram estimator
   estim = if Symbol(estimator) == :matheron
     MatheronEstimator()
@@ -80,10 +73,10 @@ function EmpiricalVariogram(
   end
 
   # define lag search method
-  lsearch = lagsearchmethod(dom, nlags, maxlag, distance, Symbol(lagsearch))
+  lsearch = lagsearchmethod(domain(data), nlags, maxlag, distance, Symbol(lagsearch))
 
   # perform estimation
-  counts, abscissas, ordinates = accumulate(pset, (var₁, var₂), estim, lsearch)
+  counts, abscissas, ordinates = accumulate(data, (var₁, var₂), estim, lsearch)
 
   EmpiricalVariogram(counts, abscissas, ordinates, distance, estim)
 end

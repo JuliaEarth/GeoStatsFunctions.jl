@@ -32,12 +32,15 @@ function accumulate(geotable, (var₁, var₂), e::VariogramEstimator, lagsearch
   # compute lag size
   δh = maxlag / nlags
 
-  # table and point set
-  𝒯 = values(geotable)
-  𝒫 = domain(geotable)
+  # table and domain
+  tab = values(geotable)
+  dom = domain(geotable)
+
+  # estimators are defined on point sets
+  pset = PointSet([centroid(dom, i) for i in 1:nelements(dom)])
 
   # table columns
-  cols = Tables.columns(𝒯)
+  cols = Tables.columns(tab)
 
   # get column from variable name
   get(var) = Tables.getcolumn(cols, Symbol(var))
@@ -47,7 +50,7 @@ function accumulate(geotable, (var₁, var₂), e::VariogramEstimator, lagsearch
   z₂ = get(var₂)
 
   # neighbors function
-  neighbors = neighfun(lagsearch, 𝒫)
+  neighbors = neighfun(lagsearch, pset)
 
   # skip condition
   skip = skipfun(lagsearch)
@@ -56,7 +59,7 @@ function accumulate(geotable, (var₁, var₂), e::VariogramEstimator, lagsearch
   exit = exitfun(lagsearch)
 
   # lag counts and abscissa sums
-  ℒ = Meshes.lentype(𝒫)
+  ℒ = Meshes.lentype(pset)
   ns = zeros(Int, nlags)
   Σx = zeros(ℒ, nlags)
 
@@ -65,13 +68,13 @@ function accumulate(geotable, (var₁, var₂), e::VariogramEstimator, lagsearch
   Σy = zeros(V, nlags)
 
   # loop over pairs of points
-  @inbounds for j in 1:nelements(𝒫)
-    pⱼ = 𝒫[j]
+  @inbounds for j in 1:nelements(pset)
+    pⱼ = pset[j]
     for i in neighbors(j)
       # skip to avoid double counting
       skip(i, j) && continue
 
-      pᵢ = 𝒫[i]
+      pᵢ = pset[i]
 
       # evaluate geospatial lag
       h = evaluate(distance, pᵢ, pⱼ)
@@ -135,18 +138,21 @@ function accumulate(geotable, pairs, ::CarleEstimator, lagsearch::LagSearchMetho
   # compute lag size
   δh = maxlag / nlags
 
-  # table and point set
-  𝒯 = values(geotable)
-  𝒫 = domain(geotable)
+  # table and domain
+  tab = values(geotable)
+  dom = domain(geotable)
+
+  # estimators are defined on point sets
+  pset = PointSet([centroid(dom, i) for i in 1:nelements(dom)])
 
   # table columns
-  cols = Tables.columns(𝒯)
+  cols = Tables.columns(tab)
 
   # get column from variable name
   get(var) = Tables.getcolumn(cols, Symbol(var))
 
   # neighbors function
-  neighbors = neighfun(lagsearch, 𝒫)
+  neighbors = neighfun(lagsearch, pset)
 
   # skip condition
   skip = skipfun(lagsearch)
@@ -155,7 +161,7 @@ function accumulate(geotable, pairs, ::CarleEstimator, lagsearch::LagSearchMetho
   exit = exitfun(lagsearch)
 
   # lag counts and abscissa sums
-  ℒ = Meshes.lentype(𝒫)
+  ℒ = Meshes.lentype(pset)
   ns = zeros(Int, nlags)
   Σx = zeros(ℒ, nlags)
 
@@ -164,13 +170,13 @@ function accumulate(geotable, pairs, ::CarleEstimator, lagsearch::LagSearchMetho
   Σd = map(_ -> zeros(Int, nlags), pairs)
 
   # loop over pairs of points
-  @inbounds for j in 1:nelements(𝒫)
-    pⱼ = 𝒫[j]
+  @inbounds for j in 1:nelements(pset)
+    pⱼ = pset[j]
     for i in neighbors(j)
       # skip to avoid double counting
       skip(i, j) && continue
 
-      pᵢ = 𝒫[i]
+      pᵢ = pset[i]
 
       # evaluate geospatial lag
       h = evaluate(distance, pᵢ, pⱼ)
