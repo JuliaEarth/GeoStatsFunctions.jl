@@ -66,7 +66,7 @@ function EmpiricalTransiogram(
   lsearch = lagsearchmethod(domain(idata), nlags, maxlag, distance, Symbol(lagsearch))
 
   # perform estimation
-  counts, abscissas, ordinates, headcounts = estimate(idata, pairs, estim, lsearch)
+  counts, abscissas, ordinates, headcounts = _transiogram(idata, pairs, estim, lsearch)
 
   EmpiricalTransiogram(counts, abscissas, ordinates, headcounts, distance, estim)
 end
@@ -160,4 +160,98 @@ function merge(tα::EmpiricalTransiogram{ℒ,V,D,E}, tβ::EmpiricalTransiogram{�
   end
 
   EmpiricalTransiogram(n, x, Y, C, d, e)
+end
+
+function _transiogram(geotable, pairs, ::CarleEstimator, lagsearch::LagSearchMethod)
+  # lag search parameters
+  nlags, maxlag, distance = params(lagsearch)
+
+  # compute lag size
+  δh = maxlag / nlags
+
+  # table and domain
+  tab = values(geotable)
+  dom = domain(geotable)
+
+  # estimators are defined on point sets
+  pset = PointSet([centroid(dom, i) for i in 1:nelements(dom)])
+
+  # table columns
+  cols = Tables.columns(tab)
+
+  # get column from variable name
+  get(var) = Tables.getcolumn(cols, Symbol(var))
+
+  # neighbors function
+  neighbors = neighfun(lagsearch, pset)
+
+  # skip condition
+  skip = skipfun(lagsearch)
+
+  # early exit condition
+  exit = exitfun(lagsearch)
+
+  # lag counts and abscissa sums
+  ℒ = Meshes.lentype(pset)
+  ns = zeros(Int, nlags)
+  Σx = zeros(ℒ, nlags)
+
+  # numerator and denominator sums
+  Σn = map(_ -> zeros(Int, nlags), pairs)
+  Σd = map(_ -> zeros(Int, nlags), pairs)
+
+  # loop over pairs of points
+  @inbounds for j in 1:nelements(pset)
+    pⱼ = pset[j]
+    for i in neighbors(j)
+      # skip to avoid double counting
+      skip(i, j) && continue
+
+      pᵢ = pset[i]
+
+      # evaluate geospatial lag
+      h = evaluate(distance, pᵢ, pⱼ)
+
+      # early exit if out of range
+      exit(h) && continue
+
+      # bin (or lag) where to accumulate result
+      lag = ceil(Int, h / δh)
+      lag == 0 && @warn "duplicate coordinates found, consider using `UniqueCoords`"
+
+      # accumulate if lag is valid
+      if 0 < lag ≤ nlags
+        for (k, (var₁, var₂)) in enumerate(pairs)
+          # retrieve indicator variables
+          I₁ = get(var₁)
+          I₂ = get(var₂)
+
+          # accumulate numerator and denominator
+          ns[lag] += 1
+          Σx[lag] += h
+          Σn[k][lag] += I₁[i] * I₂[j]
+          Σd[k][lag] += I₁[i]
+        end
+      end
+    end
+  end
+
+  # bin (or lag) size
+  lags = range(δh / 2, stop=maxlag - δh / 2, length=nlags)
+
+  # abscissa
+  xs = @. Σx / ns
+  xs[ns .== 0] .= lags[ns .== 0]
+
+  # ordinate
+  Y = map(enumerate(pairs)) do (k, _)
+    ys = Σn[k] ./ Σd[k]
+    ys[Σd[k] .== 0] .= zero(eltype(ys))
+    ys
+  end
+
+  # head count
+  C = Σd
+
+  ns, xs, Y, C
 end

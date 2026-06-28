@@ -76,7 +76,7 @@ function EmpiricalVariogram(
   lsearch = lagsearchmethod(domain(data), nlags, maxlag, distance, Symbol(lagsearch))
 
   # perform estimation
-  counts, abscissas, ordinates = estimate(data, (var₁, var₂), estim, lsearch)
+  counts, abscissas, ordinates = _variogram(data, (var₁, var₂), estim, lsearch)
 
   EmpiricalVariogram(counts, abscissas, ordinates, distance, estim)
 end
@@ -164,4 +164,97 @@ function merge(γα::EmpiricalVariogram{ℒ,V,D,E}, γβ::EmpiricalVariogram{ℒ
   y[n .== 0] .= 0
 
   EmpiricalVariogram(n, x, y, d, e)
+end
+
+function _variogram(geotable, (var₁, var₂), estim::VariogramEstimator, lagsearch::LagSearchMethod)
+  # lag search parameters
+  nlags, maxlag, distance = params(lagsearch)
+
+  # compute lag size
+  δh = maxlag / nlags
+
+  # table and domain
+  tab = values(geotable)
+  dom = domain(geotable)
+
+  # estimators are defined on point sets
+  pset = PointSet([centroid(dom, i) for i in 1:nelements(dom)])
+
+  # table columns
+  cols = Tables.columns(tab)
+
+  # get column from variable name
+  get(var) = Tables.getcolumn(cols, Symbol(var))
+
+  # vectors for variables
+  z₁ = get(var₁)
+  z₂ = get(var₂)
+
+  # neighbors function
+  neighbors = neighfun(lagsearch, pset)
+
+  # skip condition
+  skip = skipfun(lagsearch)
+
+  # early exit condition
+  exit = exitfun(lagsearch)
+
+  # lag counts and abscissa sums
+  ℒ = Meshes.lentype(pset)
+  ns = zeros(Int, nlags)
+  Σx = zeros(ℒ, nlags)
+
+  # ordinate sums
+  V = returntype(estim, z₁, z₂)
+  Σy = zeros(V, nlags)
+
+  # loop over pairs of points
+  @inbounds for j in 1:nelements(pset)
+    pⱼ = pset[j]
+    for i in neighbors(j)
+      # skip to avoid double counting
+      skip(i, j) && continue
+
+      pᵢ = pset[i]
+
+      # evaluate geospatial lag
+      h = evaluate(distance, pᵢ, pⱼ)
+
+      # early exit if out of range
+      exit(h) && continue
+
+      # bin (or lag) where to accumulate result
+      lag = ceil(Int, h / δh)
+      lag == 0 && @warn "duplicate coordinates found, consider using `UniqueCoords`"
+
+      # accumulate if lag is valid
+      if 0 < lag ≤ nlags
+        # evaluate function estimator
+        v = accumterm(estim, z₁[i], z₁[j], z₂[i], z₂[j])
+
+        # accumulate if value is valid
+        if !ismissing(v)
+          ns[lag] += 1
+          Σx[lag] += h
+          Σy[lag] += v
+        end
+      end
+    end
+  end
+
+  # ordinate function
+  ordfun(Σy, n) = accumnorm(estim, Σy, n)
+
+  # bin (or lag) size
+  lags = range(δh / 2, stop=maxlag - δh / 2, length=nlags)
+
+  # abscissa
+  xs = @. Σx / ns
+  xs[ns .== 0] .= lags[ns .== 0]
+
+  # ordinate
+  ys = @. ordfun(Σy, ns)
+  ys[ns .== 0] .= zero(eltype(ys))
+
+  ns, xs, ys
 end
