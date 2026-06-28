@@ -10,6 +10,8 @@ the estimation of geostatistical functions.
 """
 abstract type LagSearchMethod end
 
+params(m::LagSearchMethod) = (nlags=m.nlags, maxlag=m.maxlag, distance=m.distance)
+
 include("lagsearch/fullsearch.jl")
 include("lagsearch/ballsearch.jl")
 

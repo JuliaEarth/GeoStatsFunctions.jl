@@ -27,9 +27,7 @@ include("estimators/cressie.jl")
 
 function accumulate(geotable, (var₁, var₂), e::VariogramEstimator, lagsearch::LagSearchMethod)
   # lag search parameters
-  nlags = lagsearch.nlags
-  maxlag = lagsearch.maxlag
-  distance = lagsearch.distance
+  nlags, maxlag, distance = params(lagsearch)
 
   # compute lag size
   δh = maxlag / nlags
@@ -132,9 +130,7 @@ include("estimators/carle.jl")
 
 function accumulate(geotable, pairs, ::CarleEstimator, lagsearch::LagSearchMethod)
   # lag search parameters
-  nlags = lagsearch.nlags
-  maxlag = lagsearch.maxlag
-  distance = lagsearch.distance
+  nlags, maxlag, distance = params(lagsearch)
 
   # compute lag size
   δh = maxlag / nlags
