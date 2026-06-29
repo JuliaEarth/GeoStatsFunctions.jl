@@ -29,18 +29,18 @@ Tells whether or not the empirical geostatistical function `f` is symmetric.
 issymmetric(f::EmpiricalGeoStatsFunction) = issymmetric(typeof(f))
 
 """
-    nvariates(f)
+    nvariables(f)
 
-Return the number of (co)variates of the empirical geostatistical function `f`.
+Return the number of (co)variables of the empirical geostatistical function `f`.
 """
-nvariates(f::EmpiricalGeoStatsFunction) = nvariates(typeof(f))
+nvariables(f::EmpiricalGeoStatsFunction) = nvariables(typeof(f))
 
 """
-    variates(f)
+    variables(f)
 
-Return the names of the (co)variates of the empirical geostatistical function `f`.
+Return the names of the (co)variables of the empirical geostatistical function `f`.
 """
-variates(f::EmpiricalGeoStatsFunction) = defaultvariates(nvariates(f))
+variables(f::EmpiricalGeoStatsFunction) = defaultvariables(nvariables(f))
 
 # -----------
 # IO METHODS
@@ -94,18 +94,18 @@ Tells whether or not the empirical geostatistical surface `f` is symmetric.
 issymmetric(f::EmpiricalGeoStatsSurface) = issymmetric(typeof(f))
 
 """
-    nvariates(f)
+    nvariables(f)
 
-Return the number of (co)variates of the empirical geostatistical surface `f`.
+Return the number of (co)variables of the empirical geostatistical surface `f`.
 """
-nvariates(f::EmpiricalGeoStatsSurface) = nvariates(typeof(f))
+nvariables(f::EmpiricalGeoStatsSurface) = nvariables(typeof(f))
 
 """
-    variates(f)
+    variables(f)
 
-Return the names of the (co)variates of the empirical geostatistical surface `f`.
+Return the names of the (co)variables of the empirical geostatistical surface `f`.
 """
-variates(f::EmpiricalGeoStatsSurface) = defaultvariates(nvariates(f))
+variables(f::EmpiricalGeoStatsSurface) = defaultvariables(nvariables(f))
 
 # -----------
 # IO METHODS

@@ -23,7 +23,7 @@ metricball(cov::Covariance) = metricball(cov.γ)
 
 scale(cov::C, s::Real) where {C<:Covariance} = C(scale(cov.γ, s))
 
-nvariates(::Type{<:Covariance}) = 1
+nvariables(::Type{<:Covariance}) = 1
 
 (cov::Covariance)(h) = sill(cov.γ) - cov.γ(h)
 

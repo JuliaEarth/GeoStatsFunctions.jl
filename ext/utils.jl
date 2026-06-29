@@ -18,7 +18,7 @@ _eval(f, hs) = isisotropic(f) ? _isoeval(f, hs) : _anisoeval(f, hs)
 
 function _isoeval(f, hs)
   # auxiliary parameters
-  n = nvariates(f)
+  n = nvariables(f)
 
   # evaluate all lags
   fs = f.(hs)
@@ -31,7 +31,7 @@ end
 
 function _anisoeval(f, hs)
   # auxiliary parameters
-  n = nvariates(f)
+  n = nvariables(f)
 
   # reference point and basis vectors
   p, v = _anisobasis(f)

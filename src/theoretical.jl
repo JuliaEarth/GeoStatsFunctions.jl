@@ -67,18 +67,18 @@ with a strictly positive scaling factor `s`.
 function scale end
 
 """
-    nvariates(f)
+    nvariables(f)
 
-Return the number of (co)variates of the geostatistical function `f`.
+Return the number of (co)variables of the geostatistical function `f`.
 """
-nvariates(f::GeoStatsFunction) = nvariates(typeof(f))
+nvariables(f::GeoStatsFunction) = nvariables(typeof(f))
 
 """
-    variates(f)
+    variables(f)
 
-Return the names of the (co)variates of the geostatistical function `f`.
+Return the names of the (co)variables of the geostatistical function `f`.
 """
-variates(f::GeoStatsFunction) = defaultvariates(nvariates(f))
+variables(f::GeoStatsFunction) = defaultvariables(nvariables(f))
 
 """
     f(p₁, p₂)
@@ -190,7 +190,7 @@ and `domain₂`.
 function matrixparams(f::GeoStatsFunction, domain₁, domain₂)
   m = length(domain₁)
   n = length(domain₂)
-  k = nvariates(f)
+  k = nvariables(f)
   g₁ = first(domain₁)
   g₂ = first(domain₂)
   F = ustrip.(f(g₁, g₂))

@@ -73,8 +73,8 @@
   @test metricball(ExponentialVariogram(range=2.0)) == MetricBall(2.0)
   @test metricball(MaternVariogram(range=2.0)) == MetricBall(2.0)
 
-  # number of variates
-  @test all(nvariates.(γs) .== 1)
+  # number of variables
+  @test all(nvariables.(γs) .== 1)
 
   # variograms are symmetric under Euclidean distance
   for γ in (γs ∪ γn ∪ γnd ∪ [sum(γs) + sum(γn) + sum(γnd)])

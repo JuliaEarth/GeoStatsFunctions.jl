@@ -41,13 +41,13 @@
   @test metricball(γ) == MetricBall(3.0)
   @test range(γ) == 3.0u"m"
 
-  # number of variates
+  # number of variables
   C₁ = [1.0 0.5; 0.5 2.0]
   C₂ = [3.0 0.0; 0.0 3.0]
   γ₁ = GaussianVariogram(range=2.0) + ExponentialVariogram(range=3.0)
   γ₂ = C₁ * GaussianVariogram(range=1.0) + C₂ * SphericalVariogram(range=2.0)
-  @test nvariates(γ₁) == 1
-  @test nvariates(γ₂) == 2
+  @test nvariables(γ₁) == 1
+  @test nvariables(γ₂) == 2
 
   # scaling composite models
   γ = GaussianVariogram(range=2.0) + ExponentialVariogram(range=3.0)
@@ -123,13 +123,13 @@ end
   @test metricball(cov) == MetricBall(3.0)
   @test range(cov) == 3.0u"m"
 
-  # number of variates
+  # number of variables
   C₁ = [1.0 0.5; 0.5 2.0]
   C₂ = [3.0 0.0; 0.0 3.0]
   cov₁ = GaussianCovariance(range=2.0) + ExponentialCovariance(range=3.0)
   cov₂ = C₁ * GaussianCovariance(range=1.0) + C₂ * SphericalCovariance(range=2.0)
-  @test nvariates(cov₁) == 1
-  @test nvariates(cov₂) == 2
+  @test nvariables(cov₁) == 1
+  @test nvariables(cov₂) == 2
 
   # test individual structures
   cov = SphericalCovariance() + 2ExponentialCovariance() + NuggetEffect(10.0)

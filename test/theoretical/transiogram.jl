@@ -24,8 +24,8 @@
     @test range(t′) == 2.0u"m"
   end
 
-  # number of variates
-  @test all(nvariates.(ts) .== 2)
+  # number of variables
+  @test all(nvariables.(ts) .== 2)
 
   # mean lengths
   for t in ts
@@ -77,7 +77,7 @@ end
   t = MatrixExponentialTransiogram(lengths=(1.0u"m", 2.0u"m", 3.0u"m"), proportions=(0.2, 0.5, 0.3))
   @test t isa MatrixExponentialTransiogram
   @test range(t) == 3.0u"m"
-  @test nvariates(t) == 3
+  @test nvariables(t) == 3
   @test meanlengths(t) == (1.0u"m", 2.0u"m", 3.0u"m")
   @test all(proportions(t) .≈ (0.12403100775193801, 0.38759689922480606, 0.48837209302325607))
   @test range(GeoStatsFunctions.scale(t, 2)) == 6.0u"m"
@@ -87,7 +87,7 @@ end
   R = A ./ sum(A, dims=2)
   t = MatrixExponentialTransiogram(R)
   @test t isa MatrixExponentialTransiogram
-  @test nvariates(t) == 3
+  @test nvariables(t) == 3
   @test meanlengths(t) == Tuple((1 ./ -diag(R)) * u"m")
 
   # invalid transition rate matrix
@@ -123,7 +123,7 @@ end
   t = EmpiricalTransiogram(gtb, "FACIES", maxlag=20, nlags=20)
   τ = GeoStatsFunctions.fit(PiecewiseLinearTransiogram, t)
   @test range(GeoStatsFunctions.scale(τ, 2)) == 2range(τ)
-  @test nvariates(τ) == 5
+  @test nvariables(τ) == 5
   @test τ(0.0u"m") == I(5)
   @test all(x -> 0 < x < 1, τ(5.0u"m"))
   @test all(allequal, eachcol(τ(100.0u"m")))

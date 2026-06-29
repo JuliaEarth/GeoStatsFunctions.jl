@@ -69,13 +69,13 @@ function EmpiricalVariogramSurface(
   zs = [g.ordinates for g in gs]
 
   # variable names
-  vs = variates(first(gs))
+  vs = variables(first(gs))
 
   EmpiricalVariogramSurface(θs, rs, zs, vs)
 end
 
 issymmetric(::Type{<:EmpiricalVariogramSurface}) = true
 
-nvariates(g::EmpiricalVariogramSurface) = size(first(g.zs), 1)
+nvariables(g::EmpiricalVariogramSurface) = size(first(g.zs), 1)
 
-variates(g::EmpiricalVariogramSurface) = g.vs
+variables(g::EmpiricalVariogramSurface) = g.vs

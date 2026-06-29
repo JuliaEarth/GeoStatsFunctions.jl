@@ -92,9 +92,9 @@ end
 
 issymmetric(::Type{<:EmpiricalTransiogram}) = false
 
-nvariates(t::EmpiricalTransiogram) = length(t.variables)
+nvariables(t::EmpiricalTransiogram) = length(t.variables)
 
-variates(t::EmpiricalTransiogram) = t.variables
+variables(t::EmpiricalTransiogram) = t.variables
 
 """
     merge(tα, tβ)

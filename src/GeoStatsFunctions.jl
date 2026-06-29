@@ -88,8 +88,8 @@ export
   EmpiricalVariogram,
   EmpiricalTransiogram,
   issymmetric,
-  nvariates,
-  variates,
+  nvariables,
+  variables,
 
   # convenience functions
   DirectionalVariogram,
@@ -109,7 +109,8 @@ export
   issymmetric,
   isbanded,
   metricball,
-  nvariates,
+  nvariables,
+  variables,
   structures,
   meanlengths,
   proportions,

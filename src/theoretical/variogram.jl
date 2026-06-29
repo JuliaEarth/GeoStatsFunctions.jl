@@ -22,7 +22,7 @@ function scale(γ::Variogram, s::Real)
   V(s * metricball(γ); sill=sill(γ), nugget=nugget(γ))
 end
 
-nvariates(::Type{<:Variogram}) = 1
+nvariables(::Type{<:Variogram}) = 1
 
 """
     sill(γ)

@@ -21,7 +21,7 @@ end
 
 defaultmaxlag(data) = _minside(boundingbox(domain(data))) / 2
 
-defaultvariates(n) = n == 1 ? [:field] : [Symbol(:field, i) for i in 1:n]
+defaultvariables(n) = n == 1 ? [:field] : [Symbol(:field, i) for i in 1:n]
 
 rangeball(range, ::Nothing, rotation) = MetricBall(range)
 rangeball(range, ranges, rotation) = MetricBall(ranges, rotation)

@@ -107,9 +107,9 @@ end
 
 issymmetric(::Type{<:EmpiricalVariogram}) = true
 
-nvariates(g::EmpiricalVariogram) = length(g.variables)
+nvariables(g::EmpiricalVariogram) = length(g.variables)
 
-variates(g::EmpiricalVariogram) = g.variables
+variables(g::EmpiricalVariogram) = g.variables
 
 """
     merge(γα, γβ)

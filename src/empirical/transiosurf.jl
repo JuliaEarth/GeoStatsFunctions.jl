@@ -69,13 +69,13 @@ function EmpiricalTransiogramSurface(
   zs = [t.ordinates for t in ts]
 
   # variable names
-  vs = variates(first(ts))
+  vs = variables(first(ts))
 
   EmpiricalTransiogramSurface(θs, rs, zs, vs)
 end
 
 issymmetric(::Type{<:EmpiricalTransiogramSurface}) = false
 
-nvariates(t::EmpiricalTransiogramSurface) = size(first(t.zs), 1)
+nvariables(t::EmpiricalTransiogramSurface) = size(first(t.zs), 1)
 
-variates(t::EmpiricalTransiogramSurface) = t.vs
+variables(t::EmpiricalTransiogramSurface) = t.vs

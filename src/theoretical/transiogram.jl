@@ -29,13 +29,13 @@ function scale(t::Transiogram, s::Real)
   T(s * metricball(t); proportions=proportions(t))
 end
 
-nvariates(t::Transiogram) = length(proportions(t))
+nvariables(t::Transiogram) = length(proportions(t))
 
 # ----------------
 # TRANSIOGRAM API
 # ----------------
 
-meanlengths(t::Transiogram) = ntuple(i -> range(t), nvariates(t))
+meanlengths(t::Transiogram) = ntuple(i -> range(t), nvariables(t))
 
 proportions(t::Transiogram) = t.proportions
 

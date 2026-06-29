@@ -4,8 +4,8 @@
 
 function funplot(f; kwargs...)
   # initialize figure
-  n = nvariates(f)
-  v = variates(f)
+  n = nvariables(f)
+  v = variables(f)
   fig = Makie.Figure()
   for i in 1:n, j in 1:n
     issymmetric(f) && i < j && continue
@@ -50,7 +50,7 @@ function funplot!(
 
   # add plots to axes
   d = length(F)
-  n = nvariates(f)
+  n = nvariables(f)
   for i in 1:n, j in 1:n
     issymmetric(f) && i < j && continue
     ax = Makie.content(fig[i, j])
@@ -103,7 +103,7 @@ function funplot!(
   hmax = isnothing(maxlag) ? _maxlag(f) : GeoStatsFunctions.aslen(maxlag)
 
   # add plots to axes
-  n = nvariates(f)
+  n = nvariables(f)
   for i in 1:n, j in 1:n
     issymmetric(f) && i < j && continue
     ax = Makie.content(fig[i, j])

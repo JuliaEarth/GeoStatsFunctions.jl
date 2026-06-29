@@ -39,7 +39,7 @@ Base.range(f::CompositeFunction) = maximum(range(fᵢ) for fᵢ in f.fs)
 
 scale(f::CompositeFunction, s::Real) = sum(f.cs .* map(fᵢ -> scale(fᵢ, s), f.fs))
 
-nvariates(f::CompositeFunction) = maximum(size(cᵢ, 1) for cᵢ in f.cs)
+nvariables(f::CompositeFunction) = maximum(size(cᵢ, 1) for cᵢ in f.cs)
 
 # -------------------------
 # VARIOGRAM/COVARIANCE API
