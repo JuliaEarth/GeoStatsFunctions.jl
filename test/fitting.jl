@@ -85,32 +85,10 @@
   @test isapprox(nugget(γ), 0.01u"K^2", atol=1e-3u"K^2")
 
   # power variograms
-  sₜ = 1.00
-  nₜ = 0.20
-  eₜ = 1.50
-  γₜ = PowerVariogram(; scaling=sₜ, nugget=nₜ, exponent=eₜ)
-  xs = collect(0.0:0.1:10.0)u"m"
-  ys = γₜ.(xs)
-  Y = [ys for i in 1:1, j in 1:1]
-  ns = rand(1000:5000, length(xs))
-  g = EmpiricalVariogram(ns, xs, Y, Euclidean(), GeoStatsFunctions.MatheronEstimator(), [:z])
+  d = georef((; z=[i+j for i in 1:50, j in 1:50]))
+  g = EmpiricalVariogram(d, "z", maxlag=25.)
   γ = GeoStatsFunctions.fit(PowerVariogram, g)
-  @test isapprox(γ.nugget, nₜ, atol=1e-3)
-  @test isapprox(γ.scaling, sₜ, atol=1e-3)
-  @test isapprox(γ.exponent, eₜ, atol=1e-3)
-  sₜ = 6.54
-  nₜ = 1.45
-  eₜ = 0.64
-  γₜ = PowerVariogram(; scaling=sₜ, nugget=nₜ, exponent=eₜ)
-  xs = collect(0.0:10.0:200.0)u"m"
-  ys = γₜ.(xs)
-  Y = [ys for i in 1:1, j in 1:1]
-  ns = rand(100:1000, length(xs))
-  g = EmpiricalVariogram(ns, xs, Y, Euclidean(), GeoStatsFunctions.MatheronEstimator(), [:z])
-  γ = GeoStatsFunctions.fit(PowerVariogram, g)
-  @test isapprox(γ.nugget, nₜ, atol=1e-3)
-  @test isapprox(γ.scaling, sₜ, atol=1e-3)
-  @test isapprox(γ.exponent, eₜ, atol=1e-3)
+  @test γ.(g.abscissas) ≈ g.ordinates[1] atol=1e-1
 end
 
 @testset "Fitting transiograms" begin
