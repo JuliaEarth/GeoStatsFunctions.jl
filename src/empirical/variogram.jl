@@ -239,7 +239,7 @@ function _variogram(geotable, estim::VariogramEstimator, lagsearch::LagSearchMet
 
       # accumulate if lag is valid
       if 0 < lag ≤ nlags
-        for (k, idx) in enumerate(CartesianIndices(pairs))
+        for idx in CartesianIndices(pairs)
           # variogram is symmetric
           idx[1] < idx[2] && continue
 
@@ -255,7 +255,7 @@ function _variogram(geotable, estim::VariogramEstimator, lagsearch::LagSearchMet
           if !ismissing(v)
             ns[lag] += 1
             Σx[lag] += h
-            Σy[k][lag] += v
+            Σy[idx][lag] += v
           end
         end
       end
