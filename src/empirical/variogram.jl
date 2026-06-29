@@ -239,8 +239,12 @@ function _variogram(geotable, estim::VariogramEstimator, lagsearch::LagSearchMet
 
       # accumulate if lag is valid
       if 0 < lag ≤ nlags
-        for (k, (var₁, var₂)) in enumerate(pairs)
+        for (k, idx) in enumerate(CartesianIndices(pairs))
+          # variogram is symmetric
+          idx[1] < idx[2] && continue
+
           # retrieve variables
+          var₁, var₂ = pairs[idx]
           z₁ = get(var₁)
           z₂ = get(var₂)
 
@@ -256,6 +260,11 @@ function _variogram(geotable, estim::VariogramEstimator, lagsearch::LagSearchMet
         end
       end
     end
+  end
+
+  # copy symmetric values to upper triangle
+  for idx in CartesianIndices(pairs)
+    idx[1] < idx[2] && (Σy[idx] .= Σy[idx[2], idx[1]])
   end
 
   # bin (or lag) size
