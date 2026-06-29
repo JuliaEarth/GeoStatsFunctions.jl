@@ -2,92 +2,118 @@
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
 
-"""
-    HScatter
-"""
-Makie.@recipe HScatter (gtb, var₁, var₂) begin
-  "lag distance between points in length units"
-  lag = 0.0u"m"
-  "tolerance for lag distance in length units"
-  tol = 0.1u"m"
-  "distance from Distances.jl"
-  distance = Euclidean()
-  "size of points in point set"
-  size = 2
-  "color of geometries or points"
-  color = :black
-  "transparency of points in [0,1]"
-  alpha = 1.0
-  "color of regression line"
-  rcolor = :salmon
-  "color of identity line"
-  icolor = :black
-  "color of center lines"
-  ccolor = :teal
-end
+function hscatter(
+  data,
+  vars;
+  # lag distance in length units
+  lag=0.0u"m",
+  # tolerance for lag distance
+  tol=0.1u"m",
+  # distance from Distances.jl
+  distance=Euclidean(),
+  # size of points
+  size=2,
+  # color of points
+  color=:black,
+  # transparency of points
+  alpha=1.0,
+  # color of regression line
+  rcolor=:salmon,
+  # color of identity line
+  icolor=:black,
+  # color of center lines
+  ccolor=:teal
+)
+  # selected variables
+  nsamp = min(nrow(data), 4000)
+  sdata = data |> Select(vars) |> Sample(nsamp, replace=false)
 
-Makie.preferred_axis_attributes(_, plot::HScatter) =
-  (aspect=Makie.DataAspect(), xlabel=string(plot.var₁[]), ylabel=string(plot.var₂[]))
+  # pairs of variables
+  svars = setdiff(names(sdata), ["geometry"])
+  pairs = [(var₁, var₂) for var₁ in svars, var₂ in svars]
 
-function Makie.plot!(plot::HScatter)
-  # visualize h-scatter
-  Makie.map!(plot, [:gtb, :var₁, :var₂, :lag, :tol, :distance], [:x, :y]) do gtb, var₁, var₂, lag, tol, distance
-    _hscatter(gtb, var₁, var₂, aslen(lag), aslen(tol), distance)
+  n = length(svars)
+  fig = Makie.Figure()
+  for i in 1:n, j in 1:n
+    i < j && continue
+    # retrieve variable names
+    var₁, var₂ = pairs[j, i]
+
+    # initialize axis
+    ax = Makie.Axis(fig[i, j])
+    ax.aspect = Makie.AxisAspect(1)
+    ax.xlabel = var₁
+    ax.ylabel = var₂
+    i < n && Makie.hidexdecorations!(ax, grid=false)
+    j > 1 && Makie.hideydecorations!(ax, grid=false)
+
+    # compute h-scatter coordinates
+    z₁, z₂ = _hscatter(sdata, var₁, var₂, aslen(lag), aslen(tol), distance)
+
+    # skip empty lag distances
+    isnothing(z₁) && continue
+
+    # compute regression line and identity line
+    z̄₁, z̄₂ = mean(z₁), mean(z₂)
+    Z₁ = [z₁ ones(length(z₁))]
+    ẑ₂ = Z₁ * (Z₁ \ z₂)
+    a, b = extrema([extrema(z₁)..., extrema(z₂)...])
+    minmax = [(a, a), (b, b)]
+
+    # plot h-scatter points
+    Makie.scatter!(ax, z₁, z₂, color=color, alpha=alpha, markersize=size)
+
+    # plot regression line
+    Makie.lines!(ax, z₁, ẑ₂, color=rcolor)
+
+    # plot identity line
+    Makie.lines!(ax, minmax, color=icolor)
+
+    # plot center lines
+    Makie.vlines!(ax, z̄₁, color=ccolor)
+    Makie.hlines!(ax, z̄₂, color=ccolor)
+
+    # plot center point
+    Makie.scatter!(ax, z̄₁, z̄₂, color=ccolor, marker=:rect, markersize=16)
   end
 
-  # compute regression line and identity line limits
-  Makie.map!(plot, [:x, :y], [:x̄, :ȳ, :ŷ, :minmax]) do x, y
-    x̄, ȳ = mean(x), mean(y)
-    X = [x ones(length(x))]
-    ŷ = X * (X \ y)
-    a, b = extrema([extrema(x)..., extrema(y)...])
-    x̄, ȳ, ŷ, [(a, a), (b, b)]
+  for i in 1:n
+    axes = [c for c in Makie.contents(fig[i, :]) if c isa Makie.Axis]
+    Makie.linkyaxes!(axes...)
+  end
+  for j in 1:n
+    axes = [c for c in Makie.contents(fig[:, j]) if c isa Makie.Axis]
+    Makie.linkxaxes!(axes...)
   end
 
-  # visualize h-scatter points
-  Makie.scatter!(plot, plot.x, plot.y, color=plot.color, alpha=plot.alpha, markersize=plot.size)
-
-  # visualize regression line
-  Makie.lines!(plot, plot.x, plot.ŷ, color=plot.rcolor)
-
-  # visualize identity line
-  Makie.lines!(plot, plot.minmax, color=plot.icolor)
-
-  # visualize center lines
-  Makie.vlines!(plot, plot.x̄, color=plot.ccolor)
-  Makie.hlines!(plot, plot.ȳ, color=plot.ccolor)
-
-  # visualize center point
-  Makie.scatter!(plot, plot.x̄, plot.ȳ, color=plot.ccolor, marker=:rect, markersize=16)
+  fig
 end
 
 function _hscatter(gtb, var₁, var₂, lag, tol, distance)
   # lookup valid data
-  𝒮₁ = view(gtb, findall(!ismissing, gtb[:, var₁]))
-  𝒮₂ = view(gtb, findall(!ismissing, gtb[:, var₂]))
-  𝒟₁ = domain(𝒮₁)
-  𝒟₂ = domain(𝒮₂)
-  x₁ = [to(centroid(𝒟₁, i)) for i in 1:nelements(𝒟₁)]
-  x₂ = [to(centroid(𝒟₂, i)) for i in 1:nelements(𝒟₂)]
-  z₁ = getproperty(𝒮₁, var₁)
-  z₂ = getproperty(𝒮₂, var₂)
+  ind₁ = findall(!ismissing, gtb[:, var₁])
+  ind₂ = findall(!ismissing, gtb[:, var₂])
+  sub₁ = gtb[ind₁, :]
+  sub₂ = gtb[ind₂, :]
+  dom₁ = domain(sub₁)
+  dom₂ = domain(sub₂)
+  v₁ = [to(centroid(dom₁, i)) for i in 1:nelements(dom₁)]
+  v₂ = [to(centroid(dom₂, i)) for i in 1:nelements(dom₂)]
+  z₁ = sub₁[:, var₁]
+  z₂ = sub₂[:, var₂]
 
   # compute pairwise distance
   m, n = length(z₁), length(z₂)
   pairs = [(i, j) for j in 1:n for i in j:m]
-  ds = [distance(x₁[i], x₂[j]) for (i, j) in pairs]
+  dists = [distance(v₁[i], v₂[j]) for (i, j) in pairs]
 
   # find indices with given lag
-  match = findall(abs.(ds .- lag) .< tol)
+  match = findall(abs.(dists .- lag) .< tol)
 
-  if isempty(match)
-    throw(ErrorException("No points were found with lag = $lag, aborting..."))
-  end
+  # return sentinel values if no match found
+  isempty(match) && return (nothing, nothing)
 
   # h-scatter coordinates
-  mpairs = view(pairs, match)
-  x = z₁[first.(mpairs)]
-  y = z₂[last.(mpairs)]
-
-  x, y
+  ij = view(pairs, match)
+  z₁[first.(ij)], z₂[last.(ij)]
 end

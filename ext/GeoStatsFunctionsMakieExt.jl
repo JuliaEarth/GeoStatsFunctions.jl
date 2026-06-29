@@ -8,6 +8,7 @@ using GeoStatsFunctions
 using Meshes
 using Unitful
 using Distances
+using TableTransforms
 using LinearAlgebra
 using Statistics
 
@@ -15,7 +16,7 @@ import Makie
 
 import GeoStatsFunctions: funplot, funplot!
 import GeoStatsFunctions: surfplot, surfplot!
-import GeoStatsFunctions: hscatter, hscatter!
+import GeoStatsFunctions: hscatter
 
 # source code
 include("utils.jl")

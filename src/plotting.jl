@@ -3,39 +3,6 @@
 # ------------------------------------------------------------------
 
 """
-    hscatter(geotable, var₁, var₂; [options])
-
-h-scatter plot of `geotable` for pair of variables
-`var₁` and `var₂`. All available `options` will be
-documented below upon loading a Makie.jl backend.
-
-## Examples
-
-```julia
-# h-scatter of z vs. z at lag 1.0
-hscatter(geotable, "z", "z", lag=1.0)
-
-# h-scatter of z vs. w at lag 2.0
-hscatter(geotable, "z", "w", lag=2.0)
-```
-
-### Notes
-
-This function will only work in the presence of
-a Makie.jl backend via package extensions in
-Julia v1.9 or later versions of the language.
-"""
-function hscatter end
-
-"""
-    hscatter!(geotable, var₁, var₂; [options])
-
-Mutating version of [`hscatter`[@ref]. Please check
-the documentation there for available `options`.
-"""
-function hscatter! end
-
-"""
     funplot(f; [options])
 
 Plot the geostatistical function `f` with given `options`.
@@ -131,3 +98,39 @@ is updated with the plot of the geostatistical surface `f`.
 See the documentation of [`surfplot`](@ref) for `options`.
 """
 function surfplot! end
+
+"""
+    hscatter(geotable, vars; [options])
+
+h-scatter plot for all variables `vars` stored in the `geotable`.
+Optionally, specify the options documented below.
+
+## Options
+
+* `lag`      - lag distance in length units (default to `0.0u"m"`)
+* `tol`      - tolerance for lag distance (default to `0.1u"m"`)
+* `distance` - distance from Distances.jl (default to `Euclidean()`)
+* `size`     - size of points (default to `2`)
+* `color`    - color of points (default to `:black`)
+* `alpha`    - transparency of points (default to `1.0`)
+* `rcolor`   - color of regression line (default to `:salmon`)
+* `icolor`   - color of identity line (default to `:black`)
+* `ccolor`   - color of center lines (default to `:teal`)
+
+## Examples
+
+```julia
+# h-scatter of z vs. z at lag 1.0
+hscatter(geotable, "z", lag=1.0)
+
+# h-scatter of z vs. w at lag 2.0
+hscatter(geotable, ["z", "w"], lag=2.0)
+```
+
+### Notes
+
+This function will only work in the presence of
+a Makie.jl backend via package extensions in
+Julia v1.9 or later versions of the language.
+"""
+function hscatter end
