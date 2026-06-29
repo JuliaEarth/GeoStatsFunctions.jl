@@ -151,6 +151,12 @@ function merge(γα::EmpiricalVariogram{ℒ,V,D,E}, γβ::EmpiricalVariogram{ℒ
   EmpiricalVariogram(n, x, Y, d, e, vα)
 end
 
+Base.getindex(g::EmpiricalVariogram, inds::AbstractVector) =
+  EmpiricalVariogram(g.counts, g.abscissas, g.ordinates[inds, inds], g.distance, g.estimator, g.variables[inds])
+
+Base.getindex(g::EmpiricalVariogram, ind::Int) =
+  EmpiricalVariogram(g.counts, g.abscissas, g.ordinates[[ind], [ind]], g.distance, g.estimator, g.variables[[ind]])
+
 # -------------------------
 # CONVENIENCE CONSTRUCTORS
 # -------------------------
@@ -249,6 +255,8 @@ function _variogram(geotable, estim::VariogramEstimator, lagsearch::LagSearchMet
 
       # accumulate if lag is valid
       if 0 < lag ≤ nlags
+        ns[lag] += 1
+        Σx[lag] += h
         for idx in CartesianIndices(pairs)
           # variogram is symmetric
           idx[1] < idx[2] && continue
@@ -262,11 +270,7 @@ function _variogram(geotable, estim::VariogramEstimator, lagsearch::LagSearchMet
           v = accumterm(estim, z₁[i], z₁[j], z₂[i], z₂[j])
 
           # accumulate if value is valid
-          if !ismissing(v)
-            ns[lag] += 1
-            Σx[lag] += h
-            Σy[idx][lag] += v
-          end
+          ismissing(v) || (Σy[idx][lag] += v)
         end
       end
     end

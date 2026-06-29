@@ -23,10 +23,11 @@
 
   # empirical variogram with only missing data
   z = Union{Float64,Missing}[missing, missing, missing]
-  gtb = georef((z=z,), rand(Point, 3))
+  gtb = georef((z=z,), [(0.0, 0.0), (0.1, 0.0), (0.5, 0.0)])
   g = EmpiricalVariogram(gtb, "z", maxlag=1.0, nlags=5)
-  @test g.abscissas == [0.1, 0.3, 0.5, 0.7, 0.9] * u"m"
-  @test all(iszero, g.counts)
+  @test g.abscissas == [0.1, 0.4, 0.5, 0.7, 0.9] * u"m"
+  @test all(ismissing, g.ordinates[1])
+  @test g.counts == [1, 1, 1, 0, 0]
 
   # lag search methods give the same result
   rng = StableRNG(123)

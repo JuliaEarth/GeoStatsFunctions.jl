@@ -234,6 +234,8 @@ function _transiogram(geotable, ::CarleEstimator, lagsearch::LagSearchMethod)
 
       # accumulate if lag is valid
       if 0 < lag ≤ nlags
+        ns[lag] += 1
+        Σx[lag] += h
         for idx in CartesianIndices(pairs)
           # retrieve indicator variables
           var₁, var₂ = pairs[idx]
@@ -241,8 +243,6 @@ function _transiogram(geotable, ::CarleEstimator, lagsearch::LagSearchMethod)
           I₂ = get(var₂)
 
           # accumulate numerator and denominator
-          ns[lag] += 1
-          Σx[lag] += h
           Σn[idx][lag] += I₁[i] * I₂[j]
           Σd[idx][lag] += I₁[i]
         end
