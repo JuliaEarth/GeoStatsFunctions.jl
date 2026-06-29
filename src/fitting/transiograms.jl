@@ -54,8 +54,8 @@ function _fit(
   # box constraints (logits are unconstrained, proportions are recovered via softmax)
   δ = oftype(rmax, 1e-8)
   ∞ = ntuple(i -> oftype(rmax, Inf), m)
-  rₗ, rᵤ = isnothing(range′) ? (δ, rmax) : (range′, range′)
-  λₗ, λᵤ = isnothing(proportions) ? (-1 .* ∞, 1 .* ∞) : (_logit(proportions), _logit(proportions))
+  rₗ, rᵤ = isnothing(range′) ? (δ, rmax) : (range′ - δ, range′ + δ)
+  λₗ, λᵤ = isnothing(proportions) ? (-1 .* ∞, 1 .* ∞) : (_logit(proportions) .- δ, _logit(proportions) .+ δ)
   θₗ = [rₗ, λₗ...]
   θᵤ = [rᵤ, λᵤ...]
 
@@ -134,9 +134,9 @@ function _fit(
   # box constraints (logits are unconstrained, proportions are recovered via softmax)
   δ = oftype(rmax, 1e-8)
   ∞ = ntuple(i -> oftype(rmax, Inf), m)
-  rₗ, rᵤ = isnothing(range′) ? (δ, rmax) : (range′, range′)
-  lₗ, lᵤ = isnothing(lengths′) ? (ntuple(i -> δ, k), lmax) : (lengths′, lengths′)
-  λₗ, λᵤ = isnothing(proportions) ? (-1 .* ∞, 1 .* ∞) : (_logit(proportions), _logit(proportions))
+  rₗ, rᵤ = isnothing(range′) ? (δ, rmax) : (range′ - δ, range′ + δ)
+  lₗ, lᵤ = isnothing(lengths′) ? (ntuple(i -> δ, k), lmax) : (lengths′ .- δ, lengths′ .+ δ)
+  λₗ, λᵤ = isnothing(proportions) ? (-1 .* ∞, 1 .* ∞) : (_logit(proportions) .- δ, _logit(proportions) .+ δ)
   θₗ = [rₗ, lₗ..., λₗ...]
   θᵤ = [rᵤ, lᵤ..., λᵤ...]
 
