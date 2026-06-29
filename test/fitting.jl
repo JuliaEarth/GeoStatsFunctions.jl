@@ -93,7 +93,7 @@
   ys = γₜ.(xs)
   Y = [ys for i in 1:1, j in 1:1]
   ns = rand(1000:5000, length(xs))
-  g = EmpiricalVariogram(ns, xs, Y, Euclidean(), GeoStatsFunctions.MatheronEstimator())
+  g = EmpiricalVariogram(ns, xs, Y, Euclidean(), GeoStatsFunctions.MatheronEstimator(), [:z])
   γ = GeoStatsFunctions.fit(PowerVariogram, g)
   @test isapprox(γ.nugget, nₜ, atol=1e-3)
   @test isapprox(γ.scaling, sₜ, atol=1e-3)
@@ -106,7 +106,7 @@
   ys = γₜ.(xs)
   Y = [ys for i in 1:1, j in 1:1]
   ns = rand(100:1000, length(xs))
-  g = EmpiricalVariogram(ns, xs, Y, Euclidean(), GeoStatsFunctions.MatheronEstimator())
+  g = EmpiricalVariogram(ns, xs, Y, Euclidean(), GeoStatsFunctions.MatheronEstimator(), [:z])
   γ = GeoStatsFunctions.fit(PowerVariogram, g)
   @test isapprox(γ.nugget, nₜ, atol=1e-3)
   @test isapprox(γ.scaling, sₜ, atol=1e-3)
