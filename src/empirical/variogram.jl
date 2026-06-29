@@ -50,6 +50,7 @@ struct EmpiricalVariogram{ℒ<:Len,V,D,E} <: EmpiricalGeoStatsFunction
   ordinates::Matrix{Vector{V}}
   distance::D
   estimator::E
+  variables::Vector{Symbol}
 end
 
 function EmpiricalVariogram(
@@ -79,7 +80,10 @@ function EmpiricalVariogram(
   # perform estimation
   counts, abscissas, ordinates = _variogram(sdata, estim, lsearch)
 
-  EmpiricalVariogram(counts, abscissas, ordinates, distance, estim)
+  # extract variable names
+  names = sdata |> values |> Tables.columns |> Tables.columnnames |> collect
+
+  EmpiricalVariogram(counts, abscissas, ordinates, distance, estim, names)
 end
 
 """
@@ -101,7 +105,11 @@ function EmpiricalVariogram(partition::Partition, vars; kwargs...)
   tmapreduce(γ, merge, collect(filtered))
 end
 
-nvariates(g::EmpiricalVariogram) = size(g.ordinates, 1)
+issymmetric(::Type{<:EmpiricalVariogram}) = true
+
+nvariates(g::EmpiricalVariogram) = length(g.variables)
+
+variates(g::EmpiricalVariogram) = g.variables
 
 """
     merge(γα, γβ)
@@ -117,6 +125,8 @@ function merge(γα::EmpiricalVariogram{ℒ,V,D,E}, γβ::EmpiricalVariogram{ℒ
   xβ = γβ.abscissas
   Yα = γα.ordinates
   Yβ = γβ.ordinates
+  vα = γα.variables
+  vβ = γβ.variables
 
   # copy distance and estimator
   d = γα.distance
@@ -138,7 +148,7 @@ function merge(γα::EmpiricalVariogram{ℒ,V,D,E}, γβ::EmpiricalVariogram{ℒ
     y[n .== 0] .= 0
   end
 
-  EmpiricalVariogram(n, x, Y, d, e)
+  EmpiricalVariogram(n, x, Y, d, e, vα)
 end
 
 # -------------------------

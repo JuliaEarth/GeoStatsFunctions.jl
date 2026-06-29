@@ -45,7 +45,6 @@ Plot the geostatistical function `f` with given `options`.
 * `color`     - color of function graph
 * `linewidth` - line width of function graph
 * `maxlag`    - maximum lag distance
-* `names`     - variable names
 
 ### Theoretical function options:
 
@@ -98,7 +97,6 @@ Plot the geostatistical surface `f` with given `options`.
 
 * `colormap` - Color map
 * `maxlag`   - maximum lag
-* `names`    - variable names
 
 ## Theoretical function options
 

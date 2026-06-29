@@ -20,6 +20,7 @@ struct EmpiricalTransiogramSurface{T,R,Z} <: EmpiricalGeoStatsSurface
   θs::Vector{T}
   rs::Vector{R}
   zs::Vector{Z}
+  vs::Vector{Symbol}
 end
 
 function EmpiricalTransiogramSurface(
@@ -67,9 +68,14 @@ function EmpiricalTransiogramSurface(
   # surface values
   zs = [t.ordinates for t in ts]
 
-  EmpiricalTransiogramSurface(θs, rs, zs)
+  # variable names
+  vs = variates(first(ts))
+
+  EmpiricalTransiogramSurface(θs, rs, zs, vs)
 end
+
+issymmetric(::Type{<:EmpiricalTransiogramSurface}) = false
 
 nvariates(t::EmpiricalTransiogramSurface) = size(first(t.zs), 1)
 
-issymmetric(::Type{<:EmpiricalTransiogramSurface}) = false
+variates(t::EmpiricalTransiogramSurface) = t.vs

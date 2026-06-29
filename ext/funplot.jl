@@ -2,14 +2,12 @@
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
 
-function funplot(f; names=nothing, kwargs...)
+function funplot(f; kwargs...)
   # initialize figure
   n = nvariates(f)
-  v = isnothing(names) ? (1:n) : names
   fig = Makie.Figure()
   for i in 1:n, j in 1:n
     ax = Makie.Axis(fig[i, j])
-    ax.title = n > 1 ? "$(v[i]) → $(v[j])" : ""
     ax.xlabel = i == n ? "lag distance [m]" : ""
   end
   Makie.linkaxes!(fig.content...)
@@ -49,9 +47,8 @@ function funplot!(
   # add plots to axes
   d = length(F)
   n = nvariates(f)
-  I = LinearIndices((n, n))
   for i in 1:n, j in 1:n
-    ax = fig.content[I[j, i]]
+    ax = Makie.content(fig[i, j])
     for (k, Fₖ) in enumerate(F)
       # display function
       Makie.lines!(ax, ustrip.(u"m", hs), Fₖ[i, j]; color, linewidth, linestyle=linestyle[k], label=label[k])
@@ -160,14 +157,17 @@ function funplot!(
   showhist=true,
   histcolor=:slategray
 )
+  # variable names
+  vars = variates(f)
+
   # maximum lag
   hmax = isnothing(maxlag) ? _maxlag(f) : GeoStatsFunctions.aslen(maxlag)
 
   # add plots to axes
   n = nvariates(f)
-  I = LinearIndices((n, n))
   for i in 1:n, j in 1:n
-    ax = fig.content[I[j, i]]
+    ax = Makie.content(fig[i, j])
+    ax.title = "$(vars[i]) → $(vars[j])"
 
     # retrieve coordinates and counts
     hs = f.abscissas

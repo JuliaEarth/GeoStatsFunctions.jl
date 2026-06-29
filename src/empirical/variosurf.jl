@@ -20,6 +20,7 @@ struct EmpiricalVariogramSurface{T,R,Z} <: EmpiricalGeoStatsSurface
   θs::Vector{T}
   rs::Vector{R}
   zs::Vector{Z}
+  vs::Vector{Symbol}
 end
 
 function EmpiricalVariogramSurface(
@@ -67,9 +68,14 @@ function EmpiricalVariogramSurface(
   # surface values
   zs = [g.ordinates for g in gs]
 
-  EmpiricalVariogramSurface(θs, rs, zs)
+  # variable names
+  vs = variates(first(gs))
+
+  EmpiricalVariogramSurface(θs, rs, zs, vs)
 end
+
+issymmetric(::Type{<:EmpiricalVariogramSurface}) = true
 
 nvariates(g::EmpiricalVariogramSurface) = size(first(g.zs), 1)
 
-issymmetric(::Type{<:EmpiricalVariogramSurface}) = true
+variates(g::EmpiricalVariogramSurface) = g.vs

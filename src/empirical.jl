@@ -22,11 +22,25 @@ An empirical geostatistical function.
 abstract type EmpiricalGeoStatsFunction end
 
 """
+    issymmetric(f)
+
+Tells whether or not the empirical geostatistical function `f` is symmetric.
+"""
+issymmetric(f::EmpiricalGeoStatsFunction) = issymmetric(typeof(f))
+
+"""
     nvariates(f)
 
 Return the number of (co)variates of the empirical geostatistical function `f`.
 """
 nvariates(f::EmpiricalGeoStatsFunction) = nvariates(typeof(f))
+
+"""
+    variates(f)
+
+Return the (co)variates of the empirical geostatistical function `f`.
+"""
+variates(f::EmpiricalGeoStatsFunction) = [Symbol("variate$(i)") for i in 1:nvariates(f)]
 
 # -----------
 # IO METHODS
@@ -37,11 +51,6 @@ Base.summary(io::IO, f::EmpiricalGeoStatsFunction) = print(io, nameof(typeof(f))
 function Base.show(io::IO, f::EmpiricalGeoStatsFunction)
   ioctx = IOContext(io, :compact => true)
   summary(ioctx, f)
-  print(ioctx, "(")
-  print(ioctx, "distance: ", f.distance)
-  print(ioctx, ", estimator: ", f.estimator)
-  print(ioctx, ", npairs: ", sum(f.counts))
-  print(ioctx, ")")
 end
 
 function Base.show(io::IO, ::MIME"text/plain", f::EmpiricalGeoStatsFunction)
@@ -54,6 +63,8 @@ function Base.show(io::IO, ::MIME"text/plain", f::EmpiricalGeoStatsFunction)
   _printlnvec(ioctx, f.ordinates, 3)
   println(ioctx, "├─ distance: ", f.distance)
   println(ioctx, "├─ estimator: ", f.estimator)
+  print(ioctx, "├─ variables: ")
+  _printlnvec(ioctx, f.variables, 3)
   print(ioctx, "└─ npairs: ", sum(f.counts))
 end
 
@@ -78,7 +89,7 @@ abstract type EmpiricalGeoStatsSurface end
 """
     issymmetric(f)
 
-Tell whether or not the empirical geostatistical surface `f` is symmetric.
+Tells whether or not the empirical geostatistical surface `f` is symmetric.
 """
 issymmetric(f::EmpiricalGeoStatsSurface) = issymmetric(typeof(f))
 
@@ -89,6 +100,13 @@ Return the number of (co)variates of the empirical geostatistical surface `f`.
 """
 nvariates(f::EmpiricalGeoStatsSurface) = nvariates(typeof(f))
 
+"""
+    variates(f)
+
+Return the (co)variates of the empirical geostatistical surface `f`.
+"""
+variates(f::EmpiricalGeoStatsSurface) = [Symbol("variate$(i)") for i in 1:nvariates(f)]
+
 # -----------
 # IO METHODS
 # -----------
@@ -98,10 +116,6 @@ Base.summary(io::IO, f::EmpiricalGeoStatsSurface) = print(io, nameof(typeof(f)))
 function Base.show(io::IO, f::EmpiricalGeoStatsSurface)
   ioctx = IOContext(io, :compact => true)
   summary(ioctx, f)
-  print(ioctx, "(")
-  print(ioctx, "nangs: ", length(f.θs))
-  print(ioctx, ", nlags: ", length(f.rs))
-  print(ioctx, ")")
 end
 
 function Base.show(io::IO, ::MIME"text/plain", f::EmpiricalGeoStatsSurface)

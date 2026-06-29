@@ -87,6 +87,9 @@ export
   EmpiricalGeoStatsFunction,
   EmpiricalVariogram,
   EmpiricalTransiogram,
+  issymmetric,
+  nvariates,
+  variates,
 
   # convenience functions
   DirectionalVariogram,

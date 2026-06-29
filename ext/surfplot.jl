@@ -2,14 +2,12 @@
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
 
-function surfplot(f; names=nothing, kwargs...)
+function surfplot(f; kwargs...)
   # initialize figure
   n = nvariates(f)
-  v = isnothing(names) ? (1:n) : names
   fig = Makie.Figure()
   for i in 1:n, j in 1:n
-    ax = Makie.PolarAxis(fig[i, j])
-    ax.title = n > 1 ? "$(v[i]) → $(v[j])" : ""
+    Makie.PolarAxis(fig[i, j])
   end
 
   # fill figure with plots
@@ -78,9 +76,8 @@ function surfplot!(
 
   # add plots to axes
   n = nvariates(f)
-  I = LinearIndices((n, n))
   for i in 1:n, j in 1:n
-    ax = fig.content[I[j, i]]
+    ax = Makie.content(fig[i, j])
 
     # values in matrix form
     Zᵢⱼ = getindex.(Z, i, j)
@@ -104,6 +101,9 @@ function surfplot!(
   colormap=:viridis,
   maxlag=nothing
 )
+  # variable names
+  vars = variates(f)
+
   # maximum lag
   hmax = isnothing(maxlag) ? _maxlag(f) : GeoStatsFunctions.aslen(maxlag)
 
@@ -128,9 +128,9 @@ function surfplot!(
 
   # add plots to axes
   n = nvariates(f)
-  I = LinearIndices((n, n))
   for i in 1:n, j in 1:n
-    ax = fig.content[I[j, i]]
+    ax = Makie.content(fig[i, j])
+    ax.title = "$(vars[i]) → $(vars[j])"
 
     # values in matrix form
     Zᵢⱼ = getindex.(zs, i, j)

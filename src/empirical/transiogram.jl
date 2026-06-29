@@ -42,6 +42,7 @@ struct EmpiricalTransiogram{ℒ<:Len,V,D,E} <: EmpiricalGeoStatsFunction
   headcounts::Matrix{Vector{Int}}
   distance::D
   estimator::E
+  variables::Vector{Symbol}
 end
 
 function EmpiricalTransiogram(
@@ -64,7 +65,10 @@ function EmpiricalTransiogram(
   # perform estimation
   counts, abscissas, ordinates, headcounts = _transiogram(idata, estim, lsearch)
 
-  EmpiricalTransiogram(counts, abscissas, ordinates, headcounts, distance, estim)
+  # extract variable names
+  names = Symbol.(levels(data[:, var]))
+
+  EmpiricalTransiogram(counts, abscissas, ordinates, headcounts, distance, estim, names)
 end
 
 """
@@ -86,7 +90,11 @@ function EmpiricalTransiogram(partition::Partition, var; kwargs...)
   tmapreduce(t, merge, collect(filtered))
 end
 
-nvariates(t::EmpiricalTransiogram) = size(t.ordinates, 1)
+issymmetric(::Type{<:EmpiricalTransiogram}) = false
+
+nvariates(t::EmpiricalTransiogram) = length(t.variables)
+
+variates(t::EmpiricalTransiogram) = t.variables
 
 """
     merge(tα, tβ)
@@ -104,6 +112,8 @@ function merge(tα::EmpiricalTransiogram{ℒ,V,D,E}, tβ::EmpiricalTransiogram{�
   Yβ = tβ.ordinates
   Cα = tα.headcounts
   Cβ = tβ.headcounts
+  vα = tα.variables
+  vβ = tβ.variables
 
   # copy distance and estimator
   d = tα.distance
@@ -125,7 +135,7 @@ function merge(tα::EmpiricalTransiogram{ℒ,V,D,E}, tβ::EmpiricalTransiogram{�
     y[c .== 0] .= 0
   end
 
-  EmpiricalTransiogram(n, x, Y, C, d, e)
+  EmpiricalTransiogram(n, x, Y, C, d, e, vα)
 end
 
 # -------------------------
