@@ -5,9 +5,12 @@
 function surfplot(f; kwargs...)
   # initialize figure
   n = nvariates(f)
+  v = variates(f)
   fig = Makie.Figure()
   for i in 1:n, j in 1:n
-    Makie.PolarAxis(fig[i, j])
+    issymmetric(f) && i < j && continue
+    ax = Makie.PolarAxis(fig[i, j])
+    ax.title = "$(v[i]) → $(v[j])"
   end
 
   # fill figure with plots
@@ -77,6 +80,7 @@ function surfplot!(
   # add plots to axes
   n = nvariates(f)
   for i in 1:n, j in 1:n
+    issymmetric(f) && i < j && continue
     ax = Makie.content(fig[i, j])
 
     # values in matrix form
@@ -101,9 +105,6 @@ function surfplot!(
   colormap=:viridis,
   maxlag=nothing
 )
-  # variable names
-  vars = variates(f)
-
   # maximum lag
   hmax = isnothing(maxlag) ? _maxlag(f) : GeoStatsFunctions.aslen(maxlag)
 
@@ -129,8 +130,8 @@ function surfplot!(
   # add plots to axes
   n = nvariates(f)
   for i in 1:n, j in 1:n
+    issymmetric(f) && i < j && continue
     ax = Makie.content(fig[i, j])
-    ax.title = "$(vars[i]) → $(vars[j])"
 
     # values in matrix form
     Zᵢⱼ = getindex.(zs, i, j)

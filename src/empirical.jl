@@ -38,9 +38,9 @@ nvariates(f::EmpiricalGeoStatsFunction) = nvariates(typeof(f))
 """
     variates(f)
 
-Return the (co)variates of the empirical geostatistical function `f`.
+Return the names of the (co)variates of the empirical geostatistical function `f`.
 """
-variates(f::EmpiricalGeoStatsFunction) = [Symbol("variate$(i)") for i in 1:nvariates(f)]
+variates(f::EmpiricalGeoStatsFunction) = defaultvariates(nvariates(f))
 
 # -----------
 # IO METHODS
@@ -103,9 +103,9 @@ nvariates(f::EmpiricalGeoStatsSurface) = nvariates(typeof(f))
 """
     variates(f)
 
-Return the (co)variates of the empirical geostatistical surface `f`.
+Return the names of the (co)variates of the empirical geostatistical surface `f`.
 """
-variates(f::EmpiricalGeoStatsSurface) = [Symbol("variate$(i)") for i in 1:nvariates(f)]
+variates(f::EmpiricalGeoStatsSurface) = defaultvariates(nvariates(f))
 
 # -----------
 # IO METHODS

@@ -74,6 +74,13 @@ Return the number of (co)variates of the geostatistical function `f`.
 nvariates(f::GeoStatsFunction) = nvariates(typeof(f))
 
 """
+    variates(f)
+
+Return the names of the (co)variates of the geostatistical function `f`.
+"""
+variates(f::GeoStatsFunction) = defaultvariates(nvariates(f))
+
+"""
     f(p₁, p₂)
 
 Evaluate the geostatistical function at points `p₁` and `p₂`.
