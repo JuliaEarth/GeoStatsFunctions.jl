@@ -13,8 +13,3 @@ _maxlag(::PowerVariogram) = 3.0u"m"
 _maxlag(::NuggetEffect) = 3.0u"m"
 _maxlag(f::EmpiricalGeoStatsFunction) = last(f.abscissas)
 _maxlag(f::EmpiricalGeoStatsSurface) = last(f.rs)
-
-_istransiogram(f) = false
-_istransiogram(t::Transiogram) = true
-_istransiogram(t::EmpiricalTransiogram) = true
-_istransiogram(t::EmpiricalTransiogramSurface) = true

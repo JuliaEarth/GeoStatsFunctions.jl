@@ -39,8 +39,8 @@ function funplot!(
   F = _eval(f, hs)
 
   # mean lengths and proportions
-  l = _istransiogram(f) ? meanlengths(f) : nothing
-  p = _istransiogram(f) ? proportions(f) : nothing
+  l = f isa Transiogram ? meanlengths(f) : nothing
+  p = f isa Transiogram ? proportions(f) : nothing
 
   # aesthetic options
   label = Dict(1 => "1ˢᵗ axis", 2 => "2ⁿᵈ axis", 3 => "3ʳᵈ axis")
@@ -55,7 +55,7 @@ function funplot!(
     for (k, Fₖ) in enumerate(F)
       # display function
       Makie.lines!(ax, ustrip.(u"m", hs), Fₖ[i, j]; color, linewidth, linestyle=linestyle[k], label=label[k])
-      if _istransiogram(f)
+      if f isa Transiogram
         if i == j
           if showmeanlengths
             # display mean lengths
@@ -171,7 +171,7 @@ function funplot!(
 
     # retrieve coordinates and counts
     hs = f.abscissas
-    fs = _istransiogram(f) ? f.ordinates[i, j] : f.ordinates
+    fs = f.ordinates[i, j]
     ns = f.counts
 
     # discard empty bins

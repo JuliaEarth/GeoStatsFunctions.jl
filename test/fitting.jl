@@ -91,8 +91,9 @@
   γₜ = PowerVariogram(; scaling=sₜ, nugget=nₜ, exponent=eₜ)
   xs = collect(0.0:0.1:10.0)u"m"
   ys = γₜ.(xs)
+  Y = [ys for i in 1:1, j in 1:1]
   ns = rand(1000:5000, length(xs))
-  g = EmpiricalVariogram(ns, xs, ys, Euclidean(), :matheron)
+  g = EmpiricalVariogram(ns, xs, Y, Euclidean(), GeoStatsFunctions.MatheronEstimator())
   γ = GeoStatsFunctions.fit(PowerVariogram, g)
   @test isapprox(γ.nugget, nₜ, atol=1e-3)
   @test isapprox(γ.scaling, sₜ, atol=1e-3)
@@ -103,8 +104,9 @@
   γₜ = PowerVariogram(; scaling=sₜ, nugget=nₜ, exponent=eₜ)
   xs = collect(0.0:10.0:200.0)u"m"
   ys = γₜ.(xs)
+  Y = [ys for i in 1:1, j in 1:1]
   ns = rand(100:1000, length(xs))
-  g = EmpiricalVariogram(ns, xs, ys, Euclidean(), :matheron)
+  g = EmpiricalVariogram(ns, xs, Y, Euclidean(), GeoStatsFunctions.MatheronEstimator())
   γ = GeoStatsFunctions.fit(PowerVariogram, g)
   @test isapprox(γ.nugget, nₜ, atol=1e-3)
   @test isapprox(γ.scaling, sₜ, atol=1e-3)

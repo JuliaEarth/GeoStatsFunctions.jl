@@ -3,13 +3,13 @@
 # ------------------------------------------------------------------
 
 """
-    EmpiricalVariogramSurface(data, var₁, var₂=var₁;
+    EmpiricalVariogramSurface(geotable, vars;
                               normal=Vec(0,0,1), nangs=50,
                               ptol=0.5u"m", dtol=0.5u"m",
                               [options])
 
-Given a `normal` direction, estimate the (cross-)variogram of variables
-`var₁` and `var₂` along all directions in the corresponding plane of variation.
+Given a `normal` direction, estimate the (cross-)variogram of variables `vars`
+stored in `geotable` along all directions in the corresponding plane of variation.
 
 Optionally, specify the tolerance `ptol` in length units for the plane partition,
 the tolerance `dtol` in length units for the direction partition, the number of
@@ -24,8 +24,7 @@ end
 
 function EmpiricalVariogramSurface(
   data::AbstractGeoTable,
-  var₁,
-  var₂=var₁;
+  vars;
   normal=Vec(0, 0, 1),
   nangs=50,
   ptol=0.5u"m",
@@ -56,21 +55,21 @@ function EmpiricalVariogramSurface(
   θs = collect(range(0, stop=π, length=nangs))
 
   # estimate directional variograms across planes
-  γs = map(θs) do θ
+  gs = map(θs) do θ
     dir = DirectionPartition(cos(θ) * u + sin(θ) * v; tol=dtol)
-    γ(plane) = EmpiricalVariogram(partition(rng, plane, dir), var₁, var₂; kwargs...)
-    tmapreduce(γ, merge, planes)
+    g(plane) = EmpiricalVariogram(partition(rng, plane, dir), vars; kwargs...)
+    tmapreduce(g, merge, planes)
   end
 
   # polar radii
-  rs = first(γs).abscissas
+  rs = first(gs).abscissas
 
   # surface values
-  zs = [γ.ordinates for γ in γs]
+  zs = [g.ordinates for g in gs]
 
   EmpiricalVariogramSurface(θs, rs, zs)
 end
 
-nvariates(::Type{<:EmpiricalVariogramSurface}) = 1
+nvariates(g::EmpiricalVariogramSurface) = size(first(g.zs), 1)
 
 issymmetric(::Type{<:EmpiricalVariogramSurface}) = true

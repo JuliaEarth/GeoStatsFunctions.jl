@@ -133,7 +133,7 @@ function surfplot!(
     ax = fig.content[I[j, i]]
 
     # values in matrix form
-    Zᵢⱼ = _istransiogram(f) ? getindex.(zs, i, j) : zs
+    Zᵢⱼ = getindex.(zs, i, j)
     Z = reduce(hcat, Zᵢⱼ)
 
     # discard above maximum lag

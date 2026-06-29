@@ -3,11 +3,10 @@
 # ------------------------------------------------------------------
 
 """
-    EmpiricalVariogram(geotable, var₁, var₂=var₁; [options])
+    EmpiricalVariogram(geotable, vars; [options])
 
 Computes the empirical (a.k.a. experimental) omnidirectional
-(cross-)variogram for variables `var₁` and `var₂` stored in
-the `geotable`.
+(cross-)variogram for variables `vars` stored in the `geotable`.
 
 ## Options
 
@@ -48,21 +47,23 @@ See also: [`DirectionalVariogram`](@ref), [`PlanarVariogram`](@ref),
 struct EmpiricalVariogram{ℒ<:Len,V,D,E} <: EmpiricalGeoStatsFunction
   counts::Vector{Int}
   abscissas::Vector{ℒ}
-  ordinates::Vector{V}
+  ordinates::Matrix{Vector{V}}
   distance::D
   estimator::E
 end
 
 function EmpiricalVariogram(
   data::AbstractGeoTable,
-  var₁,
-  var₂=var₁;
+  vars;
   nlags=20,
   maxlag=defaultmaxlag(data),
   distance=Euclidean(),
   estimator=:matheron,
   lagsearch=:ball
 )
+  # selected variables
+  sdata = data |> Select(vars)
+
   # define variogram estimator
   estim = if Symbol(estimator) == :matheron
     MatheronEstimator()
@@ -73,64 +74,34 @@ function EmpiricalVariogram(
   end
 
   # define lag search method
-  lsearch = lagsearchmethod(domain(data), nlags, maxlag, distance, Symbol(lagsearch))
+  lsearch = lagsearchmethod(domain(sdata), nlags, maxlag, distance, Symbol(lagsearch))
 
   # perform estimation
-  counts, abscissas, ordinates = _variogram(data, (var₁, var₂), estim, lsearch)
+  counts, abscissas, ordinates = _variogram(sdata, estim, lsearch)
 
   EmpiricalVariogram(counts, abscissas, ordinates, distance, estim)
 end
 
 """
-    EmpiricalVariogram(partition, var₁, var₂=var₁; [options])
+    EmpiricalVariogram(partition, vars; [options])
 
-Compute the empirical (cross-)variogram of the geospatial `partition` for
-variables `var₁` and `var₂` as described in Hoffimann & Zadrozny 2019.
-
-Forwards `options` to the underlying [`EmpiricalVariogram`](@ref)
-calls with geospatial data.
+Computes the empirical (cross-)variogram of the geospatial `partition`
+for variables `vars` as described in Hoffimann & Zadrozny 2019.
 
 ## References
 
 * Hoffimann, J and Zadrozny, B. 2019. [Efficient variography with partition variograms]
   (https://www.sciencedirect.com/science/article/pii/S0098300419302936)
 """
-function EmpiricalVariogram(partition::Partition, var₁, var₂=var₁; kwargs...)
+function EmpiricalVariogram(partition::Partition, vars; kwargs...)
   # retain geospatial data with at least two elements
   filtered = Iterators.filter(d -> nelements(domain(d)) > 1, partition)
   @assert !isempty(filtered) "invalid partition of geospatial data"
-  γ(d) = EmpiricalVariogram(d, var₁, var₂; kwargs...)
+  γ(d) = EmpiricalVariogram(d, vars; kwargs...)
   tmapreduce(γ, merge, collect(filtered))
 end
 
-"""
-    DirectionalVariogram(direction, data, var₁, var₂=var₁; dtol=1e-6u"m", [options])
-
-Computes the empirical (cross-)variogram for the variables `var₁` and `var₂` stored in
-geospatial `data` along a given `direction` with band tolerance `dtol` in length units.
-
-Forwards `options` to the underlying [`EmpiricalVariogram`](@ref).
-"""
-function DirectionalVariogram(dir, data::AbstractGeoTable, var₁, var₂=var₁; dtol=1e-6u"m", kwargs...)
-  Π = partition(Xoshiro(123), data, DirectionPartition(dir; tol=dtol))
-  EmpiricalVariogram(Π, var₁, var₂; kwargs...)
-end
-
-"""
-    PlanarVariogram(normal, data, var₁, var₂=var₁; ntol=1e-6u"m", [options])
-
-Computes the empirical (cross-)variogram for the variables `var₁` and `var₂` stored in
-geospatial `data` along a plane perpendicular to a `normal` direction with plane
-tolerance `ntol` in length units.
-
-Forwards `options` to the underlying [`EmpiricalVariogram`](@ref).
-"""
-function PlanarVariogram(normal, data::AbstractGeoTable, var₁, var₂=var₁; ntol=1e-6u"m", kwargs...)
-  Π = partition(Xoshiro(123), data, PlanePartition(normal; tol=ntol))
-  EmpiricalVariogram(Π, var₁, var₂; kwargs...)
-end
-
-nvariates(::Type{<:EmpiricalVariogram}) = 1
+nvariates(g::EmpiricalVariogram) = size(g.ordinates, 1)
 
 """
     merge(γα, γβ)
@@ -144,8 +115,8 @@ function merge(γα::EmpiricalVariogram{ℒ,V,D,E}, γβ::EmpiricalVariogram{ℒ
   nβ = γβ.counts
   xα = γα.abscissas
   xβ = γβ.abscissas
-  yα = γα.ordinates
-  yβ = γβ.ordinates
+  Yα = γα.ordinates
+  Yβ = γβ.ordinates
 
   # copy distance and estimator
   d = γα.distance
@@ -157,16 +128,53 @@ function merge(γα::EmpiricalVariogram{ℒ,V,D,E}, γβ::EmpiricalVariogram{ℒ
   # merge coordinates and bin counts
   n = nα + nβ
   x = @. (xα * nα + xβ * nβ) / n
-  y = @. mergefun(yα, nα, yβ, nβ)
+  Y = map(Yα, Yβ) do yα, yβ
+    mergefun.(yα, nα, yβ, nβ)
+  end
 
   # adjust empty bins
   x[n .== 0] .= xα[n .== 0]
-  y[n .== 0] .= 0
+  for y in Y
+    y[n .== 0] .= 0
+  end
 
-  EmpiricalVariogram(n, x, y, d, e)
+  EmpiricalVariogram(n, x, Y, d, e)
 end
 
-function _variogram(geotable, (var₁, var₂), estim::VariogramEstimator, lagsearch::LagSearchMethod)
+# -------------------------
+# CONVENIENCE CONSTRUCTORS
+# -------------------------
+
+"""
+    DirectionalVariogram(direction, geotable, vars; dtol=1e-6u"m", [options])
+
+Computes the empirical (cross-)variogram for the variables `vars` stored in
+the `geotable` along a given `direction` with band tolerance `dtol` in length
+units. Forwards `options` to the underlying [`EmpiricalVariogram`](@ref).
+"""
+function DirectionalVariogram(dir, data::AbstractGeoTable, vars; dtol=1e-6u"m", kwargs...)
+  Π = partition(Xoshiro(123), data, DirectionPartition(dir; tol=dtol))
+  EmpiricalVariogram(Π, vars; kwargs...)
+end
+
+"""
+    PlanarVariogram(normal, geotable, vars; ntol=1e-6u"m", [options])
+
+Computes the empirical (cross-)variogram for the variables `vars` stored in
+the `geotable` along a plane perpendicular to a `normal` direction with plane
+tolerance `ntol` in length units. Forwards `options` to the underlying
+[`EmpiricalVariogram`](@ref).
+"""
+function PlanarVariogram(normal, data::AbstractGeoTable, vars; ntol=1e-6u"m", kwargs...)
+  Π = partition(Xoshiro(123), data, PlanePartition(normal; tol=ntol))
+  EmpiricalVariogram(Π, vars; kwargs...)
+end
+
+# -----------------
+# HELPER FUNCTIONS
+# -----------------
+
+function _variogram(geotable, estim::VariogramEstimator, lagsearch::LagSearchMethod)
   # lag search parameters
   nlags, maxlag, distance = params(lagsearch)
 
@@ -174,8 +182,8 @@ function _variogram(geotable, (var₁, var₂), estim::VariogramEstimator, lagse
   δh = maxlag / nlags
 
   # table and domain
-  tab = values(geotable)
   dom = domain(geotable)
+  tab = values(geotable)
 
   # estimators are defined on point sets
   pset = PointSet([centroid(dom, i) for i in 1:nelements(dom)])
@@ -183,12 +191,12 @@ function _variogram(geotable, (var₁, var₂), estim::VariogramEstimator, lagse
   # table columns
   cols = Tables.columns(tab)
 
+  # pairs of variable names
+  vars = Tables.columnnames(cols)
+  pairs = [(var₁, var₂) for var₁ in vars, var₂ in vars]
+
   # get column from variable name
   get(var) = Tables.getcolumn(cols, Symbol(var))
-
-  # vectors for variables
-  z₁ = get(var₁)
-  z₂ = get(var₂)
 
   # neighbors function
   neighbors = neighfun(lagsearch, pset)
@@ -205,8 +213,10 @@ function _variogram(geotable, (var₁, var₂), estim::VariogramEstimator, lagse
   Σx = zeros(ℒ, nlags)
 
   # ordinate sums
-  V = returntype(estim, z₁, z₂)
-  Σy = zeros(V, nlags)
+  Σy = map(pairs) do (var₁, var₂)
+    V = returntype(estim, get(var₁), get(var₂))
+    zeros(V, nlags)
+  end
 
   # loop over pairs of points
   @inbounds for j in 1:nelements(pset)
@@ -229,21 +239,24 @@ function _variogram(geotable, (var₁, var₂), estim::VariogramEstimator, lagse
 
       # accumulate if lag is valid
       if 0 < lag ≤ nlags
-        # evaluate function estimator
-        v = accumterm(estim, z₁[i], z₁[j], z₂[i], z₂[j])
+        for (k, (var₁, var₂)) in enumerate(pairs)
+          # retrieve variables
+          z₁ = get(var₁)
+          z₂ = get(var₂)
 
-        # accumulate if value is valid
-        if !ismissing(v)
-          ns[lag] += 1
-          Σx[lag] += h
-          Σy[lag] += v
+          # evaluate function estimator
+          v = accumterm(estim, z₁[i], z₁[j], z₂[i], z₂[j])
+
+          # accumulate if value is valid
+          if !ismissing(v)
+            ns[lag] += 1
+            Σx[lag] += h
+            Σy[k][lag] += v
+          end
         end
       end
     end
   end
-
-  # ordinate function
-  ordfun(Σy, n) = accumnorm(estim, Σy, n)
 
   # bin (or lag) size
   lags = range(δh / 2, stop=maxlag - δh / 2, length=nlags)
@@ -252,9 +265,15 @@ function _variogram(geotable, (var₁, var₂), estim::VariogramEstimator, lagse
   xs = @. Σx / ns
   xs[ns .== 0] .= lags[ns .== 0]
 
-  # ordinate
-  ys = @. ordfun(Σy, ns)
-  ys[ns .== 0] .= zero(eltype(ys))
+  # ordinate function
+  ordfun(Σ, n) = accumnorm(estim, Σ, n)
 
-  ns, xs, ys
+  # ordinate
+  Y = map(enumerate(pairs)) do (k, _)
+    ys = ordfun.(Σy[k], ns)
+    ys[ns .== 0] .= zero(eltype(ys))
+    ys
+  end
+
+  ns, xs, Y
 end

@@ -18,7 +18,7 @@ function _fit(
 
   # coordinates of empirical variogram
   x = g.abscissas
-  y = g.ordinates
+  y = g.ordinates[1]
   n = g.counts
 
   # discard invalid bins
@@ -98,7 +98,7 @@ function _fit(
 )
   # coordinates of empirical variogram
   x = g.abscissas
-  y = g.ordinates
+  y = g.ordinates[1]
   n = g.counts
 
   # discard invalid bins
