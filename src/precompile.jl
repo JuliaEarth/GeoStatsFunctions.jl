@@ -5,11 +5,13 @@
 using PrecompileTools
 
 @setup_workload begin
-  gtb2D = georef((; z=rand(5, 5)))
-  gtb3D = georef((; z=rand(5, 5, 5)))
+  t1 = georef((; z=rand(5, 5)))
+  t2 = georef((; z=rand(5, 5, 5)))
+  Gs = [GaussianVariogram, SphericalVariogram, ExponentialVariogram]
   @compile_workload begin
-    g = EmpiricalVariogram(gtb2D, "z")
-    g = EmpiricalVariogram(gtb3D, "z")
-    γ = GeoStatsFunctions.fit(Variogram, g)
+    g1 = EmpiricalVariogram(t1, "z")
+    g2 = EmpiricalVariogram(t2, "z")
+    γ1 = GeoStatsFunctions.fit(Gs, g1)
+    γ2 = GeoStatsFunctions.fit(Gs, g2)
   end
 end
