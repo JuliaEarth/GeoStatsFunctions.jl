@@ -48,20 +48,20 @@ function _fit(
     sum(i -> w[i] * err(i), eachindex(w, x′))
   end
 
-  # maximum range
+  # maximum range and logits
   rmax = isnothing(maxrange′) ? maximum(x′) : maxrange′
+  λmax = ntuple(i -> oftype(rmax, 3), m) # enough to explore the simplex
 
   # box constraints (logits are unconstrained, proportions are recovered via softmax)
   δ = oftype(rmax, 1e-8)
-  ∞ = ntuple(i -> oftype(rmax, Inf), m)
   rₗ, rᵤ = isnothing(range′) ? (δ, rmax) : (range′, range′)
-  λₗ, λᵤ = isnothing(proportions) ? (-1 .* ∞, 1 .* ∞) : (_logit(proportions), _logit(proportions))
+  λₗ, λᵤ = isnothing(proportions) ? (-1 .* λmax, 1 .* λmax) : (_logit(proportions), _logit(proportions))
   θₗ = [rₗ, λₗ...]
   θᵤ = [rᵤ, λᵤ...]
 
   # initial guess
   rₒ = isnothing(range′) ? rmax / 3 : range′
-  λₒ = ntuple(i -> oftype(rₒ, 0.0), m)
+  λₒ = isnothing(proportions) ? ntuple(i -> oftype(rₒ, 0.0), m) : _logit(proportions)
   θₒ = [rₒ, λₒ...]
 
   # solve optimization problem
@@ -126,17 +126,17 @@ function _fit(
     sum(i -> w[i] * err(i), eachindex(w, x′))
   end
 
-  # maximum range and lengths
+  # maximum range, lengths and logits
   xmax = maximum(x′)
   rmax = isnothing(maxrange′) ? xmax : maxrange′
   lmax = isnothing(maxlengths′) ? ntuple(i -> xmax, k) : maxlengths′
+  λmax = ntuple(i -> oftype(rmax, 3), m) # enough to explore the simplex
 
   # box constraints (logits are unconstrained, proportions are recovered via softmax)
   δ = oftype(rmax, 1e-8)
-  ∞ = ntuple(i -> oftype(rmax, Inf), m)
   rₗ, rᵤ = isnothing(range′) ? (δ, rmax) : (range′, range′)
   lₗ, lᵤ = isnothing(lengths′) ? (ntuple(i -> δ, k), lmax) : (lengths′, lengths′)
-  λₗ, λᵤ = isnothing(proportions) ? (-1 .* ∞, 1 .* ∞) : (_logit(proportions), _logit(proportions))
+  λₗ, λᵤ = isnothing(proportions) ? (-1 .* λmax, 1 .* λmax) : (_logit(proportions), _logit(proportions))
   θₗ = [rₗ, lₗ..., λₗ...]
   θᵤ = [rᵤ, lᵤ..., λᵤ...]
 
@@ -145,7 +145,7 @@ function _fit(
   # free blocks (lengths and proportion logits) and keep the best fit.
   rₒ = isnothing(range′) ? rmax / 3 : range′
   ls = isnothing(lengths′) ? [α .* lmax for α in (0.1, 0.25, 0.5, 0.75, 0.9)] : [lengths′]
-  λₒ = ntuple(i -> oftype(rₒ, 0.0), m)
+  λₒ = isnothing(proportions) ? ntuple(i -> oftype(rₒ, 0.0), m) : _logit(proportions)
   sols = map(ls) do lₒ
     # initial guess
     θₒ = [rₒ, lₒ..., λₒ...]
