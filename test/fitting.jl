@@ -85,10 +85,10 @@
   @test isapprox(nugget(γ), 0.01u"K^2", atol=1e-3u"K^2")
 
   # power variograms
-  d = georef((; z=[i+j for i in 1:50, j in 1:50]))
-  g = EmpiricalVariogram(d, "z", maxlag=25.)
+  d = georef((; z=[i + j for i in 1:50, j in 1:50]))
+  g = EmpiricalVariogram(d, "z", maxlag=25.0)
   γ = GeoStatsFunctions.fit(PowerVariogram, g)
-  @test γ.(g.abscissas) ≈ g.ordinates[1] atol=1e-1
+  @test γ.(g.abscissas) ≈ g.ordinates[1] atol = 1e-1
 end
 
 @testset "Fitting transiograms" begin
