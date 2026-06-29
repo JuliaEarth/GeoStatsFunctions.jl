@@ -142,9 +142,6 @@ end
   # fix maximum parameters
   τ = GeoStatsFunctions.fit(SphericalTransiogram, t, maxrange=5.0u"m")
   @test isapprox(range(τ), 5.0u"m", atol=1e-3u"m")
-  ps = (0.2, 0.1, 0.1, 0.3, 0.25)
-  τ = GeoStatsFunctions.fit(SphericalTransiogram, t, maxproportions=ps)
-  @test all(isapprox.(proportions(τ), ps, atol=1e-1))
 
   # fix maximum range without units
   τ = GeoStatsFunctions.fit(SphericalTransiogram, t, maxrange=5.0)
@@ -161,9 +158,6 @@ end
   ls = (7.0u"m", 3.0u"m", 2.0u"m", 7.0u"m", 14.0u"m")
   τ = GeoStatsFunctions.fit(MatrixExponentialTransiogram, t, range=1.0u"m", lengths=ls)
   @test all(isapprox.(meanlengths(τ), ls, atol=1e-3u"m"))
-  ps = (0.32, 0.1, 0.1, 0.3, 0.31)
-  τ = GeoStatsFunctions.fit(MatrixExponentialTransiogram, t, maxproportions=ps)
-  @test all(proportions(τ) .≤ ps)
 
   # piecewise linear
   τ = GeoStatsFunctions.fit(PiecewiseLinearTransiogram, t)

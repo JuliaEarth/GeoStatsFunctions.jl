@@ -62,22 +62,22 @@ function _fit(
   smax = isnothing(maxsill′) ? ymax : maxsill′
   nmax = isnothing(maxnugget′) ? ymax : maxnugget′
 
+  # box constraints
+  δ = oftype(rmax, 1e-8)
+  rₗ, rᵤ = isnothing(range′) ? (δ, rmax) : (range′ - δ, range′ + δ)
+  sₗ, sᵤ = isnothing(sill′) ? (zero(smax), smax) : (sill′ - δ, sill′ + δ)
+  nₗ, nᵤ = isnothing(nugget′) ? (zero(nmax), nmax) : (nugget′ - δ, nugget′ + δ)
+  θₗ = [rₗ, sₗ, nₗ]
+  θᵤ = [rᵤ, sᵤ, nᵤ]
+
   # initial guess
   rₒ = isnothing(range′) ? rmax / 3 : range′
   sₒ = isnothing(sill′) ? 0.95 * smax : sill′
   nₒ = isnothing(nugget′) ? 0.01 * smax : nugget′
   θₒ = [rₒ, sₒ, nₒ]
 
-  # box constraints
-  δ = 1e-8
-  rₗ, rᵤ = isnothing(range′) ? (zero(rmax), rmax) : (range′ - δ, range′ + δ)
-  sₗ, sᵤ = isnothing(sill′) ? (zero(smax), smax) : (sill′ - δ, sill′ + δ)
-  nₗ, nᵤ = isnothing(nugget′) ? (zero(nmax), nmax) : (nugget′ - δ, nugget′ + δ)
-  l = [rₗ, sₗ, nₗ]
-  u = [rᵤ, sᵤ, nᵤ]
-
   # solve optimization problem
-  θ, ϵ = _optimize(J, L, λ, l, u, θₒ)
+  θ, ϵ = _optimize(θ -> J(θ) + λ * L(θ), θₗ, θᵤ, θₒ)
 
   # optimal variogram (with units)
   γ = G(ball(θ[1] * ux), sill=θ[2] * uy, nugget=θ[3] * uy)
@@ -142,22 +142,22 @@ function _fit(
   nmax = isnothing(maxnugget′) ? ymax : maxnugget′
   emax = isnothing(maxexponent′) ? 2.0 : maxexponent′
 
+  # box constraints
+  δ = oftype(smax, 1e-8)
+  sₗ, sᵤ = isnothing(scaling′) ? (δ, smax) : (scaling′ - δ, scaling′ + δ)
+  nₗ, nᵤ = isnothing(nugget′) ? (zero(nmax), nmax) : (nugget′ - δ, nugget′ + δ)
+  eₗ, eᵤ = isnothing(exponent′) ? (zero(emax), emax) : (exponent′ - δ, exponent′ + δ)
+  θₗ = [sₗ, nₗ, eₗ]
+  θᵤ = [sᵤ, nᵤ, eᵤ]
+
   # initial guess
   sₒ = isnothing(scaling′) ? smax / 3 : scaling′
   nₒ = isnothing(nugget′) ? 0.01 * nmax : nugget′
   eₒ = isnothing(exponent′) ? 0.95 * emax : exponent′
   θₒ = [sₒ, nₒ, eₒ]
 
-  # box constraints
-  δ = 1e-8
-  sₗ, sᵤ = isnothing(scaling′) ? (zero(smax), smax) : (scaling′ - δ, scaling′ + δ)
-  nₗ, nᵤ = isnothing(nugget′) ? (zero(nmax), nmax) : (nugget′ - δ, nugget′ + δ)
-  eₗ, eᵤ = isnothing(exponent′) ? (zero(emax), emax) : (exponent′ - δ, exponent′ + δ)
-  l = [sₗ, nₗ, eₗ]
-  u = [sᵤ, nᵤ, eᵤ]
-
   # solve optimization problem
-  θ, ϵ = _optimize(J, L, λ, l, u, θₒ)
+  θ, ϵ = _optimize(θ -> J(θ) + λ * L(θ), θₗ, θᵤ, θₒ)
 
   # optimal variogram (with units)
   γ = G(scaling=θ[1] * uy, nugget=θ[2] * uy, exponent=θ[3])

@@ -8,8 +8,7 @@ function _fit(
   algo::WeightedLeastSquares;
   range=nothing,
   proportions=nothing,
-  maxrange=nothing,
-  maxproportions=nothing
+  maxrange=nothing
 )
   # custom ball of given radius
   ball(r) = MetricBall(r, t.distance)
@@ -35,52 +34,42 @@ function _fit(
   # evaluate weights
   w = _weights(algo.weightfun, x, n)
 
-  # auxiliary variables
+  # number of categories and free logits
   k = size(Y, 1)
-  V = eltype(first(Y))
-  _ones = ntuple(i -> one(V), k)
-  _zeros = ntuple(i -> zero(V), k)
+  m = k - 1
 
-  # objective function
+  # objective function (θ = [range, logits...])
   function J(θ)
     b = ball(θ[1])
-    p = _proportions(θ[2:end])
+    p = _softmax(θ[2:end])
     τ = T(b, proportions=p)
     mat(i) = getindex.(Y, i)
     err(i) = sum(abs2, τ(x′[i]) - mat(i))
     sum(i -> w[i] * err(i), eachindex(w, x′))
   end
 
-  # linear constraint (sum(proportions) == 1)
-  L(θ) = abs(sum(θ[2:end]) - 1)
+  # maximum range
+  rmax = isnothing(maxrange′) ? maximum(x′) : maxrange′
 
-  # penalty for linear constraint (J + λL)
-  λ = sum(y -> sum(abs2, y), Y)
-
-  # maximum range and proportions
-  xmax = maximum(x′)
-  ymax = _ones
-  rmax = isnothing(maxrange′) ? xmax : maxrange′
-  pmax = isnothing(maxproportions) ? ymax : maxproportions
+  # box constraints (logits are unconstrained, proportions are recovered via softmax)
+  δ = oftype(rmax, 1e-8)
+  ∞ = ntuple(i -> oftype(rmax, Inf), m)
+  rₗ, rᵤ = isnothing(range′) ? (δ, rmax) : (range′ - δ, range′ + δ)
+  λₗ, λᵤ = isnothing(proportions) ? (-1 .* ∞, 1 .* ∞) : (_logit(proportions) .- δ, _logit(proportions) .+ δ)
+  θₗ = [rₗ, λₗ...]
+  θᵤ = [rᵤ, λᵤ...]
 
   # initial guess
   rₒ = isnothing(range′) ? rmax / 3 : range′
-  pₒ = isnothing(proportions) ? 0.95 .* pmax : proportions
-  θₒ = [rₒ, pₒ...]
-
-  # box constraints
-  δ = 1e-8
-  rₗ, rᵤ = isnothing(range′) ? (zero(rmax), rmax) : (range′ - δ, range′ + δ)
-  pₗ, pᵤ = isnothing(proportions) ? (_zeros, pmax) : (proportions .- δ, proportions .+ δ)
-  l = [rₗ, pₗ...]
-  u = [rᵤ, pᵤ...]
+  λₒ = ntuple(i -> oftype(rₒ, 0.0), m)
+  θₒ = [rₒ, λₒ...]
 
   # solve optimization problem
-  θ, ϵ = _optimize(J, L, λ, l, u, θₒ)
+  θ, ϵ = _optimize(J, θₗ, θᵤ, θₒ)
 
   # optimal transiogram (with units)
   b = ball(θ[1] * ux)
-  p = _proportions(θ[2:end])
+  p = _softmax(θ[2:end])
   τ = T(b, proportions=p)
 
   τ, ϵ
@@ -94,8 +83,7 @@ function _fit(
   lengths=nothing,
   proportions=nothing,
   maxrange=nothing,
-  maxlengths=nothing,
-  maxproportions=nothing
+  maxlengths=nothing
 )
   # custom ball of given radius
   ball(r) = MetricBall(r, t.distance)
@@ -123,57 +111,54 @@ function _fit(
   # evaluate weights
   w = _weights(algo.weightfun, x, n)
 
-  # auxiliary variables
+  # number of categories and free logits
   k = size(Y, 1)
-  V = eltype(first(Y))
-  _ones = ntuple(i -> one(V), k)
-  _zeros = ntuple(i -> zero(V), k)
+  m = k - 1
 
-  # objective function
+  # objective function (θ = [range, lengths..., logits...])
   function J(θ)
     b = ball(θ[1])
     l = _lengths(θ[2:(k + 1)])
-    p = _proportions(θ[(k + 2):end])
+    p = _softmax(θ[(k + 2):end])
     τ = T(b, lengths=l, proportions=p)
     mat(i) = getindex.(Y, i)
     err(i) = sum(abs2, τ(x′[i]) - mat(i))
     sum(i -> w[i] * err(i), eachindex(w, x′))
   end
 
-  # linear constraint (sum(proportions) == 1)
-  L(θ) = abs(sum(θ[(k + 2):end]) - 1)
-
-  # penalty for linear constraint (J + λL)
-  λ = sum(y -> sum(abs2, y), Y)
-
-  # maximum range, proportions and lengths
+  # maximum range and lengths
   xmax = maximum(x′)
-  ymax = _ones
   rmax = isnothing(maxrange′) ? xmax : maxrange′
   lmax = isnothing(maxlengths′) ? ntuple(i -> xmax, k) : maxlengths′
-  pmax = isnothing(maxproportions) ? ymax : maxproportions
 
-  # initial guess
+  # box constraints (logits are unconstrained, proportions are recovered via softmax)
+  δ = oftype(rmax, 1e-8)
+  ∞ = ntuple(i -> oftype(rmax, Inf), m)
+  rₗ, rᵤ = isnothing(range′) ? (δ, rmax) : (range′ - δ, range′ + δ)
+  lₗ, lᵤ = isnothing(lengths′) ? (ntuple(i -> δ, k), lmax) : (lengths′ .- δ, lengths′ .+ δ)
+  λₗ, λᵤ = isnothing(proportions) ? (-1 .* ∞, 1 .* ∞) : (_logit(proportions) .- δ, _logit(proportions) .+ δ)
+  θₗ = [rₗ, lₗ..., λₗ...]
+  θᵤ = [rᵤ, lᵤ..., λᵤ...]
+
+  # the matrix-exponential misfit is non-convex, so a single start can land in
+  # a poor local minimum. Run a small deterministic multistart that varies the
+  # free blocks (lengths and proportion logits) and keep the best fit.
   rₒ = isnothing(range′) ? rmax / 3 : range′
-  lₒ = isnothing(lengths′) ? lmax ./ 3 : lengths′
-  pₒ = isnothing(proportions) ? 0.95 .* pmax : proportions
-  θₒ = [rₒ, lₒ..., pₒ...]
+  ls = isnothing(lengths′) ? [α .* lmax for α in (0.1, 0.25, 0.5, 0.75, 0.9)] : [lengths′]
+  λₒ = ntuple(i -> oftype(rₒ, 0.0), m)
+  sols = map(ls) do lₒ
+    # initial guess
+    θₒ = [rₒ, lₒ..., λₒ...]
 
-  # box constraints
-  δ = 1e-8
-  rₗ, rᵤ = isnothing(range′) ? (zero(rmax), rmax) : (range′ - δ, range′ + δ)
-  lₗ, lᵤ = isnothing(lengths′) ? (_zeros, lmax) : (lengths′ .- δ, lengths′ .+ δ)
-  pₗ, pᵤ = isnothing(proportions) ? (_zeros, pmax) : (proportions .- δ, proportions .+ δ)
-  l = [rₗ, lₗ..., pₗ...]
-  u = [rᵤ, lᵤ..., pᵤ...]
-
-  # solve optimization problem
-  θ, ϵ = _optimize(J, L, λ, l, u, θₒ)
+    # solve optimization problem
+    _optimize(J, θₗ, θᵤ, θₒ)
+  end
+  θ, ϵ = argmin(last, sols)
 
   # optimal transiogram (with units)
   b = ball(θ[1] * ux)
   l = _lengths(θ[2:(k + 1)] * ux)
-  p = _proportions(θ[(k + 2):end])
+  p = _softmax(θ[(k + 2):end])
   τ = T(b, lengths=l, proportions=p)
 
   τ, ϵ
@@ -205,10 +190,18 @@ end
 # HELPER FUNCTIONS
 # -----------------
 
-function _proportions(θ)
-  p = clamp.(θ, 0, 1)
-  s = sum(abs, p)
-  ntuple(i -> p[i] / s, length(p))
+function _softmax(θ)
+  T = eltype(θ)
+  n = length(θ)
+  e = ntuple(i -> i ≤ n ? exp(θ[i]) : one(T), n + 1)
+  s = sum(e)
+  ntuple(i -> e[i] / s, n + 1)
+end
+
+function _logit(p)
+  T = eltype(p)
+  n = length(p)
+  ntuple(i -> log(p[i] / p[n]), n - 1)
 end
 
 _lengths(θ) = ntuple(i -> θ[i], length(θ))
