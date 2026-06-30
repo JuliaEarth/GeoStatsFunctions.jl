@@ -270,7 +270,7 @@ function _variogram(geotable, estim::VariogramEstimator, lagsearch::LagSearchMet
           v = accumterm(estim, z₁[i], z₁[j], z₂[i], z₂[j])
 
           # accumulate if value is valid
-          ismissing(v) || (Σy[idx][lag] += v)
+          isinvalid(v) || (Σy[idx][lag] += v)
         end
       end
     end

@@ -10,7 +10,7 @@ function surfplot(f; kwargs...)
   for i in 1:n, j in 1:n
     issymmetric(f) && i < j && continue
     ax = Makie.PolarAxis(fig[i, j])
-    ax.title = "$(v[i]) → $(v[j])"
+    ax.title = issymmetric(f) ? "$(v[j]) → $(v[i])" : "$(v[i]) → $(v[j])"
   end
 
   # fill figure with plots

@@ -10,7 +10,7 @@ function funplot(f; kwargs...)
   for i in 1:n, j in 1:n
     issymmetric(f) && i < j && continue
     ax = Makie.Axis(fig[i, j])
-    ax.title = "$(v[i]) → $(v[j])"
+    ax.title = issymmetric(f) ? "$(v[j]) → $(v[i])" : "$(v[i]) → $(v[j])"
     i < n && Makie.hidexdecorations!(ax, grid=false)
     i == n && (ax.xlabel = "lag distance [m]")
   end

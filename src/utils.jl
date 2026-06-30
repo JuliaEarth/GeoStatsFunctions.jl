@@ -19,6 +19,8 @@ function unitless(a::Quantity, b::Quantity)
   ustrip(u, a), ustrip(u, b)
 end
 
+isinvalid(v) = ismissing(v) || (v isa Number && !isfinite(v))
+
 defaultmaxlag(data) = _minside(boundingbox(domain(data))) / 2
 
 defaultvariables(n) = n == 1 ? [:field] : [Symbol(:field, i) for i in 1:n]
