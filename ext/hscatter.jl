@@ -28,7 +28,11 @@ function hscatter(
 )
   # perform subsampling to avoid memory issues
   nsamp = min(nrow(data), nmax)
-  sdata = data |> Select(vars) |> Sample(nsamp, replace=false)
+  sdata = data |> Select(vars) |> Sample(nsamp, replace=false, rng=Xoshiro(123))
+
+  # fix lag and tolerance units if necessary
+  l = aslen(lag)
+  τ = aslen(tol)
 
   # pairs of variables
   svars = setdiff(names(sdata), ["geometry"])
@@ -44,16 +48,19 @@ function hscatter(
     # initialize axis
     ax = Makie.Axis(fig[i, j])
     ax.aspect = Makie.AxisAspect(1)
-    ax.xlabel = var₁
-    ax.ylabel = var₂
     i < n && Makie.hidexdecorations!(ax, grid=false)
     j > 1 && Makie.hideydecorations!(ax, grid=false)
+    ax.xlabel = var₁
+    ax.ylabel = var₂
 
     # compute h-scatter coordinates
-    z₁, z₂ = _hscatter(sdata, var₁, var₂, aslen(lag), aslen(tol), distance)
+    z₁, z₂ = _hscatter(sdata, var₁, var₂, l, τ, distance)
 
     # skip empty lag distances
     isnothing(z₁) && continue
+
+    # add title with Pearson correlation coefficient
+    ax.title = "corr: $(round(cor(z₁, z₂), digits=2))"
 
     # compute regression line and identity line
     z̄₁, z̄₂ = mean(z₁), mean(z₂)
@@ -79,6 +86,7 @@ function hscatter(
     Makie.scatter!(ax, z̄₁, z̄₂, color=ccolor, marker=:rect, markersize=16)
   end
 
+  # link axes horizontally and vertically
   for i in 1:n
     axes = [c for c in Makie.contents(fig[i, :]) if c isa Makie.Axis]
     Makie.linkyaxes!(axes...)
@@ -87,6 +95,9 @@ function hscatter(
     axes = [c for c in Makie.contents(fig[:, j]) if c isa Makie.Axis]
     Makie.linkxaxes!(axes...)
   end
+
+  # add super title
+  Makie.Label(fig[0, :], "h-scatter plot with lag distance $l ± $τ", fontsize=16)
 
   fig
 end

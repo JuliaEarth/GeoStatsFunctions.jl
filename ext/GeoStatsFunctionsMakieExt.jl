@@ -11,6 +11,7 @@ using Distances
 using TableTransforms
 using LinearAlgebra
 using Statistics
+using Random
 
 using GeoStatsFunctions: isinvalid
 
