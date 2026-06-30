@@ -12,6 +12,8 @@ using TableTransforms
 using LinearAlgebra
 using Statistics
 
+using GeoStatsFunctions: isinvalid
+
 import Makie
 
 import GeoStatsFunctions: funplot, funplot!

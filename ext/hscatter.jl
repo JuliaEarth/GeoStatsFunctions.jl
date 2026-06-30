@@ -25,8 +25,7 @@ function hscatter(
   ccolor=:teal
 )
   # selected variables
-  nsamp = min(nrow(data), 4000)
-  sdata = data |> Select(vars) |> Sample(nsamp, replace=false)
+  sdata = data |> Select(vars)
 
   # pairs of variables
   svars = setdiff(names(sdata), ["geometry"])
@@ -89,12 +88,19 @@ function hscatter(
   fig
 end
 
-function _hscatter(gtb, var₁, var₂, lag, tol, distance)
+function _hscatter(data, var₁, var₂, lag, tol, distance)
   # lookup valid data
-  ind₁ = findall(!ismissing, gtb[:, var₁])
-  ind₂ = findall(!ismissing, gtb[:, var₂])
-  sub₁ = gtb[ind₁, :]
-  sub₂ = gtb[ind₂, :]
+  ind₁ = findall(!isinvalid, data[:, var₁])
+  ind₂ = findall(!isinvalid, data[:, var₂])
+  val₁ = data[ind₁, :]
+  val₂ = data[ind₂, :]
+
+  # subsample to avoid long-waiting times
+  nmax = 4000
+  sub₁ = val₁ |> Sample(min(nrow(val₁), nmax), replace=false)
+  sub₂ = val₂ |> Sample(min(nrow(val₂), nmax), replace=false)
+
+  # extract coordinates and values
   dom₁ = domain(sub₁)
   dom₂ = domain(sub₂)
   v₁ = [to(centroid(dom₁, i)) for i in 1:nelements(dom₁)]
