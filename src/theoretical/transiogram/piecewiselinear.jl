@@ -140,7 +140,7 @@ function Base.show(io::IO, ::MIME"text/plain", t::PiecewiseLinearTransiogram)
     println(ioctx, "├─ ranges: ", radii(t.ball))
   end
   print(ioctx, "├─ abscissas: ")
-  _printlnvec(ioctx, t.abscissas, 3)
+  printlnvec(ioctx, t.abscissas, 3)
   print(ioctx, "├─ ordinates: ")
-  _printvec(ioctx, t.ordinates, 3)
+  printvec(ioctx, t.ordinates, 3)
 end

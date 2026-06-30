@@ -21,21 +21,21 @@ end
 
 isinvalid(v) = ismissing(v) || (v isa Number && !isfinite(v))
 
-defaultmaxlag(data) = _minside(boundingbox(domain(data))) / 2
+defaultmaxlag(data) = minside(boundingbox(domain(data))) / 2
 
 defaultvariables(n) = n == 1 ? [:field] : [Symbol(:field, i) for i in 1:n]
 
 rangeball(range, ::Nothing, rotation) = MetricBall(range)
 rangeball(range, ranges, rotation) = MetricBall(ranges, rotation)
 
-function _minside(box)
-  s = _sides(box)
+function minside(box)
+  s = uniquesides(box)
   minimum(filter(>(zero(eltype(s))), s))
 end
 
-_sides(box::Box{<:𝔼}) = sides(box)
+uniquesides(box::Box{<:𝔼}) = sides(box)
 
-function _sides(box::Box{<:🌐})
+function uniquesides(box::Box{<:🌐})
   r = vertices(boundary(box))
   s1 = length(Segment(r[1], r[2]))
   s2 = length(Segment(r[2], r[3]))
@@ -44,12 +44,12 @@ function _sides(box::Box{<:🌐})
   (s1, s2, s3, s4)
 end
 
-function _printlnvec(io, vec, n)
-  _printvec(io, vec, n)
+function printlnvec(io, vec, n)
+  printvec(io, vec, n)
   println(io)
 end
 
-function _printvec(io, vec::AbstractArray, n)
+function printvec(io, vec::AbstractArray, n)
   print(io, "[")
   if length(vec) > 2n
     k = n - 1
@@ -62,25 +62,25 @@ function _printvec(io, vec::AbstractArray, n)
   print(io, "]")
 end
 
-function _printvec(io, vec::AbstractArray{<:AbstractArray}, n)
+function printvec(io, vec::AbstractArray{<:AbstractArray}, n)
   len = length(vec)
   println(io)
   if len > 2n
     for i in 1:n
       print(io, "│  ├─ ")
-      _printlnvec(io, vec[i], n)
+      printlnvec(io, vec[i], n)
     end
     println(io, "│  ⋮")
     for i in (len - n + 1):(len - 1)
       print(io, "│  ├─ ")
-      _printlnvec(io, vec[i], n)
+      printlnvec(io, vec[i], n)
     end
   else
     for i in 1:(len - 1)
       print(io, "│  ├─ ")
-      _printlnvec(io, vec[i], n)
+      printlnvec(io, vec[i], n)
     end
   end
   print(io, "│  └─ ")
-  _printvec(io, vec[len], n)
+  printvec(io, vec[len], n)
 end

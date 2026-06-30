@@ -147,5 +147,5 @@ function Base.show(io::IO, ::MIME"text/plain", t::CarleTransiogram)
   summary(ioctx, t)
   println(ioctx)
   print(ioctx, "├─ rates: ")
-  _printvec(ioctx, collect(t.rates), 3)
+  printvec(ioctx, collect(t.rates), 3)
 end
