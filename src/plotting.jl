@@ -15,12 +15,12 @@ Plot the geostatistical function `f` with given `options`.
 
 ## Empirical function options:
 
-* `linestyle`   - line style of function graph
-* `pointsize`   - size of points
-* `showtext`    - show text counts
-* `textsize`    - size of text counts
-* `showhist`    - show histogram
-* `histcolor`   - color of histogram
+* `linestyle` - line style of function graph
+* `pointsize` - size of points
+* `showtext`  - show text counts
+* `textsize`  - size of text counts
+* `showhist`  - show histogram
+* `histcolor` - color of histogram
 
 ### Notes
 
