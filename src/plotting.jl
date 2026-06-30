@@ -110,6 +110,7 @@ Optionally, specify the options documented below.
 * `lag`      - lag distance in length units (default to `0.0u"m"`)
 * `tol`      - tolerance for lag distance (default to `0.1u"m"`)
 * `distance` - distance from Distances.jl (default to `Euclidean()`)
+* `nmax`     - maximum number of samples (default to `4000`)
 * `size`     - size of points (default to `2`)
 * `color`    - color of points (default to `:black`)
 * `alpha`    - transparency of points (default to `1.0`)

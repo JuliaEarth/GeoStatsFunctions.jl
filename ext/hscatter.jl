@@ -11,6 +11,8 @@ function hscatter(
   tol=0.1u"m",
   # distance from Distances.jl
   distance=Euclidean(),
+  # maximum number of samples
+  nmax=4000,
   # size of points
   size=2,
   # color of points
@@ -24,8 +26,9 @@ function hscatter(
   # color of center lines
   ccolor=:teal
 )
-  # selected variables
-  sdata = data |> Select(vars)
+  # perform subsampling to avoid memory issues
+  nsamp = min(nrow(data), nmax)
+  sdata = data |> Select(vars) |> Sample(nsamp, replace=false)
 
   # pairs of variables
   svars = setdiff(names(sdata), ["geometry"])
@@ -92,13 +95,8 @@ function _hscatter(data, var₁, var₂, lag, tol, distance)
   # lookup valid data
   ind₁ = findall(!isinvalid, data[:, var₁])
   ind₂ = findall(!isinvalid, data[:, var₂])
-  val₁ = data[ind₁, :]
-  val₂ = data[ind₂, :]
-
-  # subsample to avoid long-waiting times
-  nmax = 4000
-  sub₁ = val₁ |> Sample(min(nrow(val₁), nmax), replace=false)
-  sub₂ = val₂ |> Sample(min(nrow(val₂), nmax), replace=false)
+  sub₁ = data[ind₁, :]
+  sub₂ = data[ind₂, :]
   dom₁ = domain(sub₁)
   dom₂ = domain(sub₂)
 
