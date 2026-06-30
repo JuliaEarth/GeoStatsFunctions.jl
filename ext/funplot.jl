@@ -27,10 +27,7 @@ function funplot!(
   # common options
   color=:teal,
   linewidth=1.5,
-  maxlag=nothing,
-  # theoretical options
-  showmeanlengths=false,
-  showproportions=true
+  maxlag=nothing
 )
   # maximum lag
   hmax = isnothing(maxlag) ? _maxlag(f) : GeoStatsFunctions.aslen(maxlag)
@@ -40,10 +37,6 @@ function funplot!(
 
   # evaluate function
   F = _eval(f, hs)
-
-  # mean lengths and proportions
-  l = f isa Transiogram ? meanlengths(f) : nothing
-  p = f isa Transiogram ? proportions(f) : nothing
 
   # aesthetic options
   label = Dict(1 => "1ˢᵗ axis", 2 => "2ⁿᵈ axis", 3 => "3ʳᵈ axis")
@@ -56,27 +49,7 @@ function funplot!(
     issymmetric(f) && i < j && continue
     ax = Makie.content(fig[i, j])
     for (k, Fₖ) in enumerate(F)
-      # display function
       Makie.lines!(ax, ustrip.(u"m", hs), Fₖ[i, j]; color, linewidth, linestyle=linestyle[k], label=label[k])
-      if f isa Transiogram
-        if i == j
-          if showmeanlengths
-            # display mean lengths
-            Makie.lines!(
-              ax,
-              ustrip.(u"m", [zero(hmax), l[i]]),
-              [1.0, 0.0];
-              color=:slategray,
-              linewidth,
-              linestyle=:dash
-            )
-          end
-          if showproportions
-            # display proportions
-            Makie.hlines!(ax, p[i]; color=:slategray, linewidth, linestyle=:dash)
-          end
-        end
-      end
     end
     position = (i == j) && isbanded(f) ? :rt : :rb
     d > 1 && Makie.axislegend(ax, position=position)
