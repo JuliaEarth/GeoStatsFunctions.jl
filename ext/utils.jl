@@ -14,6 +14,15 @@ _maxlag(::NuggetEffect) = 3.0u"m"
 _maxlag(f::EmpiricalGeoStatsFunction) = last(f.abscissas)
 _maxlag(f::EmpiricalGeoStatsSurface) = last(f.rs)
 
+_ylabel(f::GeoStatsFunction) = "function value"
+_ylabel(f::Variogram) = "variogram"
+_ylabel(f::Covariance) = "covariance"
+_ylabel(f::Transiogram) = "probability"
+_ylabel(f::CompositeFunction) = _ylabel(first(last(structures(f))))
+_ylabel(f::EmpiricalGeoStatsFunction) = "function value"
+_ylabel(f::EmpiricalVariogram) = "variogram"
+_ylabel(f::EmpiricalTransiogram) = "probability"
+
 _eval(f, hs) = isisotropic(f) ? _isoeval(f, hs) : _anisoeval(f, hs)
 
 function _isoeval(f, hs)

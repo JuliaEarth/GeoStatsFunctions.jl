@@ -141,6 +141,9 @@ export
   SineHoleCovariance,
   CircularCovariance,
 
+  # theoretical composite functions
+  CompositeFunction,
+
   # theoretical transiograms
   Transiogram,
   LinearTransiogram,
