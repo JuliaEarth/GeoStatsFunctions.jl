@@ -99,19 +99,19 @@ function _hscatter(data, var₁, var₂, lag, tol, distance)
   nmax = 4000
   sub₁ = val₁ |> Sample(min(nrow(val₁), nmax), replace=false)
   sub₂ = val₂ |> Sample(min(nrow(val₂), nmax), replace=false)
-
-  # extract coordinates and values
   dom₁ = domain(sub₁)
   dom₂ = domain(sub₂)
-  v₁ = [to(centroid(dom₁, i)) for i in 1:nelements(dom₁)]
-  v₂ = [to(centroid(dom₂, i)) for i in 1:nelements(dom₂)]
+
+  # extract coordinates and values
+  c₁ = [centroid(dom₁, i) for i in 1:nelements(dom₁)]
+  c₂ = [centroid(dom₂, i) for i in 1:nelements(dom₂)]
   z₁ = sub₁[:, var₁]
   z₂ = sub₂[:, var₂]
 
   # compute pairwise distance
   m, n = length(z₁), length(z₂)
   pairs = [(i, j) for j in 1:n for i in j:m]
-  dists = [distance(v₁[i], v₂[j]) for (i, j) in pairs]
+  dists = [evaluate(distance, c₁[i], c₂[j]) for (i, j) in pairs]
 
   # find indices with given lag
   match = findall(abs.(dists .- lag) .< tol)
