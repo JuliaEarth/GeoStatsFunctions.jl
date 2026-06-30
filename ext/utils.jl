@@ -2,12 +2,6 @@
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
 
-const Len{T} = Quantity{T,u"𝐋"}
-
-aslen(x::Len) = x
-aslen(x::Number) = x * u"m"
-aslen(::Quantity) = throw(ArgumentError("invalid length unit"))
-
 _maxlag(f::GeoStatsFunction) = 3range(f)
 _maxlag(::PowerVariogram) = 3.0u"m"
 _maxlag(::NuggetEffect) = 3.0u"m"

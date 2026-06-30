@@ -31,8 +31,8 @@ function hscatter(
   sdata = data |> Select(vars) |> Sample(nsamp, replace=false, rng=Xoshiro(123))
 
   # fix lag and tolerance units if necessary
-  l = aslen(lag)
-  τ = aslen(tol)
+  l = GeoStatsFunctions.aslen(lag)
+  τ = GeoStatsFunctions.aslen(tol)
 
   # pairs of variables
   svars = setdiff(names(sdata), ["geometry"])
