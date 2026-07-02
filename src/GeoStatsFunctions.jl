@@ -53,11 +53,7 @@ function __init__()
   # register error hint for visualization functions
   # since this is a recurring issue for new users
   Base.Experimental.register_error_hint(MethodError) do io, exc, argtypes, kwargs
-    if exc.f == funplot ||
-       exc.f == funplot! ||
-       exc.f == surfplot ||
-       exc.f == surfplot! ||
-       exc.f == hscatter
+    if exc.f == funplot || exc.f == funplot! || exc.f == surfplot || exc.f == surfplot! || exc.f == hscatter
       if isnothing(Base.get_extension(GeoStatsFunctions, :GeoStatsFunctionsMakieExt))
         print(
           io,
