@@ -8,6 +8,12 @@
     @test ys[1] > ys[10] > ys[20]
   end
 
+  # getindex interface
+  @test nvariables(t[1]) == 1
+  @test variables(t[1]) == variables(t)[1:1]
+  @test nvariables(t[1:2]) == 2
+  @test variables(t[1:2]) == variables(t)[1:2]
+
   # same for directional transiograms
   t = DirectionalTransiogram((0.0, 0.0, 1.0), gtb, "FACIES", maxlag=20, nlags=20)
   for i in 1:5

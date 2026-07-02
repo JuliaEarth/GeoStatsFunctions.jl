@@ -73,6 +73,17 @@
   @test all(≥(0u"m"), g.abscissas)
   @test all(>(0.8), g.ordinates[1][11:end])
   @test all(≥(0), g.counts)
+
+  # multivariate variogram
+  img = readdlm(joinpath(datadir, "Gaussian30x10.txt"))
+  gtb = georef((; z1=img, z2=2img, z3=3img))
+  g = EmpiricalVariogram(gtb, 1:3, maxlag=50.0)
+
+  # getindex interface
+  @test nvariables(g[1]) == 1
+  @test variables(g[1]) == variables(g)[1:1]
+  @test nvariables(g[1:2]) == 2
+  @test variables(g[1:2]) == variables(g)[1:2]
 end
 
 @testset "DirectionalVariogram" begin
