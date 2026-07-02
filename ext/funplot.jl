@@ -11,11 +11,13 @@ function funplot(f; kwargs...)
     issymmetric(f) && i < j && continue
     ax = Makie.Axis(fig[i, j])
     ax.title = issymmetric(f) ? "$(v[j]) → $(v[i])" : "$(v[i]) → $(v[j])"
-    ax.ylabel = _ylabel(f)
-    i < n && Makie.hidexdecorations!(ax, grid=false)
     i == n && (ax.xlabel = "lag distance [m]")
+    j == 1 && (ax.ylabel = _ylabel(f))
+    i < n && Makie.hidexdecorations!(ax, grid=false)
+    j > 1 && _istransiogram(f) && Makie.hideydecorations!(ax, grid=false)
   end
   Makie.linkxaxes!(fig.content...)
+  _istransiogram(f) && Makie.linkyaxes!(fig.content...)
 
   # fill figure with plots
   funplot!(fig, f; kwargs...)

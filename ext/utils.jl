@@ -17,6 +17,10 @@ _ylabel(f::EmpiricalGeoStatsFunction) = "function value"
 _ylabel(f::EmpiricalVariogram) = "variogram"
 _ylabel(f::EmpiricalTransiogram) = "probability"
 
+_istransiogram(f) = false
+_istransiogram(f::Transiogram) = true
+_istransiogram(f::EmpiricalTransiogram) = true
+
 _eval(f, hs) = isisotropic(f) ? _isoeval(f, hs) : _anisoeval(f, hs)
 
 function _isoeval(f, hs)
