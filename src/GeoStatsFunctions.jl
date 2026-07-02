@@ -57,8 +57,7 @@ function __init__()
        exc.f == funplot! ||
        exc.f == surfplot ||
        exc.f == surfplot! ||
-       exc.f == hscatter ||
-       exc.f == hscatter!
+       exc.f == hscatter
       if isnothing(Base.get_extension(GeoStatsFunctions, :GeoStatsFunctionsMakieExt))
         print(
           io,
@@ -162,7 +161,6 @@ export
   funplot!,
   surfplot,
   surfplot!,
-  hscatter,
-  hscatter!
+  hscatter
 
 end
