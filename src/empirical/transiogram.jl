@@ -138,6 +138,26 @@ function merge(tα::EmpiricalTransiogram{ℒ,V,D,E}, tβ::EmpiricalTransiogram{�
   EmpiricalTransiogram(n, x, Y, C, d, e, vα)
 end
 
+Base.getindex(t::EmpiricalTransiogram, inds::AbstractVector) = EmpiricalTransiogram(
+  t.counts,
+  t.abscissas,
+  t.ordinates[inds, inds],
+  t.headcounts[inds, inds],
+  t.distance,
+  t.estimator,
+  t.variables[inds]
+)
+
+Base.getindex(t::EmpiricalTransiogram, ind::Int) = EmpiricalTransiogram(
+  t.counts,
+  t.abscissas,
+  t.ordinates[[ind], [ind]],
+  t.headcounts[[ind], [ind]],
+  t.distance,
+  t.estimator,
+  t.variables[[ind]]
+)
+
 # -------------------------
 # CONVENIENCE CONSTRUCTORS
 # -------------------------
