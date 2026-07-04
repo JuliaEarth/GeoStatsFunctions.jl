@@ -9,79 +9,39 @@ include("fitting/algorithms.jl")
 # -----------------
 
 """
-    fit(F, f, algo=WeightedLeastSquares(); kwargs...)
+    fit(F, f, [w]; parameters..., maxparameters...)
 
-Fit theoretical geostatistical function of type `F` to empirical function `f` using algorithm `algo`.
+Fit theoretical geostatistical function of type `F` to empirical function `f`.
+The weighting function `w` is optional, and defaults to the number of pairs of
+observations in each lag used to estimate the empirical function `f`.
 
-Optionally fix theoretical parameters like `range`, `sill` and `nugget` in the `kwargs`.
+Theoretical `parameters` like `range`, `sill` and `nugget` as well as their
+maximum values like `maxrange`, `maxsill` and `maxnugget` can be fixed as
+keyword arguments. They are converted into optimization constraints in the
+weighted least squares fitting algorithm.
+
+The type `F` can be abstract like `Variogram` or `Transiogram`, in which case
+all fittable (e.g., stationary) subtypes are fitted and the one with minimum
+error is returned.
 
 ## Examples
 
 ```julia
 julia> fit(SphericalVariogram, g)
-julia> fit(ExponentialVariogram, g)
-julia> fit(ExponentialVariogram, g, sill=1.0)
+julia> fit(ExponentialVariogram, g, range=1.0)
+julia> fit(GaussianVariogram, g, sill=1.0, nugget=0.1)
 julia> fit(ExponentialVariogram, g, maxsill=1.0)
-julia> fit(GaussianVariogram, g, WeightedLeastSquares())
+julia> fit(SphericalVariogram, g, h -> 1/h)
+julia> fit(Variogram, g, range=1.0)
+julia> fit(Transiogram, t, h -> 1/h)
 ```
 """
+fit(F::Type{<:GeoStatsFunction}, f::EmpiricalGeoStatsFunction, w::Function; kwargs...) =
+  fit(F, f, WeightedLeastSquares(w); kwargs...)
+
 fit(F::Type{<:GeoStatsFunction}, f::EmpiricalGeoStatsFunction, algo::FitAlgo=WeightedLeastSquares(); kwargs...) =
   _fit(F, f, algo; kwargs...) |> first
 
-"""
-    fit(Fs, f, algo=WeightedLeastSquares(); kwargs...)
-
-Fit theoretical geostatistical functions of types `Fs` to empirical function `f`
-using algorithm `algo` and return the one with minimum error.
-
-## Examples
-
-```julia
-julia> fit([SphericalVariogram, ExponentialVariogram], g)
-```
-"""
-function fit(Fs, f::EmpiricalGeoStatsFunction, algo::FitAlgo=WeightedLeastSquares(); kwargs...)
-  # fit each variogram type
-  res = [_fit(F, f, algo; kwargs...) for F in Fs]
-  fs, ϵs = first.(res), last.(res)
-
-  # return best candidate
-  fs[argmin(ϵs)]
-end
-
-"""
-    fit(F, f, weightfun; kwargs...)
-
-Convenience method that forwards the weighting function `weightfun`
-to the `WeightedLeastSquares` algorithm.
-
-## Examples
-
-```julia
-fit(SphericalVariogram, g, h -> exp(-h))
-fit(Variogram, g, h -> exp(-h/100))
-```
-"""
-fit(F, f::EmpiricalGeoStatsFunction, weightfun::Function; kwargs...) =
-  fit(F, f, WeightedLeastSquares(weightfun); kwargs...)
-
-# ----------
-# VARIOGRAM
-# ----------
-
-"""
-    fit(Variogram, g, algo=WeightedLeastSquares(); kwargs...)
-
-Fit all stationary `Variogram` models to empirical variogram `g`
-using algorithm `algo` and return the one with minimum error.
-
-## Examples
-
-```julia
-julia> fit(Variogram, g)
-julia> fit(Variogram, g, h -> 1 / h)
-```
-"""
 function fit(::Type{Variogram}, g::EmpiricalVariogram, algo::FitAlgo=WeightedLeastSquares(); kwargs...)
   Gs = (
     CircularVariogram,
@@ -93,26 +53,33 @@ function fit(::Type{Variogram}, g::EmpiricalVariogram, algo::FitAlgo=WeightedLea
     SineHoleVariogram,
     SphericalVariogram
   )
-  fit(Gs, g, algo; kwargs...)
+  fitbest(Gs, g, algo; kwargs...)
+end
+
+function fit(::Type{Transiogram}, t::EmpiricalTransiogram, algo::FitAlgo=WeightedLeastSquares(); kwargs...)
+  Ts =
+    (ExponentialTransiogram, GaussianTransiogram, LinearTransiogram, MatrixExponentialTransiogram, SphericalTransiogram)
+  fitbest(Ts, t, algo; kwargs...)
 end
 
 """
-    fit(Transiogram, t, algo=WeightedLeastSquares(); kwargs...)
+    fitbest([F₁, F₂, ...], f, [w]; parameters..., maxparameters...)
 
-Fit all theoretical `Transiogram` models to empirical transiogram `t`
-using algorithm `algo` and return the one with minimum error.
+Fit all theoretical geostatistical functions of types `F₁, F₂, ...`
+to empirical function `f` and return the one with minimum error.
 
 ## Examples
 
 ```julia
-julia> fit(Transiogram, t)
-julia> fit(Transiogram, t, h -> 1 / h)
+julia> fitbest([SphericalVariogram, ExponentialVariogram], g)
 ```
+
+See [`fit`](@ref) for details on the arguments and keyword arguments.
 """
-function fit(::Type{Transiogram}, t::EmpiricalTransiogram, algo::FitAlgo=WeightedLeastSquares(); kwargs...)
-  Ts =
-    (ExponentialTransiogram, GaussianTransiogram, LinearTransiogram, MatrixExponentialTransiogram, SphericalTransiogram)
-  fit(Ts, t, algo; kwargs...)
+function fitbest(Fs, f::EmpiricalGeoStatsFunction, algo::FitAlgo=WeightedLeastSquares(); kwargs...)
+  sols = [_fit(F, f, algo; kwargs...) for F in Fs]
+  f, _ = argmin(last, sols)
+  f
 end
 
 # ----------------

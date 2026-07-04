@@ -11,7 +11,7 @@ using PrecompileTools
   @compile_workload begin
     g1 = EmpiricalVariogram(t1, "z")
     g2 = EmpiricalVariogram(t2, "z")
-    γ1 = GeoStatsFunctions.fit(Gs, g1)
-    γ2 = GeoStatsFunctions.fit(Gs, g2)
+    γ1 = GeoStatsFunctions.fitbest(Gs, g1)
+    γ2 = GeoStatsFunctions.fitbest(Gs, g2)
   end
 end
