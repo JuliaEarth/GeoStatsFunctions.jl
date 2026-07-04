@@ -18,10 +18,17 @@ function _fit(
   Y = t.ordinates
   n = t.counts
 
+  # number of categories and free logits
+  k = size(Y, 1)
+  m = k - 1
+
   # discard invalid bins
   x = x[n .> 0]
   Y = [y[n .> 0] for y in Y]
   n = n[n .> 0]
+
+  # evaluate weights
+  ω = _weights(w, x, n)
 
   # strip units of coordinates
   ux = unit(eltype(x))
@@ -31,12 +38,9 @@ function _fit(
   range′ = isnothing(range) ? range : _ustrip(ux, range)
   maxrange′ = isnothing(maxrange) ? maxrange : _ustrip(ux, maxrange)
 
-  # evaluate weights
-  ω = _weights(w, x, n)
-
-  # number of categories and free logits
-  k = size(Y, 1)
-  m = k - 1
+  # maximum range and logits
+  rmax = isnothing(maxrange′) ? maximum(x′) : maxrange′
+  λmax = ntuple(i -> oftype(rmax, 3), m) # enough to explore the simplex
 
   # objective function (θ = [range, logits...])
   function J(θ)
@@ -47,10 +51,6 @@ function _fit(
     err(i) = sum(abs2, τ(x′[i]) - mat(i))
     sum(i -> ω[i] * err(i), eachindex(ω, x′))
   end
-
-  # maximum range and logits
-  rmax = isnothing(maxrange′) ? maximum(x′) : maxrange′
-  λmax = ntuple(i -> oftype(rmax, 3), m) # enough to explore the simplex
 
   # box constraints (logits are unconstrained, proportions are recovered via softmax)
   δ = oftype(rmax, 1e-8)
@@ -93,10 +93,17 @@ function _fit(
   Y = t.ordinates
   n = t.counts
 
+  # number of categories and free logits
+  k = size(Y, 1)
+  m = k - 1
+
   # discard invalid bins
   x = x[n .> 0]
   Y = [y[n .> 0] for y in Y]
   n = n[n .> 0]
+
+  # evaluate weights
+  ω = _weights(w, x, n)
 
   # strip units of coordinates
   ux = unit(eltype(x))
@@ -108,12 +115,11 @@ function _fit(
   maxrange′ = isnothing(maxrange) ? maxrange : _ustrip(ux, maxrange)
   maxlengths′ = isnothing(maxlengths) ? maxlengths : _ustrip.(ux, maxlengths)
 
-  # evaluate weights
-  ω = _weights(w, x, n)
-
-  # number of categories and free logits
-  k = size(Y, 1)
-  m = k - 1
+  # maximum range, lengths and logits
+  xmax = maximum(x′)
+  rmax = isnothing(maxrange′) ? xmax : maxrange′
+  lmax = isnothing(maxlengths′) ? ntuple(i -> xmax, k) : maxlengths′
+  λmax = ntuple(i -> oftype(rmax, 3), m) # enough to explore the simplex
 
   # objective function (θ = [range, lengths..., logits...])
   function J(θ)
@@ -125,12 +131,6 @@ function _fit(
     err(i) = sum(abs2, τ(x′[i]) - mat(i))
     sum(i -> ω[i] * err(i), eachindex(ω, x′))
   end
-
-  # maximum range, lengths and logits
-  xmax = maximum(x′)
-  rmax = isnothing(maxrange′) ? xmax : maxrange′
-  lmax = isnothing(maxlengths′) ? ntuple(i -> xmax, k) : maxlengths′
-  λmax = ntuple(i -> oftype(rmax, 3), m) # enough to explore the simplex
 
   # box constraints (logits are unconstrained, proportions are recovered via softmax)
   δ = oftype(rmax, 1e-8)
