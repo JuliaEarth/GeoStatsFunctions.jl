@@ -29,6 +29,9 @@ function _fitunivariate(
   y = y[n .> 0]
   n = n[n .> 0]
 
+  # evaluate weights
+  ω = _weights(w, x, n)
+
   # strip units of coordinates
   ux = unit(eltype(x))
   uy = unit(eltype(y))
@@ -43,8 +46,12 @@ function _fitunivariate(
   maxsill′ = isnothing(maxsill) ? maxsill : _ustrip(uy, maxsill)
   maxnugget′ = isnothing(maxnugget) ? maxnugget : _ustrip(uy, maxnugget)
 
-  # evaluate weights
-  ω = _weights(w, x, n)
+  # maximum range, sill and nugget
+  xmax = maximum(x′)
+  ymax = maximum(y′)
+  rmax = isnothing(maxrange′) ? xmax : maxrange′
+  smax = isnothing(maxsill′) ? ymax : maxsill′
+  nmax = isnothing(maxnugget′) ? ymax : maxnugget′
 
   # objective function
   function J(θ)
@@ -57,13 +64,6 @@ function _fitunivariate(
 
   # penalty for linear constraint (J + λL)
   λ = sum(abs2, y′)
-
-  # maximum range, sill and nugget
-  xmax = maximum(x′)
-  ymax = maximum(y′)
-  rmax = isnothing(maxrange′) ? xmax : maxrange′
-  smax = isnothing(maxsill′) ? ymax : maxsill′
-  nmax = isnothing(maxnugget′) ? ymax : maxnugget′
 
   # box constraints
   δ = oftype(rmax, 1e-8)
@@ -109,6 +109,9 @@ function _fitunivariate(
   y = y[n .> 0]
   n = n[n .> 0]
 
+  # evaluate weights
+  ω = _weights(w, x, n)
+
   # strip units of coordinates
   uy = unit(eltype(y))
   x′ = ustrip.(x)
@@ -122,8 +125,11 @@ function _fitunivariate(
   maxnugget′ = isnothing(maxnugget) ? maxnugget : _ustrip(uy, maxnugget)
   maxexponent′ = maxexponent
 
-  # evaluate weights
-  ω = _weights(w, x, n)
+  # maximum scaling, nugget and exponent
+  ymax = maximum(y′)
+  smax = isnothing(maxscaling′) ? ymax : maxscaling′
+  nmax = isnothing(maxnugget′) ? ymax : maxnugget′
+  emax = isnothing(maxexponent′) ? 2.0 : maxexponent′
 
   # objective function
   function J(θ)
@@ -138,12 +144,6 @@ function _fitunivariate(
 
   # penalty for linear constraint (J + λL)
   λ = sum(abs2, y′)
-
-  # maximum scaling, nugget and exponent
-  ymax = maximum(y′)
-  smax = isnothing(maxscaling′) ? ymax : maxscaling′
-  nmax = isnothing(maxnugget′) ? ymax : maxnugget′
-  emax = isnothing(maxexponent′) ? 2.0 : maxexponent′
 
   # box constraints
   δ = oftype(smax, 1e-8)
