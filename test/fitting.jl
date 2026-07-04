@@ -54,7 +54,7 @@
   γ = GeoStatsFunctions.fit(Variogram, g)
   @test γ isa GaussianVariogram
   @test isapprox(sill(γ), 0.054, atol=1e-3)
-  γ = GeoStatsFunctions.fitbest([SphericalVariogram, GaussianVariogram], g)
+  γ = GeoStatsFunctions.fitany([SphericalVariogram, GaussianVariogram], g)
   @test γ isa GaussianVariogram
   @test isapprox(sill(γ), 0.054, atol=1e-3)
 
@@ -148,7 +148,7 @@ end
   τ = GeoStatsFunctions.fit(Transiogram, t)
   @test τ isa MatrixExponentialTransiogram
   @test all(isapprox.(proportions(τ), ps, atol=3e-2))
-  τ = GeoStatsFunctions.fitbest([SphericalTransiogram, MatrixExponentialTransiogram], t)
+  τ = GeoStatsFunctions.fitany([SphericalTransiogram, MatrixExponentialTransiogram], t)
   @test τ isa MatrixExponentialTransiogram
   @test all(isapprox.(proportions(τ), ps, atol=3e-2))
 

@@ -16,7 +16,7 @@ weighted least squares fitting algorithm.
 
 The type `F` can be abstract like `Variogram` or `Transiogram`, in which case
 all fittable (e.g., stationary) subtypes are fitted and the one with minimum
-error is returned.
+error is returned. See [`fitany`](@ref) for custom lists of types.
 
 ## Examples
 
@@ -43,30 +43,30 @@ function fit(::Type{Variogram}, g::EmpiricalVariogram, w=nothing; kwargs...)
     SineHoleVariogram,
     SphericalVariogram
   )
-  fitbest(Gs, g, w; kwargs...)
+  fitany(Gs, g, w; kwargs...)
 end
 
 function fit(::Type{Transiogram}, t::EmpiricalTransiogram, w=nothing; kwargs...)
   Ts =
     (ExponentialTransiogram, GaussianTransiogram, LinearTransiogram, MatrixExponentialTransiogram, SphericalTransiogram)
-  fitbest(Ts, t, w; kwargs...)
+  fitany(Ts, t, w; kwargs...)
 end
 
 """
-    fitbest([F₁, F₂, ...], f, [w]; parameters..., maxparameters...)
+    fitany([F₁, F₂, ...], f, [w]; parameters..., maxparameters...)
 
-Fit all theoretical geostatistical functions of types `F₁, F₂, ...`
+Fit theoretical geostatistical functions of types `F₁, F₂, ...`
 to empirical function `f` and return the one with minimum error.
 
 ## Examples
 
 ```julia
-julia> fitbest([SphericalVariogram, ExponentialVariogram], g)
+julia> fitany([SphericalVariogram, ExponentialVariogram], g)
 ```
 
 See [`fit`](@ref) for details on the arguments and keyword arguments.
 """
-function fitbest(Fs, f::EmpiricalGeoStatsFunction, w=nothing; kwargs...)
+function fitany(Fs, f::EmpiricalGeoStatsFunction, w=nothing; kwargs...)
   sols = [_fit(F, f, w; kwargs...) for F in Fs]
   f, _ = argmin(last, sols)
   f
