@@ -2,7 +2,10 @@
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
 
-function _fit(
+_fit(G::Type{<:Variogram}, g::EmpiricalVariogram, w::Union{Function,Nothing}; kwargs...) =
+  nvariables(g) == 1 ? _fitunivariate(G, g, w; kwargs...) : _fitmultivariate(G, g, w; kwargs...)
+
+function _fitunivariate(
   G::Type{<:Variogram},
   g::EmpiricalVariogram,
   w::Union{Function,Nothing};
@@ -85,7 +88,7 @@ function _fit(
   γ, ϵ
 end
 
-function _fit(
+function _fitunivariate(
   G::Type{<:PowerVariogram},
   g::EmpiricalVariogram,
   w::Union{Function,Nothing};
@@ -163,4 +166,18 @@ function _fit(
   γ = G(scaling=θ[1] * uy, nugget=θ[2] * uy, exponent=θ[3])
 
   γ, ϵ
+end
+
+function _fitmultivariate(
+  G::Type{<:Variogram},
+  g::EmpiricalVariogram,
+  w::Union{Function,Nothing};
+  range=nothing,
+  sill=nothing,
+  nugget=nothing,
+  maxrange=nothing,
+  maxsill=nothing,
+  maxnugget=nothing
+)
+  error("not implemented")
 end
