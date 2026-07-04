@@ -2,7 +2,10 @@
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
 
-function funplot(f; kwargs...)
+function funplot(f; link=nothing, kwargs...)
+  # decide whether to link y axes of subplots
+  ylink = isnothing(link) ? _istransiogram(f) : link
+
   # initialize figure
   n = nvariables(f)
   v = variables(f)
@@ -14,10 +17,10 @@ function funplot(f; kwargs...)
     i == n && (ax.xlabel = "lag distance [m]")
     j == 1 && (ax.ylabel = _ylabel(f))
     i < n && Makie.hidexdecorations!(ax, grid=false)
-    j > 1 && _istransiogram(f) && Makie.hideydecorations!(ax, grid=false)
+    j > 1 && ylink && Makie.hideydecorations!(ax, grid=false)
   end
   Makie.linkxaxes!(fig.content...)
-  _istransiogram(f) && Makie.linkyaxes!(fig.content...)
+  ylink && Makie.linkyaxes!(fig.content...)
 
   # fill figure with plots
   funplot!(fig, f; kwargs...)

@@ -7,6 +7,8 @@
 
 Computes the empirical (a.k.a. experimental) omnidirectional
 transiogram for categorical variable `var` stored in the `geotable`.
+The variable can be specified by name or index. Additional options are
+documented below.
 
 ## Options
 

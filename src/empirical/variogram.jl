@@ -3,10 +3,13 @@
 # ------------------------------------------------------------------
 
 """
-    EmpiricalVariogram(geotable, vars; [options])
+    EmpiricalVariogram(geotable, [vars]; [options])
 
 Computes the empirical (a.k.a. experimental) omnidirectional
 (cross-)variogram for variables `vars` stored in the `geotable`.
+The variables can be specified by their names or indices, and
+all variables are used by default. Additional options are
+documented below.
 
 ## Options
 
@@ -55,7 +58,7 @@ end
 
 function EmpiricalVariogram(
   data::AbstractGeoTable,
-  vars;
+  vars=1:(ncol(data) - 1);
   nlags=20,
   maxlag=defaultmaxlag(data),
   distance=Euclidean(),

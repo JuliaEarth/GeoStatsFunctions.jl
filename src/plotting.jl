@@ -12,6 +12,7 @@ Plot the geostatistical function `f` with given `options`.
 * `color`     - color of function graph
 * `linewidth` - line width of function graph
 * `maxlag`    - maximum lag distance
+* `link`      - whether to link axes of subplots
 
 ## Empirical function options:
 
@@ -95,10 +96,12 @@ See the documentation of [`surfplot`](@ref) for `options`.
 function surfplot! end
 
 """
-    hscatter(geotable, vars; [options])
+    hscatter(geotable, [vars]; [options])
 
-h-scatter plot for all variables `vars` stored in the `geotable`.
-Optionally, specify the options documented below.
+h-scatter plot for variables `vars` stored in the `geotable`.
+The variables can be specified by their names or indices, and
+all variables are plotted by default. Additional options are
+documented below.
 
 ## Options
 
@@ -110,7 +113,6 @@ Optionally, specify the options documented below.
 * `color`    - color of points (default to `:black`)
 * `alpha`    - transparency of points (default to `1.0`)
 * `rcolor`   - color of regression line (default to `:salmon`)
-* `icolor`   - color of identity line (default to `:black`)
 * `ccolor`   - color of center lines (default to `:teal`)
 
 ## Examples
@@ -121,6 +123,12 @@ hscatter(geotable, "z", lag=1.0)
 
 # h-scatter of z vs. w at lag 2.0
 hscatter(geotable, ["z", "w"], lag=2.0)
+
+# h-scatter of first 4 variables
+hscatter(geotable, 1:4)
+
+# h-scatter of all variables
+hscatter(geotable)
 ```
 
 ### Notes

@@ -4,7 +4,7 @@
 
 function hscatter(
   data,
-  vars;
+  vars=1:(ncol(data) - 1);
   # lag distance in length units
   lag=0.0u"m",
   # tolerance for lag distance
@@ -21,8 +21,6 @@ function hscatter(
   alpha=1.0,
   # color of regression line
   rcolor=:salmon,
-  # color of identity line
-  icolor=:black,
   # color of center lines
   ccolor=:teal
 )
@@ -50,11 +48,11 @@ function hscatter(
     ax.aspect = Makie.AxisAspect(1)
     i < n && Makie.hidexdecorations!(ax, grid=false)
     j > 1 && Makie.hideydecorations!(ax, grid=false)
-    ax.xlabel = var₁
-    ax.ylabel = var₂
 
     # compute h-scatter coordinates
-    z₁, z₂ = _hscatter(sdata, var₁, var₂, l, τ, distance)
+    z₁, z₂, u₁, u₂ = _hscatter(sdata, var₁, var₂, l, τ, distance)
+    ax.xlabel = u₁ == NoUnits ? var₁ : var₁ * " [$u₁]"
+    ax.ylabel = u₂ == NoUnits ? var₂ : var₂ * " [$u₂]"
 
     # skip empty lag distances
     isnothing(z₁) && continue
@@ -62,21 +60,16 @@ function hscatter(
     # add title with Pearson correlation coefficient
     ax.title = "corr: $(round(cor(z₁, z₂), digits=2))"
 
-    # compute regression line and identity line
+    # compute regression line
     z̄₁, z̄₂ = mean(z₁), mean(z₂)
     Z₁ = [z₁ ones(length(z₁))]
     ẑ₂ = Z₁ * (Z₁ \ z₂)
-    a, b = extrema([extrema(z₁)..., extrema(z₂)...])
-    minmax = [(a, a), (b, b)]
 
     # plot h-scatter points
     Makie.scatter!(ax, z₁, z₂, color=color, alpha=alpha, markersize=size)
 
     # plot regression line
     Makie.lines!(ax, z₁, ẑ₂, color=rcolor)
-
-    # plot identity line
-    Makie.lines!(ax, minmax, color=icolor)
 
     # plot center lines
     Makie.vlines!(ax, z̄₁, color=ccolor)
@@ -114,8 +107,12 @@ function _hscatter(data, var₁, var₂, lag, tol, distance)
   # extract coordinates and values
   c₁ = [centroid(dom₁, i) for i in 1:nelements(dom₁)]
   c₂ = [centroid(dom₂, i) for i in 1:nelements(dom₂)]
-  z₁ = sub₁[:, var₁]
-  z₂ = sub₂[:, var₂]
+  v₁ = sub₁[:, var₁]
+  v₂ = sub₂[:, var₂]
+  z₁ = ustrip.(v₁)
+  z₂ = ustrip.(v₂)
+  u₁ = unit(eltype(v₁))
+  u₂ = unit(eltype(v₂))
 
   # compute pairwise distance
   m, n = length(z₁), length(z₂)
@@ -126,9 +123,9 @@ function _hscatter(data, var₁, var₂, lag, tol, distance)
   match = findall(abs.(dists .- lag) .< tol)
 
   # return sentinel values if no match found
-  isempty(match) && return (nothing, nothing)
+  isempty(match) && return (nothing, nothing, nothing, nothing)
 
   # h-scatter coordinates
   ij = view(pairs, match)
-  z₁[first.(ij)], z₂[last.(ij)]
+  z₁[first.(ij)], z₂[last.(ij)], u₁, u₂
 end

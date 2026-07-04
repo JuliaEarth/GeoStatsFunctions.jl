@@ -3,9 +3,9 @@
 # ------------------------------------------------------------------
 
 """
-    NuggetEffect(; nugget)
+    NuggetEffect(nugget)
 
-A pure nugget effect variogram with `nugget`.
+A pure `nugget` effect variogram.
 """
 struct NuggetEffect{V} <: Variogram
   nugget::V
