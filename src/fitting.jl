@@ -2,18 +2,12 @@
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
 
-include("fitting/algorithms.jl")
-
-# -----------------
-# GEOSTATSFUNCTION
-# -----------------
-
 """
     fit(F, f, [w]; parameters..., maxparameters...)
 
 Fit theoretical geostatistical function of type `F` to empirical function `f`.
-The weighting function `w` is optional, and defaults to the number of pairs of
-observations in each lag used to estimate the empirical function `f`.
+The weighting function `w` maps lags to importance weights. It is optional and
+defaults to the bin counts stored in each lag of the empirical function `f`.
 
 Theoretical `parameters` like `range`, `sill` and `nugget` as well as their
 maximum values like `maxrange`, `maxsill` and `maxnugget` can be fixed as
@@ -36,13 +30,9 @@ julia> fit(Variogram, g, range=1.0)
 julia> fit(Transiogram, t, h -> 1/h)
 ```
 """
-fit(F::Type{<:GeoStatsFunction}, f::EmpiricalGeoStatsFunction, w::Function; kwargs...) =
-  fit(F, f, WeightedLeastSquares(w); kwargs...)
+fit(F::Type{<:GeoStatsFunction}, f::EmpiricalGeoStatsFunction, w=nothing; kwargs...) = _fit(F, f, w; kwargs...) |> first
 
-fit(F::Type{<:GeoStatsFunction}, f::EmpiricalGeoStatsFunction, algo::FitAlgo=WeightedLeastSquares(); kwargs...) =
-  _fit(F, f, algo; kwargs...) |> first
-
-function fit(::Type{Variogram}, g::EmpiricalVariogram, algo::FitAlgo=WeightedLeastSquares(); kwargs...)
+function fit(::Type{Variogram}, g::EmpiricalVariogram, w=nothing; kwargs...)
   Gs = (
     CircularVariogram,
     CubicVariogram,
@@ -53,13 +43,13 @@ function fit(::Type{Variogram}, g::EmpiricalVariogram, algo::FitAlgo=WeightedLea
     SineHoleVariogram,
     SphericalVariogram
   )
-  fitbest(Gs, g, algo; kwargs...)
+  fitbest(Gs, g, w; kwargs...)
 end
 
-function fit(::Type{Transiogram}, t::EmpiricalTransiogram, algo::FitAlgo=WeightedLeastSquares(); kwargs...)
+function fit(::Type{Transiogram}, t::EmpiricalTransiogram, w=nothing; kwargs...)
   Ts =
     (ExponentialTransiogram, GaussianTransiogram, LinearTransiogram, MatrixExponentialTransiogram, SphericalTransiogram)
-  fitbest(Ts, t, algo; kwargs...)
+  fitbest(Ts, t, w; kwargs...)
 end
 
 """
@@ -76,8 +66,8 @@ julia> fitbest([SphericalVariogram, ExponentialVariogram], g)
 
 See [`fit`](@ref) for details on the arguments and keyword arguments.
 """
-function fitbest(Fs, f::EmpiricalGeoStatsFunction, algo::FitAlgo=WeightedLeastSquares(); kwargs...)
-  sols = [_fit(F, f, algo; kwargs...) for F in Fs]
+function fitbest(Fs, f::EmpiricalGeoStatsFunction, w=nothing; kwargs...)
+  sols = [_fit(F, f, w; kwargs...) for F in Fs]
   f, _ = argmin(last, sols)
   f
 end

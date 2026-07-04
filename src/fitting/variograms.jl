@@ -5,7 +5,7 @@
 function _fit(
   G::Type{<:Variogram},
   g::EmpiricalVariogram,
-  algo::WeightedLeastSquares;
+  w::Union{Function,Nothing};
   range=nothing,
   sill=nothing,
   nugget=nothing,
@@ -41,12 +41,12 @@ function _fit(
   maxnugget′ = isnothing(maxnugget) ? maxnugget : _ustrip(uy, maxnugget)
 
   # evaluate weights
-  w = _weights(algo.weightfun, x, n)
+  ω = _weights(w, x, n)
 
   # objective function
   function J(θ)
     γ = G(ball(θ[1]), sill=θ[2], nugget=θ[3])
-    sum(i -> w[i] * (γ(x′[i]) - y′[i])^2, eachindex(w, x′, y′))
+    sum(i -> ω[i] * (γ(x′[i]) - y′[i])^2, eachindex(ω, x′, y′))
   end
 
   # linear constraint (sill ≥ nugget)
@@ -88,7 +88,7 @@ end
 function _fit(
   G::Type{<:PowerVariogram},
   g::EmpiricalVariogram,
-  algo::WeightedLeastSquares;
+  w::Union{Function,Nothing};
   scaling=nothing,
   nugget=nothing,
   exponent=nothing,
@@ -120,12 +120,12 @@ function _fit(
   maxexponent′ = maxexponent
 
   # evaluate weights
-  w = _weights(algo.weightfun, x, n)
+  ω = _weights(w, x, n)
 
   # objective function
   function J(θ)
     γ = G(scaling=θ[1], nugget=θ[2], exponent=θ[3])
-    sum(i -> w[i] * (γ(x′[i]) - y′[i])^2, eachindex(w, x′, y′))
+    sum(i -> ω[i] * (γ(x′[i]) - y′[i])^2, eachindex(ω, x′, y′))
   end
 
   # linear constraints

@@ -149,9 +149,6 @@ export
   PiecewiseLinearTransiogram,
   CarleTransiogram,
 
-  # fitting algorithms
-  WeightedLeastSquares,
-
   # plotting functions
   funplot,
   funplot!,

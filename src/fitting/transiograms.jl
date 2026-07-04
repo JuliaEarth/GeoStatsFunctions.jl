@@ -5,7 +5,7 @@
 function _fit(
   T::Type{<:Transiogram},
   t::EmpiricalTransiogram,
-  algo::WeightedLeastSquares;
+  w::Union{Function,Nothing};
   range=nothing,
   proportions=nothing,
   maxrange=nothing
@@ -32,7 +32,7 @@ function _fit(
   maxrange′ = isnothing(maxrange) ? maxrange : _ustrip(ux, maxrange)
 
   # evaluate weights
-  w = _weights(algo.weightfun, x, n)
+  ω = _weights(w, x, n)
 
   # number of categories and free logits
   k = size(Y, 1)
@@ -45,7 +45,7 @@ function _fit(
     τ = T(b, proportions=p)
     mat(i) = getindex.(Y, i)
     err(i) = sum(abs2, τ(x′[i]) - mat(i))
-    sum(i -> w[i] * err(i), eachindex(w, x′))
+    sum(i -> ω[i] * err(i), eachindex(ω, x′))
   end
 
   # maximum range and logits
@@ -78,7 +78,7 @@ end
 function _fit(
   T::Type{<:MatrixExponentialTransiogram},
   t::EmpiricalTransiogram,
-  algo::WeightedLeastSquares;
+  w::Union{Function,Nothing};
   range=nothing,
   lengths=nothing,
   proportions=nothing,
@@ -109,7 +109,7 @@ function _fit(
   maxlengths′ = isnothing(maxlengths) ? maxlengths : _ustrip.(ux, maxlengths)
 
   # evaluate weights
-  w = _weights(algo.weightfun, x, n)
+  ω = _weights(w, x, n)
 
   # number of categories and free logits
   k = size(Y, 1)
@@ -123,7 +123,7 @@ function _fit(
     τ = T(b, lengths=l, proportions=p)
     mat(i) = getindex.(Y, i)
     err(i) = sum(abs2, τ(x′[i]) - mat(i))
-    sum(i -> w[i] * err(i), eachindex(w, x′))
+    sum(i -> ω[i] * err(i), eachindex(ω, x′))
   end
 
   # maximum range, lengths and logits
@@ -164,7 +164,7 @@ function _fit(
   τ, ϵ
 end
 
-function _fit(T::Type{<:PiecewiseLinearTransiogram}, t::EmpiricalTransiogram, ::WeightedLeastSquares)
+function _fit(T::Type{<:PiecewiseLinearTransiogram}, t::EmpiricalTransiogram, ::Union{Function,Nothing})
   # auxiliary variables
   n = length(t.abscissas)
   k = size(t.ordinates, 1)
