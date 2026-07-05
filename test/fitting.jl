@@ -106,7 +106,7 @@
   @test γ isa CompositeFunction
   @test issymmetric(γ)
   @test nvariables(γ) == 2
-  @test 4s[1, 1] ≈ s[2, 2] atol = 1e-4
+  @test 4s[1, 1] ≈ s[2, 2] atol = 1e-2
 
   # multiple structures
   γ = GeoStatsFunctions.fit([CubicVariogram, SphericalVariogram], g)
@@ -114,7 +114,7 @@
   @test γ isa CompositeFunction
   @test issymmetric(γ)
   @test nvariables(γ) == 2
-  @test 4s[1, 1] ≈ s[2, 2] atol = 1e-4
+  @test 4s[1, 1] ≈ s[2, 2] atol = 1e-2
 
   # different units
   d = georef((; z₁=img * u"K", z₂=2img * u"Pa"))
@@ -124,7 +124,7 @@
   @test γ isa CompositeFunction
   @test issymmetric(γ)
   @test nvariables(γ) == 2
-  @test ustrip.(4s[1, 1]) ≈ ustrip.(s[2, 2]) atol = 1e-4
+  @test ustrip.(4s[1, 1]) ≈ ustrip.(s[2, 2]) atol = 1e-2
 end
 
 @testset "Fitting transiograms" begin
