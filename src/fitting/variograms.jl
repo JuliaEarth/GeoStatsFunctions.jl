@@ -3,9 +3,9 @@
 # ------------------------------------------------------------------
 
 _fit(G::Type{<:Variogram}, g::EmpiricalVariogram, w::Function; kwargs...) =
-  nvariables(g) == 1 ? _fitunivariate(G, g, w; kwargs...) : _fitmultivariate(G, g, w; kwargs...)
+  nvariables(g) == 1 ? _fituni(G, g, w; kwargs...) : _fitlmc(G, g, w; kwargs...)
 
-function _fitunivariate(
+function _fituni(
   G::Type{<:Variogram},
   g::EmpiricalVariogram,
   w::Function;
@@ -88,7 +88,7 @@ function _fitunivariate(
   γ, ϵ
 end
 
-function _fitunivariate(
+function _fituni(
   G::Type{<:PowerVariogram},
   g::EmpiricalVariogram,
   w::Function;
@@ -168,8 +168,10 @@ function _fitunivariate(
   γ, ϵ
 end
 
-function _fitmultivariate(
-  G::Type{<:Variogram},
+_fitlmc(G::Type{<:Variogram}, g::EmpiricalVariogram, w::Function; kwargs...) = _fitlmc([G], g, w; kwargs...)
+
+function _fitlmc(
+  G::AbstractVector,
   g::EmpiricalVariogram,
   w::Function;
   range=nothing,
@@ -224,10 +226,10 @@ function _fitmultivariate(
 
   # objective function
   function J(θ)
-    r = θ[1]
-    Bₒ = _coefmat(θ[2:(p + 1)], k)
-    B₁ = _coefmat(θ[(p + 2):end], k)
-    γ = Bₒ * NuggetEffect() + B₁ * G(ball(r))
+    Bₒ = _coefmat(θ[1:p], k)
+    B₁ = _coefmat(θ[(p + 1):(p + 1 + p - 1)], k)
+    r₁ = θ[p + 1 + p]
+    γ = Bₒ * NuggetEffect() + B₁ * G[1](ball(r₁))
     sum(eachindex(ω, x′)) do i
       ωᵢ = ω[i]
       Γᵢ = γ(x′[i])
@@ -237,8 +239,8 @@ function _fitmultivariate(
 
   # linear constraint (sill ≥ nugget)
   function L(θ)
-    Bₒ = _coefmat(θ[2:(p + 1)], k)
-    B₁ = _coefmat(θ[(p + 2):end], k)
+    Bₒ = _coefmat(θ[1:p], k)
+    B₁ = _coefmat(θ[(p + 1):(p + 1 + p - 1)], k)
     sum(zip(Bₒ, B₁)) do (bₒ, b₁)
       b₁ ≥ bₒ ? 0.0 : bₒ - b₁
     end
@@ -252,24 +254,24 @@ function _fitmultivariate(
   rₗ, rᵤ = isnothing(range′) ? (δ, rmax) : (range′, range′)
   nₗ, nᵤ = isnothing(nugget′) ? (_coefvec(δ * I(k)), _coefvec(nmax)) : (_coefvec(nugget′), _coefvec(nugget′))
   sₗ, sᵤ = isnothing(sill′) ? (_coefvec(δ * I(k)), _coefvec(smax)) : (_coefvec(sill′), _coefvec(sill′))
-  θₗ = [rₗ, nₗ..., sₗ...]
-  θᵤ = [rᵤ, nᵤ..., sᵤ...]
+  θₗ = [nₗ..., sₗ..., rₗ]
+  θᵤ = [nᵤ..., sᵤ..., rᵤ]
 
   # initial guess
   rₒ = isnothing(range′) ? rmax / 3 : range′
   nₒ = isnothing(nugget′) ? _coefvec(0.01 * smax) : _coefvec(nugget′)
   sₒ = isnothing(sill′) ? _coefvec(0.95 * smax) : _coefvec(sill′)
-  θₒ = [rₒ, nₒ..., sₒ...]
+  θₒ = [nₒ..., sₒ..., rₒ]
 
   # solve optimization problem
   θ, ϵ = _optimize(θ -> J(θ) + λ * L(θ), θₗ, θᵤ, θₒ)
 
   # optimal variogram (with units)
   γ = let
-    r = θ[1] * ux
-    Bₒ = _coefmat(θ[2:(p + 1)], k) .* uY
-    B₁ = _coefmat(θ[(p + 2):end], k) .* uY
-    Bₒ * NuggetEffect() + B₁ * G(ball(r))
+    Bₒ = _coefmat(θ[1:p], k) .* uY
+    B₁ = _coefmat(θ[(p + 1):(p + 1 + p - 1)], k) .* uY
+    r₁ = θ[p + 1 + p] * ux
+    Bₒ * NuggetEffect() + B₁ * G[1](ball(r₁))
   end
 
   γ, ϵ
