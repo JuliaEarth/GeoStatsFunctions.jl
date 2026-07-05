@@ -4,7 +4,7 @@
 
 function funplot(f; link=nothing, kwargs...)
   # decide whether to link y axes of subplots
-  ylink = isnothing(link) ? _istransiogram(f) : link
+  ylink = isnothing(link) ? _ylink(f) : link
 
   # initialize figure
   n = nvariables(f)

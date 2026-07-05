@@ -13,13 +13,16 @@ _ylabel(f::Variogram) = "variogram"
 _ylabel(f::Covariance) = "covariance"
 _ylabel(f::Transiogram) = "probability"
 _ylabel(f::CompositeFunction) = _ylabel(first(last(structures(f))))
-_ylabel(f::EmpiricalGeoStatsFunction) = "function value"
 _ylabel(f::EmpiricalVariogram) = "variogram"
 _ylabel(f::EmpiricalTransiogram) = "probability"
 
-_istransiogram(f) = false
-_istransiogram(f::Transiogram) = true
-_istransiogram(f::EmpiricalTransiogram) = true
+_ylink(f::GeoStatsFunction) = false
+_ylink(f::Variogram) = true
+_ylink(f::Covariance) = true
+_ylink(f::Transiogram) = true
+_ylink(f::CompositeFunction) = allequal(unit.(sill(f)))
+_ylink(f::EmpiricalVariogram) = allequal(unit.(first.(f.ordinates)))
+_ylink(f::EmpiricalTransiogram) = true
 
 _eval(f, hs) = isisotropic(f) ? _isoeval(f, hs) : _anisoeval(f, hs)
 
