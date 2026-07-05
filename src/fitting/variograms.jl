@@ -258,14 +258,14 @@ function _fitlmc(
   rₗ, rᵤ = isnothing(range′) ? (δ, rmax) : (range′, range′)
   nₗ, nᵤ = isnothing(nugget′) ? (_coefvec(δ * I(k)), _coefvec(nmax)) : (_coefvec(nugget′), _coefvec(nugget′))
   sₗ, sᵤ = isnothing(sill′) ? (_coefvec(δ * I(k)), _coefvec(smax)) : (_coefvec(sill′), _coefvec(sill′))
-  θₗ = [nₗ..., sₗ..., rₗ]
-  θᵤ = [nᵤ..., sᵤ..., rᵤ]
+  θₗ = [nₗ; repeat([sₗ..., rₗ], length(G))]
+  θᵤ = [nᵤ; repeat([sᵤ..., rᵤ], length(G))]
 
   # initial guess
   rₒ = isnothing(range′) ? rmax / 3 : range′
   nₒ = isnothing(nugget′) ? _coefvec(0.01 * smax) : _coefvec(nugget′)
   sₒ = isnothing(sill′) ? _coefvec(0.95 * smax) : _coefvec(sill′)
-  θₒ = [nₒ..., sₒ..., rₒ]
+  θₒ = [nₒ; repeat([sₒ..., rₒ], length(G))]
 
   # solve optimization problem
   θ, ϵ = _optimize(θ -> J(θ) + λ * L(θ), θₗ, θᵤ, θₒ)
