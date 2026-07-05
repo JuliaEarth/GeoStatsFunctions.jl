@@ -179,5 +179,100 @@ function _fitmultivariate(
   maxsill=nothing,
   maxnugget=nothing
 )
-  error("not implemented")
+  # number of variables
+  k = nvariables(g)
+
+  # custom ball of given radius
+  ball(r) = MetricBall(r, g.distance)
+
+  # coordinates of empirical variogram
+  x = g.abscissas
+  Y = g.ordinates
+  n = g.counts
+
+  # discard invalid bins
+  x = x[n .> 0]
+  Y = [y[n .> 0] for y in Y]
+  n = n[n .> 0]
+
+  # evaluate weights
+  ω = _weights(w, x, n)
+
+  # strip units of coordinates
+  ux = unit(eltype(x))
+  uY = [unit(eltype(y)) for y in Y]
+  x′ = ustrip.(x)
+  Y′ = [ustrip.(y) for y in Y]
+
+  # strip units of kwargs
+  range′ = isnothing(range) ? range : _ustrip(ux, range)
+  sill′ = isnothing(sill) ? sill : _ustrip(uY, sill)
+  nugget′ = isnothing(nugget) ? nugget : _ustrip(uY, nugget)
+  maxrange′ = isnothing(maxrange) ? maxrange : _ustrip(ux, maxrange)
+  maxsill′ = isnothing(maxsill) ? maxsill : _ustrip(uY, maxsill)
+  maxnugget′ = isnothing(maxnugget) ? maxnugget : _ustrip(uY, maxnugget)
+
+  # maximum range, sill and nugget
+  xmax = maximum(x′)
+  Ymin = [minimum(y′) for y′ in Y′]
+  Ymax = [maximum(y′) for y′ in Y′]
+  rmax = isnothing(maxrange′) ? xmax : maxrange′
+  smax = isnothing(maxsill′) ? Ymax : maxsill′
+  nmax = isnothing(maxnugget′) ? max.(Ymin, 0) : nugget′
+
+  # number of parameters in lower triangular matrix
+  p = k * (k + 1) ÷ 2
+
+  # objective function
+  function J(θ)
+    r = θ[1]
+    Bₒ = _coefmat(θ[2:(p + 1)], k)
+    B₁ = _coefmat(θ[(p + 2):end], k)
+    γ = Bₒ * NuggetEffect() + B₁ * G(ball(r))
+    sum(eachindex(ω, x′)) do i
+      ωᵢ = ω[i]
+      Γᵢ = γ(x′[i])
+      sum(j -> ωᵢ * (Γᵢ[j] - Y′[j][i])^2, eachindex(Γᵢ, Y′))
+    end
+  end
+
+  # linear constraint (sill ≥ nugget)
+  function L(θ)
+    Bₒ = _coefmat(θ[2:(p + 1)], k)
+    B₁ = _coefmat(θ[(p + 2):end], k)
+    sum(zip(Bₒ, B₁)) do (bₒ, b₁)
+      b₁ ≥ bₒ ? 0.0 : bₒ - b₁
+    end
+  end
+
+  # penalty for linear constraint (J + λL)
+  λ = sum(sum(abs2, y′) for y′ in Y′)
+
+  # box constraints
+  δ = oftype(rmax, 1e-8)
+  ∞ = fill(oftype(rmax, Inf), p)
+  rₗ, rᵤ = isnothing(range′) ? (δ, rmax) : (range′, range′)
+  nₗ, nᵤ = isnothing(nugget′) ? (-∞, ∞) : (_coefvec(nugget′), _coefvec(nugget′))
+  sₗ, sᵤ = isnothing(sill′) ? (-∞, ∞) : (_coefvec(sill′), _coefvec(sill′))
+  θₗ = [rₗ, nₗ..., sₗ...]
+  θᵤ = [rᵤ, nᵤ..., sᵤ...]
+
+  # initial guess
+  rₒ = isnothing(range′) ? rmax / 3 : range′
+  nₒ = isnothing(nugget′) ? _coefvec(0.95 * nmax) : _coefvec(nugget′)
+  sₒ = isnothing(sill′) ? _coefvec(0.95 * smax) : _coefvec(sill′)
+  θₒ = [rₒ, nₒ..., sₒ...]
+
+  # solve optimization problem
+  θ, ϵ = _optimize(θ -> J(θ) + λ * L(θ), θₗ, θᵤ, θₒ)
+
+  # optimal variogram (with units)
+  γ = let
+    r = θ[1] * ux
+    Bₒ = _coefmat(θ[2:(p + 1)], k) .* uY
+    B₁ = _coefmat(θ[(p + 2):end], k) .* uY
+    Bₒ * NuggetEffect() + B₁ * G(ball(r))
+  end
+
+  γ, ϵ
 end

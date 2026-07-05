@@ -85,8 +85,27 @@ include("fitting/transiograms.jl")
 
 _ustrip(u, x) = x
 _ustrip(u, x::Quantity) = ustrip(u, x)
+_ustrip(u, X::AbstractMatrix{<:Quantity}) = ustrip.(u, X)
 
 _weights(f, x, n) = isnothing(f) ? n / sum(n) : map(xᵢ -> ustrip(f(xᵢ)), x)
+
+function _coefmat(θ, k)
+  L = _lowertrimat(θ, k)
+  Symmetric(L * transpose(L))
+end
+
+function _lowertrimat(θ, k)
+  T = eltype(θ)
+  p(i, j) = i + (j - 1) * k - (j - 1) * j ÷ 2
+  A = SMatrix{k,k}(i ≥ j ? θ[p(i, j)] : zero(T) for i in 1:k, j in 1:k)
+  LowerTriangular(A)
+end
+
+function _coefvec(A)
+  L = cholesky(A).L
+  k = size(L, 1)
+  [L[i, j] for j in 1:k for i in j:k]
+end
 
 function _optimize(J, θₗ, θᵤ, θₒ)
   s = Optim.optimize(J, θₗ, θᵤ, θₒ, LBFGSB())
