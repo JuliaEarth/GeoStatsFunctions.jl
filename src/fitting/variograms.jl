@@ -178,8 +178,7 @@ function _fitlmc(
   sill=nothing,
   nugget=nothing,
   maxrange=nothing,
-  maxsill=nothing,
-  maxnugget=nothing
+  maxsill=nothing
 )
   # number of variables
   k = nvariables(g)
@@ -212,14 +211,12 @@ function _fitlmc(
   nugget′ = isnothing(nugget) ? nugget : _ustrip(uY, nugget)
   maxrange′ = isnothing(maxrange) ? maxrange : _ustrip(ux, maxrange)
   maxsill′ = isnothing(maxsill) ? maxsill : _ustrip(uY, maxsill)
-  maxnugget′ = isnothing(maxnugget) ? maxnugget : _ustrip(uY, maxnugget)
 
   # maximum range, sill and nugget
   xmax = maximum(x′)
   Ymax = [maximum(y′) for y′ in Y′]
   rmax = isnothing(maxrange′) ? xmax : maxrange′
   smax = isnothing(maxsill′) ? _posmat(Ymax) : maxsill′
-  nmax = isnothing(maxnugget′) ? _posmat(Ymax) : maxnugget′
 
   # number of parameters in lower triangular matrix
   p = k * (k + 1) ÷ 2
@@ -255,9 +252,10 @@ function _fitlmc(
 
   # box constraints
   δ = oftype(rmax, 1e-8)
+  ∞ = fill(oftype(rmax, 1e8), p)
   rₗ, rᵤ = isnothing(range′) ? (δ, rmax) : (range′, range′)
-  nₗ, nᵤ = isnothing(nugget′) ? (_coefvec(δ * I(k)), _coefvec(nmax)) : (_coefvec(nugget′), _coefvec(nugget′))
-  sₗ, sᵤ = isnothing(sill′) ? (_coefvec(δ * I(k)), _coefvec(smax)) : (_coefvec(sill′), _coefvec(sill′))
+  nₗ, nᵤ = isnothing(nugget′) ? (-∞, ∞) : (_coefvec(nugget′), _coefvec(nugget′))
+  sₗ, sᵤ = isnothing(sill′) ? (-∞, ∞) : (_coefvec(sill′), _coefvec(sill′))
   θₗ = [nₗ; repeat([sₗ..., rₗ], length(G))]
   θᵤ = [nᵤ; repeat([sᵤ..., rᵤ], length(G))]
 

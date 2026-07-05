@@ -50,7 +50,7 @@ See also: [`DirectionalVariogram`](@ref), [`PlanarVariogram`](@ref),
 struct EmpiricalVariogram{ℒ<:Len,V,D,E} <: EmpiricalGeoStatsFunction
   counts::Vector{Int}
   abscissas::Vector{ℒ}
-  ordinates::Matrix{Vector{V}}
+  ordinates::Matrix{V}
   distance::D
   estimator::E
   variables::Vector{Symbol}

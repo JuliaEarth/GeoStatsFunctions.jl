@@ -15,7 +15,7 @@ struct CompositeFunction{CS,FS} <: GeoStatsFunction
 
   function CompositeFunction(cs::CS, fs::FS) where {CS,FS}
     # convert arrays to static arrays of floats
-    cs′ = map(c -> _static(float(c)), cs)
+    cs′ = map(c -> _static(float.(c)), cs)
     CS′ = typeof(cs′)
     new{CS′,FS}(cs′, fs)
   end

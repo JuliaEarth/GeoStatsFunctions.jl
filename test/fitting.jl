@@ -1,7 +1,7 @@
 @testset "Fitting variograms" begin
   img = readdlm(joinpath(datadir, "WalkerLake.txt"))
-  d = georef((; Z=img))
-  g = EmpiricalVariogram(d, :Z, maxlag=15.0)
+  d = georef((; z=img))
+  g = EmpiricalVariogram(d, "z", maxlag=15.0)
 
   # all fits lead to similar sill
   γ₁ = GeoStatsFunctions.fit(GaussianVariogram, g)
@@ -64,10 +64,17 @@
   @test sill(γ₁) > 0
   @test sill(γ₂) > 0
 
+  # multiple structures
+  γ = GeoStatsFunctions.fit([CubicVariogram, SphericalVariogram], g)
+  @test γ isa CompositeFunction
+  @test issymmetric(γ)
+  @test nvariables(γ) == 1
+  @test sill(γ)[1] > 0
+
   # unitful types
   img = readdlm(joinpath(datadir, "WalkerLake.txt"))
-  d = georef((; Z=img * u"K"))
-  g = EmpiricalVariogram(d, :Z, maxlag=15.0)
+  d = georef((; z=img * u"K"))
+  g = EmpiricalVariogram(d, "z", maxlag=15.0)
   γ = GeoStatsFunctions.fit(Variogram, g)
   @test unit(sill(γ)) == u"K^2"
   @test unit(nugget(γ)) == u"K^2"
@@ -89,6 +96,35 @@
   g = EmpiricalVariogram(d, "z", maxlag=25.0)
   γ = GeoStatsFunctions.fit(PowerVariogram, g)
   @test γ.(g.abscissas) ≈ g.ordinates[1] atol = 1e-1
+
+  # linear model of coregionalization (LMC)
+  img = readdlm(joinpath(datadir, "WalkerLake.txt"))
+  d = georef((; z₁=img, z₂=2img))
+  g = EmpiricalVariogram(d, maxlag=25.0)
+  γ = GeoStatsFunctions.fit(SphericalVariogram, g)
+  s = sill(γ)
+  @test γ isa CompositeFunction
+  @test issymmetric(γ)
+  @test nvariables(γ) == 2
+  @test 4s[1, 1] ≈ s[2, 2] atol = 1e-4
+
+  # multiple structures
+  γ = GeoStatsFunctions.fit([CubicVariogram, SphericalVariogram], g)
+  s = sill(γ)
+  @test γ isa CompositeFunction
+  @test issymmetric(γ)
+  @test nvariables(γ) == 2
+  @test 4s[1, 1] ≈ s[2, 2] atol = 1e-4
+
+  # different units
+  d = georef((; z₁=img * u"K", z₂=2img * u"Pa"))
+  g = EmpiricalVariogram(d, maxlag=25.0)
+  γ = GeoStatsFunctions.fit(SphericalVariogram, g)
+  s = sill(γ)
+  @test γ isa CompositeFunction
+  @test issymmetric(γ)
+  @test nvariables(γ) == 2
+  @test ustrip.(4s[1, 1]) ≈ ustrip.(s[2, 2]) atol = 1e-4
 end
 
 @testset "Fitting transiograms" begin
