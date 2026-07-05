@@ -227,9 +227,11 @@ function _fitlmc(
   # objective function
   function J(θ)
     Bₒ = _coefmat(θ[1:p], k)
-    B₁ = _coefmat(θ[(p + 1):(p + 1 + p - 1)], k)
-    r₁ = θ[p + 1 + p]
-    γ = Bₒ * NuggetEffect() + B₁ * G[1](ball(r₁))
+    γ = Bₒ * NuggetEffect() + sum(eachindex(G)) do i
+      Bᵢ = _coefmat(θ[(i * (p + 1)):(i * (p + 1) + p - 1)], k)
+      rᵢ = θ[i * (p + 1) + p]
+      Bᵢ * G[i](ball(rᵢ))
+    end
     sum(eachindex(ω, x′)) do i
       ωᵢ = ω[i]
       Γᵢ = γ(x′[i])
@@ -240,9 +242,11 @@ function _fitlmc(
   # linear constraint (sill ≥ nugget)
   function L(θ)
     Bₒ = _coefmat(θ[1:p], k)
-    B₁ = _coefmat(θ[(p + 1):(p + 1 + p - 1)], k)
-    sum(zip(Bₒ, B₁)) do (bₒ, b₁)
-      b₁ ≥ bₒ ? 0.0 : bₒ - b₁
+    sum(eachindex(G)) do i
+      Bᵢ = _coefmat(θ[(i * (p + 1)):(i * (p + 1) + p - 1)], k)
+      sum(zip(Bₒ, Bᵢ)) do (bₒ, bᵢ)
+        bᵢ ≥ bₒ ? 0.0 : bₒ - bᵢ
+      end
     end
   end
 
@@ -267,11 +271,11 @@ function _fitlmc(
   θ, ϵ = _optimize(θ -> J(θ) + λ * L(θ), θₗ, θᵤ, θₒ)
 
   # optimal variogram (with units)
-  γ = let
-    Bₒ = _coefmat(θ[1:p], k) .* uY
-    B₁ = _coefmat(θ[(p + 1):(p + 1 + p - 1)], k) .* uY
-    r₁ = θ[p + 1 + p] * ux
-    Bₒ * NuggetEffect() + B₁ * G[1](ball(r₁))
+  Bₒ = _coefmat(θ[1:p], k) .* uY
+  γ = Bₒ * NuggetEffect() + sum(eachindex(G)) do i
+    Bᵢ = _coefmat(θ[(i * (p + 1)):(i * (p + 1) + p - 1)], k) .* uY
+    rᵢ = θ[i * (p + 1) + p] * ux
+    Bᵢ * G[i](ball(rᵢ))
   end
 
   γ, ϵ
