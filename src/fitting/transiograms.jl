@@ -5,7 +5,7 @@
 function _fit(
   T::Type{<:Transiogram},
   t::EmpiricalTransiogram,
-  w::Union{Function,Nothing};
+  w::Function;
   range=nothing,
   proportions=nothing,
   maxrange=nothing
@@ -28,7 +28,7 @@ function _fit(
   n = n[n .> 0]
 
   # evaluate weights
-  ω = _weights(w, x, n)
+  ω = _weights(w, x)
 
   # strip units of coordinates
   ux = unit(eltype(x))
@@ -78,7 +78,7 @@ end
 function _fit(
   T::Type{<:MatrixExponentialTransiogram},
   t::EmpiricalTransiogram,
-  w::Union{Function,Nothing};
+  w::Function;
   range=nothing,
   lengths=nothing,
   proportions=nothing,
@@ -103,7 +103,7 @@ function _fit(
   n = n[n .> 0]
 
   # evaluate weights
-  ω = _weights(w, x, n)
+  ω = _weights(w, x)
 
   # strip units of coordinates
   ux = unit(eltype(x))
@@ -164,7 +164,7 @@ function _fit(
   τ, ϵ
 end
 
-function _fit(T::Type{<:PiecewiseLinearTransiogram}, t::EmpiricalTransiogram, ::Union{Function,Nothing})
+function _fit(T::Type{<:PiecewiseLinearTransiogram}, t::EmpiricalTransiogram, ::Function)
   # number of categories
   k = nvariables(t)
 

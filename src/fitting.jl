@@ -3,11 +3,10 @@
 # ------------------------------------------------------------------
 
 """
-    fit(F, f, [w]; parameters..., maxparameters...)
+    fit(F, f, w=inv; parameters..., maxparameters...)
 
 Fit theoretical geostatistical function of type `F` to empirical function `f`.
-The weighting function `w` maps lags to importance weights. It is optional and
-defaults to the bin counts stored in each lag of the empirical function `f`.
+The weighting function `w` is optional and maps lag distances to importance weights.
 
 Theoretical `parameters` like `range`, `sill` and `nugget` as well as their
 maximum values like `maxrange`, `maxsill` and `maxnugget` can be fixed as
@@ -25,14 +24,14 @@ julia> fit(SphericalVariogram, g)
 julia> fit(ExponentialVariogram, g, range=1.0)
 julia> fit(GaussianVariogram, g, sill=1.0, nugget=0.1)
 julia> fit(ExponentialVariogram, g, maxsill=1.0)
-julia> fit(SphericalVariogram, g, h -> 1/h)
+julia> fit(SphericalVariogram, g, h -> 1/h^2)
 julia> fit(Variogram, g, range=1.0)
-julia> fit(Transiogram, t, h -> 1/h)
+julia> fit(Transiogram, t, h -> exp(-h))
 ```
 """
-fit(F::Type{<:GeoStatsFunction}, f::EmpiricalGeoStatsFunction, w=nothing; kwargs...) = _fit(F, f, w; kwargs...) |> first
+fit(F::Type{<:GeoStatsFunction}, f::EmpiricalGeoStatsFunction, w=inv; kwargs...) = _fit(F, f, w; kwargs...) |> first
 
-function fit(::Type{Variogram}, g::EmpiricalVariogram, w=nothing; kwargs...)
+function fit(::Type{Variogram}, g::EmpiricalVariogram, w=inv; kwargs...)
   Gs = (
     CircularVariogram,
     CubicVariogram,
@@ -46,27 +45,28 @@ function fit(::Type{Variogram}, g::EmpiricalVariogram, w=nothing; kwargs...)
   fitany(Gs, g, w; kwargs...)
 end
 
-function fit(::Type{Transiogram}, t::EmpiricalTransiogram, w=nothing; kwargs...)
+function fit(::Type{Transiogram}, t::EmpiricalTransiogram, w=inv; kwargs...)
   Ts =
     (ExponentialTransiogram, GaussianTransiogram, LinearTransiogram, MatrixExponentialTransiogram, SphericalTransiogram)
   fitany(Ts, t, w; kwargs...)
 end
 
 """
-    fitany([F₁, F₂, ...], f, [w]; parameters..., maxparameters...)
+    fitany([F₁, F₂, ...], f, w=inv; parameters..., maxparameters...)
 
 Fit theoretical geostatistical functions of types `F₁, F₂, ...`
 to empirical function `f` and return the one with minimum error.
+
+Please check [`fit`](@ref) for documentation on the arguments and
+keyword arguments.
 
 ## Examples
 
 ```julia
 julia> fitany([SphericalVariogram, ExponentialVariogram], g)
 ```
-
-See [`fit`](@ref) for details on the arguments and keyword arguments.
 """
-function fitany(Fs, f::EmpiricalGeoStatsFunction, w=nothing; kwargs...)
+function fitany(Fs, f::EmpiricalGeoStatsFunction, w=inv; kwargs...)
   sols = [_fit(F, f, w; kwargs...) for F in Fs]
   f, _ = argmin(last, sols)
   f
@@ -87,7 +87,7 @@ _ustrip(u, x) = x
 _ustrip(u, x::Quantity) = ustrip(u, x)
 _ustrip(u, X::AbstractMatrix{<:Quantity}) = ustrip.(u, X)
 
-_weights(f, x, n) = isnothing(f) ? n / sum(n) : map(xᵢ -> ustrip(f(xᵢ)), x)
+_weights(w, x) = map(xᵢ -> ustrip(w(xᵢ)), x)
 
 function _coefmat(θ, k)
   L = _lowertrimat(θ, k)

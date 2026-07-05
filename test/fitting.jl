@@ -101,7 +101,7 @@ end
   τ₂ = GeoStatsFunctions.fit(SphericalTransiogram, t)
   τ₃ = GeoStatsFunctions.fit(GaussianTransiogram, t)
   τ₄ = GeoStatsFunctions.fit(ExponentialTransiogram, t)
-  ps = (0.30, 0.12, 0.12, 0.20, 0.25)
+  ps = (0.28, 0.13, 0.12, 0.20, 0.25)
   @test all(isapprox.(proportions(τ₁), ps, atol=1e-2))
   @test all(isapprox.(proportions(τ₂), ps, atol=1e-2))
   @test all(isapprox.(proportions(τ₃), ps, atol=1e-2))
@@ -127,7 +127,7 @@ end
 
   # matrix-exponential
   τ = GeoStatsFunctions.fit(MatrixExponentialTransiogram, t)
-  ps = (0.30, 0.12, 0.12, 0.20, 0.25)
+  ps = (0.28, 0.13, 0.12, 0.20, 0.25)
   @test all(isapprox.(proportions(τ), ps, atol=3e-2))
   τ = GeoStatsFunctions.fit(MatrixExponentialTransiogram, t, range=0.8u"m")
   @test isapprox(radius(metricball((τ))), 0.8u"m", atol=1e-3u"m")
@@ -144,7 +144,7 @@ end
   @test all(allequal, eachcol(τ(100.0u"m")))
 
   # best fit is a matrix-exponential transiogram
-  ps = (0.30, 0.12, 0.12, 0.20, 0.25)
+  ps = (0.28, 0.13, 0.12, 0.20, 0.25)
   τ = GeoStatsFunctions.fit(Transiogram, t)
   @test τ isa MatrixExponentialTransiogram
   @test all(isapprox.(proportions(τ), ps, atol=3e-2))
@@ -153,7 +153,7 @@ end
   @test all(isapprox.(proportions(τ), ps, atol=3e-2))
 
   # make sure convenient methods work
-  ps = (0.30, 0.12, 0.12, 0.20, 0.25)
+  ps = (0.28, 0.13, 0.12, 0.20, 0.25)
   τ₁ = GeoStatsFunctions.fit(MatrixExponentialTransiogram, t, h -> 1 / h)
   τ₂ = GeoStatsFunctions.fit(Transiogram, t, h -> 1 / h)
   @test all(isapprox.(proportions(τ₁), ps, atol=3e-2))

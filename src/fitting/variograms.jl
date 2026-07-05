@@ -2,13 +2,13 @@
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
 
-_fit(G::Type{<:Variogram}, g::EmpiricalVariogram, w::Union{Function,Nothing}; kwargs...) =
+_fit(G::Type{<:Variogram}, g::EmpiricalVariogram, w::Function; kwargs...) =
   nvariables(g) == 1 ? _fitunivariate(G, g, w; kwargs...) : _fitmultivariate(G, g, w; kwargs...)
 
 function _fitunivariate(
   G::Type{<:Variogram},
   g::EmpiricalVariogram,
-  w::Union{Function,Nothing};
+  w::Function;
   range=nothing,
   sill=nothing,
   nugget=nothing,
@@ -30,7 +30,7 @@ function _fitunivariate(
   n = n[n .> 0]
 
   # evaluate weights
-  ω = _weights(w, x, n)
+  ω = _weights(w, x)
 
   # strip units of coordinates
   ux = unit(eltype(x))
@@ -91,7 +91,7 @@ end
 function _fitunivariate(
   G::Type{<:PowerVariogram},
   g::EmpiricalVariogram,
-  w::Union{Function,Nothing};
+  w::Function;
   scaling=nothing,
   nugget=nothing,
   exponent=nothing,
@@ -110,7 +110,7 @@ function _fitunivariate(
   n = n[n .> 0]
 
   # evaluate weights
-  ω = _weights(w, x, n)
+  ω = _weights(w, x)
 
   # strip units of coordinates
   uy = unit(eltype(y))
@@ -171,7 +171,7 @@ end
 function _fitmultivariate(
   G::Type{<:Variogram},
   g::EmpiricalVariogram,
-  w::Union{Function,Nothing};
+  w::Function;
   range=nothing,
   sill=nothing,
   nugget=nothing,
@@ -196,7 +196,7 @@ function _fitmultivariate(
   n = n[n .> 0]
 
   # evaluate weights
-  ω = _weights(w, x, n)
+  ω = _weights(w, x)
 
   # strip units of coordinates
   ux = unit(eltype(x))
