@@ -10,6 +10,10 @@ function _fit(
   proportions=nothing,
   maxrange=nothing
 )
+  # number of categories and free logits
+  k = nvariables(t)
+  m = k - 1
+
   # custom ball of given radius
   ball(r) = MetricBall(r, t.distance)
 
@@ -17,10 +21,6 @@ function _fit(
   x = t.abscissas
   Y = t.ordinates
   n = t.counts
-
-  # number of categories and free logits
-  k = size(Y, 1)
-  m = k - 1
 
   # discard invalid bins
   x = x[n .> 0]
@@ -85,6 +85,10 @@ function _fit(
   maxrange=nothing,
   maxlengths=nothing
 )
+  # number of categories and free logits
+  k = nvariables(t)
+  m = k - 1
+
   # custom ball of given radius
   ball(r) = MetricBall(r, t.distance)
 
@@ -92,10 +96,6 @@ function _fit(
   x = t.abscissas
   Y = t.ordinates
   n = t.counts
-
-  # number of categories and free logits
-  k = size(Y, 1)
-  m = k - 1
 
   # discard invalid bins
   x = x[n .> 0]
@@ -165,15 +165,14 @@ function _fit(
 end
 
 function _fit(T::Type{<:PiecewiseLinearTransiogram}, t::EmpiricalTransiogram, ::Union{Function,Nothing})
-  # auxiliary variables
-  n = length(t.abscissas)
-  k = size(t.ordinates, 1)
+  # number of categories
+  k = nvariables(t)
 
-  # abscissa vector
+  # vector with abscissas
   x = t.abscissas
 
   # ordinate matrices
-  Y = map(1:n) do m
+  Y = map(eachindex(x)) do m
     SMatrix{k,k}(t.ordinates[i, j][m] for i in 1:k, j in 1:k)
   end
 
