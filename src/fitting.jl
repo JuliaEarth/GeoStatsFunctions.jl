@@ -8,14 +8,21 @@
 Fit theoretical geostatistical function of type `F` to empirical function `f`.
 The weighting function `w` is optional and maps lag distances to importance weights.
 
-Theoretical `parameters` like `range`, `sill` and `nugget` as well as their
-maximum values like `maxrange`, `maxsill` and `maxnugget` can be fixed as
-keyword arguments. They are converted into optimization constraints in the
-weighted least squares fitting algorithm.
+Theoretical `parameters` of `F` like `range`, `sill` and `nugget` as well as their
+maximum values like `maxrange`, `maxsill` and `maxnugget` can be fixed as keyword
+arguments. They are converted into optimization constraints in the weighted least
+squares fitting algorithm.
 
 The type `F` can be abstract like `Variogram` or `Transiogram`, in which case
 all fittable (e.g., stationary) subtypes are fitted and the one with minimum
 error is returned. See [`fitany`](@ref) for custom lists of types.
+
+    fit([F₁, F₂, ..., Fₙ], f, w=inv; parameters..., maxparameters...)
+
+Alternatively, fit linear model of coregionalization (LMC) with structures of type
+`F₁, F₂, ..., Fₙ`. The result is a [`CompositeFunction`](@ref) that can be written as
+`f = Bₒfₒ + B₁f₁ + B₂f₂ + ⋯ + Bₙfₙ` where `fₒ` is a [`NuggetEffect`](@ref) and
+`Bₒ, B₁, B₂, ..., Bₙ` are positive semidefinite coefficient matrices.
 
 ## Examples
 
@@ -27,9 +34,12 @@ julia> fit(ExponentialVariogram, g, maxsill=1.0)
 julia> fit(SphericalVariogram, g, h -> 1/h^2)
 julia> fit(Variogram, g, range=1.0)
 julia> fit(Transiogram, t, h -> exp(-h))
+julia> fit([SphericalVariogram, ExponentialVariogram], g)
 ```
 """
 fit(F::Type{<:GeoStatsFunction}, f::EmpiricalGeoStatsFunction, w=inv; kwargs...) = _fit(F, f, w; kwargs...) |> first
+
+fit(Fs::AbstractVector, f::EmpiricalGeoStatsFunction, w=inv; kwargs...) = _fitlmc(Fs, f, w; kwargs...) |> first
 
 function fit(::Type{Variogram}, g::EmpiricalVariogram, w=inv; kwargs...)
   Gs = (
@@ -52,13 +62,13 @@ function fit(::Type{Transiogram}, t::EmpiricalTransiogram, w=inv; kwargs...)
 end
 
 """
-    fitany([F₁, F₂, ...], f, w=inv; parameters..., maxparameters...)
+    fitany([F₁, F₂, ..., Fₙ], f, w=inv; parameters..., maxparameters...)
 
-Fit theoretical geostatistical functions of types `F₁, F₂, ...`
+Fit theoretical geostatistical functions of types `F₁, F₂, ..., Fₙ`
 to empirical function `f` and return the one with minimum error.
 
-Please check [`fit`](@ref) for documentation on the arguments and
-keyword arguments.
+Please check [`fit`](@ref) for more detailed documentation on the
+arguments and keyword arguments.
 
 ## Examples
 
