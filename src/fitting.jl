@@ -107,6 +107,13 @@ function _coefvec(A)
   [L[i, j] for j in 1:k for i in j:k]
 end
 
+function _posmat(A)
+  λ, V = eigen((A + transpose(A)) / 2)
+  δ = eltype(λ)(1e-8)
+  P = V * Diagonal(max.(λ, δ)) * transpose(V)
+  Symmetric((P + transpose(P)) / 2)
+end
+
 function _optimize(J, θₗ, θᵤ, θₒ)
   s = Optim.optimize(J, θₗ, θᵤ, θₒ, LBFGSB())
   ϵ = Optim.minimum(s)

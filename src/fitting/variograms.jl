@@ -214,11 +214,10 @@ function _fitmultivariate(
 
   # maximum range, sill and nugget
   xmax = maximum(x′)
-  Ymin = [minimum(y′) for y′ in Y′]
   Ymax = [maximum(y′) for y′ in Y′]
   rmax = isnothing(maxrange′) ? xmax : maxrange′
-  smax = isnothing(maxsill′) ? Ymax : maxsill′
-  nmax = isnothing(maxnugget′) ? max.(Ymin, 0) : nugget′
+  smax = isnothing(maxsill′) ? _posmat(Ymax) : maxsill′
+  nmax = isnothing(maxnugget′) ? _posmat(Ymax) : maxnugget′
 
   # number of parameters in lower triangular matrix
   p = k * (k + 1) ÷ 2
@@ -250,16 +249,15 @@ function _fitmultivariate(
 
   # box constraints
   δ = oftype(rmax, 1e-8)
-  ∞ = fill(oftype(rmax, Inf), p)
   rₗ, rᵤ = isnothing(range′) ? (δ, rmax) : (range′, range′)
-  nₗ, nᵤ = isnothing(nugget′) ? (-∞, ∞) : (_coefvec(nugget′), _coefvec(nugget′))
-  sₗ, sᵤ = isnothing(sill′) ? (-∞, ∞) : (_coefvec(sill′), _coefvec(sill′))
+  nₗ, nᵤ = isnothing(nugget′) ? (_coefvec(δ*I(k)), _coefvec(nmax)) : (_coefvec(nugget′), _coefvec(nugget′))
+  sₗ, sᵤ = isnothing(sill′) ? (_coefvec(δ*I(k)), _coefvec(smax)) : (_coefvec(sill′), _coefvec(sill′))
   θₗ = [rₗ, nₗ..., sₗ...]
   θᵤ = [rᵤ, nᵤ..., sᵤ...]
 
   # initial guess
   rₒ = isnothing(range′) ? rmax / 3 : range′
-  nₒ = isnothing(nugget′) ? _coefvec(0.95 * nmax) : _coefvec(nugget′)
+  nₒ = isnothing(nugget′) ? _coefvec(0.01 * smax) : _coefvec(nugget′)
   sₒ = isnothing(sill′) ? _coefvec(0.95 * smax) : _coefvec(sill′)
   θₒ = [rₒ, nₒ..., sₒ...]
 
