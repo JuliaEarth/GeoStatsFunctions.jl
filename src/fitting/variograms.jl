@@ -250,8 +250,8 @@ function _fitmultivariate(
   # box constraints
   δ = oftype(rmax, 1e-8)
   rₗ, rᵤ = isnothing(range′) ? (δ, rmax) : (range′, range′)
-  nₗ, nᵤ = isnothing(nugget′) ? (_coefvec(δ*I(k)), _coefvec(nmax)) : (_coefvec(nugget′), _coefvec(nugget′))
-  sₗ, sᵤ = isnothing(sill′) ? (_coefvec(δ*I(k)), _coefvec(smax)) : (_coefvec(sill′), _coefvec(sill′))
+  nₗ, nᵤ = isnothing(nugget′) ? (_coefvec(δ * I(k)), _coefvec(nmax)) : (_coefvec(nugget′), _coefvec(nugget′))
+  sₗ, sᵤ = isnothing(sill′) ? (_coefvec(δ * I(k)), _coefvec(smax)) : (_coefvec(sill′), _coefvec(sill′))
   θₗ = [rₗ, nₗ..., sₗ...]
   θᵤ = [rᵤ, nᵤ..., sᵤ...]
 
