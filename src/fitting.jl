@@ -9,11 +9,11 @@ Fit theoretical geostatistical function of type `F` to empirical function `f`.
 The weighting function `w` is optional and maps lag distances to importance weights.
 
 Theoretical `parameters` of `F` like `range`, `sill` and `nugget` as well as their
-maximum values like `maxrange`, `maxsill` and `maxnugget` can be fixed as keyword
-arguments. They are converted into optimization constraints in the weighted least
-squares fitting algorithm.
+`maxparameters` values like `maxrange`, `maxsill` and `maxnugget` can be fixed as
+keyword arguments. They are converted into optimization constraints in the weighted
+least squares fitting algorithm.
 
-The type `F` can be abstract like `Variogram` or `Transiogram`, in which case
+The type `F` can be abstract (e.g., `Variogram`, `Transiogram`), in which case
 all fittable (e.g., stationary) subtypes are fitted and the one with minimum
 error is returned. See [`fitany`](@ref) for custom lists of types.
 
