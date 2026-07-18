@@ -3,12 +3,12 @@ using CoordRefSystems
 using Meshes
 using GeoTables
 using Unitful
+using CoDa
 using Distances
 using StaticArrays
 using LinearAlgebra
 using CSV, DelimitedFiles
 using Test, StableRNGs
-using CoDa: Composition
 
 # environment settings
 datadir = joinpath(@__DIR__, "data")
