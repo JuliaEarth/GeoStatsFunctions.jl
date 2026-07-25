@@ -1,7 +1,7 @@
 @testset "EmpiricalVariogramSurface" begin
   img = readdlm(joinpath(datadir, "anisotropic.tsv"))
-  data = georef((z=img,))
-  g = variogramsurface(data, :z, maxlag=50.0)
+  gtb = georef((z=img,))
+  g = variogramsurface(gtb, "z", maxlag=50.0)
   @test sprint(show, g) == "EmpiricalVariogramSurface"
   @test sprint(show, MIME"text/plain"(), g) == """
   EmpiricalVariogramSurface
