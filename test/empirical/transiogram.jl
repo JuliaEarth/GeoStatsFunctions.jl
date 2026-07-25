@@ -1,4 +1,4 @@
-@testset "transiogram" begin
+@testset "omnidirectional transiogram" begin
   # diagonal ordinates are non-increasing
   csv = CSV.File(joinpath(datadir, "facies5.csv"))
   gtb = georef(csv, ("X", "Y", "Z"))

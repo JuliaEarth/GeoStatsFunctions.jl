@@ -1,4 +1,4 @@
-@testset "EmpiricalTransiogramSurface" begin
+@testset "transiogramsurface" begin
   img = readdlm(joinpath(datadir, "anisotropic.tsv"))
   gtb = georef((c=[v < 0 ? 1 : 2 for v in img],))
   t = transiogramsurface(gtb, "c", maxlag=50.0)

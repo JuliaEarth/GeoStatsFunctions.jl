@@ -1,4 +1,4 @@
-@testset "EmpiricalVariogramSurface" begin
+@testset "variogramsurface" begin
   img = readdlm(joinpath(datadir, "anisotropic.tsv"))
   gtb = georef((z=img,))
   g = variogramsurface(gtb, "z", maxlag=50.0)

@@ -1,4 +1,4 @@
-@testset "variogram" begin
+@testset "omnidirectional variogram" begin
   # homogeneous field has zero variogram
   gtb = georef((z=ones(3),), [(1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0)])
   g = variogram(gtb, "z", nlags=2, maxlag=2.0)
