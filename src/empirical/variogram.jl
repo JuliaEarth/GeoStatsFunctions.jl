@@ -70,6 +70,10 @@ Base.getindex(g::EmpiricalVariogram, inds::AbstractVector) =
 Base.getindex(g::EmpiricalVariogram, ind::Int) =
   EmpiricalVariogram(g.counts, g.abscissas, g.ordinates[[ind], [ind]], g.distance, g.estimator, g.variables[[ind]])
 
+# -------------------
+# END-USER INTERFACE
+# -------------------
+
 """
     variogram(geotable, [vars]; [options])
 
@@ -107,6 +111,8 @@ All implemented lag search methods produce the exact same result.
 The `:ball` method is considerably faster when the maximum lag is
 much smaller than the bounding box of the domain.
 
+See also [`variogramsurface`](@ref).
+
 ## References
 
 * Chilès, JP and Delfiner, P. 2012. [Geostatistics: Modeling Spatial Uncertainty]
@@ -115,8 +121,8 @@ much smaller than the bounding box of the domain.
 * Webster, R and Oliver, MA. 2007. [Geostatistics for Environmental Scientists]
   (https://onlinelibrary.wiley.com/doi/book/10.1002/9780470517277)
 
-* Hoffimann, J and Zadrozny, B. 2019. [Efficient variography with partition variograms]
-  (https://www.sciencedirect.com/science/article/pii/S0098300419302936)
+* Hoffimann, J and Zadrozny, B. 2019. [Efficient variography with
+  partition variograms](https://www.sciencedirect.com/science/article/pii/S0098300419302936)
 """
 function variogram(
   data::AbstractGeoTable,

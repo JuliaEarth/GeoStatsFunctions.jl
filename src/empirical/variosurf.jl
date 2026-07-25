@@ -22,6 +22,10 @@ nvariables(g::EmpiricalVariogramSurface) = size(first(g.zs), 1)
 
 variables(g::EmpiricalVariogramSurface) = g.vs
 
+# -------------------
+# END-USER INTERFACE
+# -------------------
+
 """
     variogramsurface(geotable, [vars];
                      normal=Vec(0,0,1), nangs=50,

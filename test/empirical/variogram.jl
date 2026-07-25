@@ -86,7 +86,7 @@
   @test variables(g[1:2]) == variables(g)[1:2]
 end
 
-@testset "directional" begin
+@testset "directional variogram" begin
   # merge operation does not produce NaN
   dir = (0.286788, -0.496732, -0.819152)
   gtb = georef(CSV.File(joinpath(datadir, "nanlags.csv")), ("X", "Y", "Z"))
