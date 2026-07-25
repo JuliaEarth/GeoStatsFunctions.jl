@@ -86,16 +86,21 @@ export
   nvariables,
   variables,
 
-  # convenience functions
-  DirectionalVariogram,
-  DirectionalTransiogram,
-  PlanarVariogram,
-  PlanarTransiogram,
-
   # empirical surfaces
   EmpiricalGeoStatsSurface,
   EmpiricalVariogramSurface,
   EmpiricalTransiogramSurface,
+  issymmetric,
+  nvariables,
+  variables,
+
+  # public api
+  variogram,
+  variogramsurface,
+
+  # empirical transiograms
+  DirectionalTransiogram,
+  PlanarTransiogram,
 
   # theoretical functions
   GeoStatsFunction,

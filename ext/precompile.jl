@@ -13,7 +13,7 @@ using TableTransforms
   c = d |> Indicator("z", k=2) |> Select(1 => "z")
 
   # empirical variograms and transiograms
-  g = EmpiricalVariogram(d, "z", maxlag=25)
+  g = variogram(d, "z", maxlag=25)
   t = EmpiricalTransiogram(c, "z", maxlag=25)
 
   # theoretical variograms and transiograms
