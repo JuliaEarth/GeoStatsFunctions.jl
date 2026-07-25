@@ -90,7 +90,7 @@ function EmpiricalVariogram(
 end
 
 """
-    EmpiricalVariogram(partition, vars; [options])
+    EmpiricalVariogram(partition, [vars]; [options])
 
 Computes the empirical (cross-)variogram of the geospatial `partition`
 for variables `vars` as described in Hoffimann & Zadrozny 2019.
@@ -100,10 +100,10 @@ for variables `vars` as described in Hoffimann & Zadrozny 2019.
 * Hoffimann, J and Zadrozny, B. 2019. [Efficient variography with partition variograms]
   (https://www.sciencedirect.com/science/article/pii/S0098300419302936)
 """
-function EmpiricalVariogram(partition::Partition, vars; kwargs...)
+function EmpiricalVariogram(part::Partition, vars=1:(ncol(part[1]) - 1); kwargs...)
   # retain geospatial data with at least two elements
-  filtered = Iterators.filter(d -> nelements(domain(d)) > 1, partition)
-  @assert !isempty(filtered) "invalid partition of geospatial data"
+  filtered = Iterators.filter(d -> nelements(domain(d)) > 1, part)
+  @assert !isempty(filtered) "invalid partition of geospatial data, try increasing tolerance parameters"
   γ(d) = EmpiricalVariogram(d, vars; kwargs...)
   tmapreduce(γ, merge, collect(filtered))
 end
@@ -165,26 +165,26 @@ Base.getindex(g::EmpiricalVariogram, ind::Int) =
 # -------------------------
 
 """
-    DirectionalVariogram(direction, geotable, vars; dtol=1e-6u"m", [options])
+    DirectionalVariogram(direction, geotable, [vars]; dtol=1e-6u"m", [options])
 
 Computes the empirical (cross-)variogram for the variables `vars` stored in
 the `geotable` along a given `direction` with band tolerance `dtol` in length
 units. Forwards `options` to the underlying [`EmpiricalVariogram`](@ref).
 """
-function DirectionalVariogram(dir, data::AbstractGeoTable, vars; dtol=1e-6u"m", kwargs...)
+function DirectionalVariogram(dir, data::AbstractGeoTable, vars=1:(ncol(data) - 1); dtol=1e-6u"m", kwargs...)
   Π = partition(Xoshiro(123), data, DirectionPartition(dir; tol=dtol))
   EmpiricalVariogram(Π, vars; kwargs...)
 end
 
 """
-    PlanarVariogram(normal, geotable, vars; ntol=1e-6u"m", [options])
+    PlanarVariogram(normal, geotable, [vars]; ntol=1e-6u"m", [options])
 
 Computes the empirical (cross-)variogram for the variables `vars` stored in
 the `geotable` along a plane perpendicular to a `normal` direction with plane
 tolerance `ntol` in length units. Forwards `options` to the underlying
 [`EmpiricalVariogram`](@ref).
 """
-function PlanarVariogram(normal, data::AbstractGeoTable, vars; ntol=1e-6u"m", kwargs...)
+function PlanarVariogram(normal, data::AbstractGeoTable, vars=1:(ncol(data) - 1); ntol=1e-6u"m", kwargs...)
   Π = partition(Xoshiro(123), data, PlanePartition(normal; tol=ntol))
   EmpiricalVariogram(Π, vars; kwargs...)
 end

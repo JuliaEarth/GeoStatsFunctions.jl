@@ -3,12 +3,12 @@
 # ------------------------------------------------------------------
 
 """
-    EmpiricalTransiogram(geotable, var; [options])
+    EmpiricalTransiogram(geotable, [var]; [options])
 
 Computes the empirical (a.k.a. experimental) omnidirectional
 transiogram for categorical variable `var` stored in the `geotable`.
-The variable can be specified by name or index. Additional options are
-documented below.
+The variable can be specified by name or index, and the first variable
+is used by default. Additional options are documented below.
 
 ## Options
 
@@ -49,7 +49,7 @@ end
 
 function EmpiricalTransiogram(
   data::AbstractGeoTable,
-  var;
+  var=1;
   nlags=20,
   maxlag=defaultmaxlag(data),
   distance=Euclidean(),
@@ -74,20 +74,20 @@ function EmpiricalTransiogram(
 end
 
 """
-    EmpiricalTransiogram(partition, var; [options])
+    EmpiricalTransiogram(partition, [var]; [options])
 
 Compute the empirical transiogram of the geospatial
 `partition` for the categorical variable `var`.
 """
-function EmpiricalTransiogram(partition::Partition, var; kwargs...)
+function EmpiricalTransiogram(part::Partition, var=1; kwargs...)
   # categorical levels across subsets
-  gtb = parent(partition)
+  gtb = parent(part)
   cols = Tables.columns(values(gtb))
   vals = Tables.getcolumn(cols, Symbol(var))
   levs = levels(vals)
   # retain geospatial data with at least two elements
-  filtered = Iterators.filter(d -> nelements(domain(d)) > 1, partition)
-  @assert !isempty(filtered) "invalid partition of geospatial data"
+  filtered = Iterators.filter(d -> nelements(domain(d)) > 1, part)
+  @assert !isempty(filtered) "invalid partition of geospatial data, try increasing tolerance parameters"
   t(d) = EmpiricalTransiogram(d |> Levels(var => levs), var; kwargs...)
   tmapreduce(t, merge, collect(filtered))
 end
@@ -165,26 +165,26 @@ Base.getindex(t::EmpiricalTransiogram, ind::Int) = EmpiricalTransiogram(
 # -------------------------
 
 """
-    DirectionalTransiogram(direction, geotable, var; dtol=1e-6u"m", [options])
+    DirectionalTransiogram(direction, geotable, [var]; dtol=1e-6u"m", [options])
 
 Computes the empirical transiogram for the categorical variable `var` stored in
 the `geotable` along a given `direction` with band tolerance `dtol` in length units.
 Forwards `options` to the underlying [`EmpiricalTransiogram`](@ref).
 """
-function DirectionalTransiogram(dir, data::AbstractGeoTable, var; dtol=1e-6u"m", kwargs...)
+function DirectionalTransiogram(dir, data::AbstractGeoTable, var=1; dtol=1e-6u"m", kwargs...)
   Π = partition(Xoshiro(123), data, DirectionPartition(dir; tol=dtol))
   EmpiricalTransiogram(Π, var; kwargs...)
 end
 
 """
-    PlanarTransiogram(normal, geotable, var; ntol=1e-6u"m", [options])
+    PlanarTransiogram(normal, geotable, [var]; ntol=1e-6u"m", [options])
 
 Computes the empirical transiogram for the categorical variable `var` stored in
 the `geotable` along a plane perpendicular to a `normal` direction with plane
 tolerance `ntol` in length units. Forwards `options` to the underlying
 [`EmpiricalTransiogram`](@ref).
 """
-function PlanarTransiogram(normal, data::AbstractGeoTable, var; ntol=1e-6u"m", kwargs...)
+function PlanarTransiogram(normal, data::AbstractGeoTable, var=1; ntol=1e-6u"m", kwargs...)
   Π = partition(Xoshiro(123), data, PlanePartition(normal; tol=ntol))
   EmpiricalTransiogram(Π, var; kwargs...)
 end
