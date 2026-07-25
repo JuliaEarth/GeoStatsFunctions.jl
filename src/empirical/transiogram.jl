@@ -189,7 +189,7 @@ function _transiogram(data, var, maxlag, nlags, distance, lagsearch)
   EmpiricalTransiogram(counts, abscissas, ordinates, headcounts, distance, estim, names)
 end
 
-function _transiogrameestimate(geotable, ::CarleEstimator, lagsearch::LagSearchMethod)
+function _transiogramestimate(geotable, ::CarleEstimator, lagsearch::LagSearchMethod)
   # lag search parameters
   nlags, maxlag, distance = params(lagsearch)
 
