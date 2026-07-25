@@ -130,7 +130,7 @@ end
 @testset "Fitting transiograms" begin
   csv = CSV.File(joinpath(datadir, "facies5.csv"))
   gtb = georef(csv, ("X", "Y", "Z"))
-  t = EmpiricalTransiogram(gtb, "FACIES", maxlag=20, nlags=20)
+  t = transiogram(gtb, "FACIES", maxlag=20, nlags=20)
 
   # all fits lead to similar proportions
   τ₁ = GeoStatsFunctions.fit(LinearTransiogram, t)

@@ -96,11 +96,9 @@ export
 
   # public api
   variogram,
+  transiogram,
   variogramsurface,
-
-  # empirical transiograms
-  DirectionalTransiogram,
-  PlanarTransiogram,
+  transiogramsurface,
 
   # theoretical functions
   GeoStatsFunction,

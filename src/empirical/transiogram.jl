@@ -3,39 +3,11 @@
 # ------------------------------------------------------------------
 
 """
-    EmpiricalTransiogram(geotable, [var]; [options])
+    EmpiricalTransiogram(counts, abscissas, ordinates, headcounts, distance, estimator, variables)
 
-Computes the empirical (a.k.a. experimental) omnidirectional
-transiogram for categorical variable `var` stored in the `geotable`.
-The variable can be specified by name or index, and the first variable
-is used by default. Additional options are documented below.
-
-## Options
-
-  * nlags     - number of lags (default to `20`)
-  * maxlag    - maximum lag in length units (default to 1/2 of minimum side of bounding box)
-  * distance  - custom distance function (default to `Euclidean` distance)
-  * lagsearch - lag search method (default to `:ball`)
-
-Available lag search methods:
-
-  * `:full` - loop over all pairs of points available
-  * `:ball` - loop over all points within maximum lag
-
-All implemented lag search methods produce the exact same result.
-The `:ball` method is considerably faster when the maximum lag is
-much smaller than the bounding box of the domain.
-
-See also: [`DirectionalTransiogram`](@ref), [`PlanarTransiogram`](@ref),
-[`EmpiricalTransiogramSurface`](@ref).
-
-## References
-
-* Carle, S.F. & Fogg, G.E. 1996. [Transition probability-based
-  indicator geostatistics](https://link.springer.com/article/10.1007/BF02083656)
-
-* Carle et al 1998. [Conditional Simulation of Hydrofacies Architecture:
-  A Transition Probability/Markov Approach](https://doi.org/10.2110/sepmcheg.01.147)
+Type that stores all information about the empirical (a.k.a. experimental) transiogram.
+It is returned by the [`transiogram`](@ref) function and is considered an internal type
+(i.e., not intended for end-users).
 """
 struct EmpiricalTransiogram{ℒ<:Len,V,D,E} <: EmpiricalGeoStatsFunction
   counts::Vector{Int}
@@ -45,51 +17,6 @@ struct EmpiricalTransiogram{ℒ<:Len,V,D,E} <: EmpiricalGeoStatsFunction
   distance::D
   estimator::E
   variables::Vector{Symbol}
-end
-
-function EmpiricalTransiogram(
-  data::AbstractGeoTable,
-  var=1;
-  nlags=20,
-  maxlag=defaultmaxlag(data),
-  distance=Euclidean(),
-  lagsearch=:ball
-)
-  # indicators of categorical variable
-  idata = data |> Select(var) |> OneHot(var)
-
-  # define transiogram estimator
-  estim = CarleEstimator()
-
-  # define lag search method
-  lsearch = lagsearchmethod(domain(idata), nlags, maxlag, distance, Symbol(lagsearch))
-
-  # perform estimation
-  counts, abscissas, ordinates, headcounts = _transiogram(idata, estim, lsearch)
-
-  # extract variable names
-  names = Symbol.(levels(data[:, var]))
-
-  EmpiricalTransiogram(counts, abscissas, ordinates, headcounts, distance, estim, names)
-end
-
-"""
-    EmpiricalTransiogram(partition, [var]; [options])
-
-Compute the empirical transiogram of the geospatial
-`partition` for the categorical variable `var`.
-"""
-function EmpiricalTransiogram(part::Partition, var=1; kwargs...)
-  # categorical levels across subsets
-  gtb = parent(part)
-  cols = Tables.columns(values(gtb))
-  vals = Tables.getcolumn(cols, Symbol(var))
-  levs = levels(vals)
-  # retain geospatial data with at least two elements
-  filtered = Iterators.filter(d -> nelements(domain(d)) > 1, part)
-  @assert !isempty(filtered) "invalid partition of geospatial data, try increasing tolerance parameters"
-  t(d) = EmpiricalTransiogram(d |> Levels(var => levs), var; kwargs...)
-  tmapreduce(t, merge, collect(filtered))
 end
 
 issymmetric(::Type{<:EmpiricalTransiogram}) = false
@@ -160,40 +87,109 @@ Base.getindex(t::EmpiricalTransiogram, ind::Int) = EmpiricalTransiogram(
   t.variables[[ind]]
 )
 
-# -------------------------
-# CONVENIENCE CONSTRUCTORS
-# -------------------------
+# -------------------
+# END-USER INTERFACE
+# -------------------
 
 """
-    DirectionalTransiogram(direction, geotable, [var]; dtol=1e-6u"m", [options])
+    transiogram(geotable, [var]; [options])
 
-Computes the empirical transiogram for the categorical variable `var` stored in
-the `geotable` along a given `direction` with band tolerance `dtol` in length units.
-Forwards `options` to the underlying [`EmpiricalTransiogram`](@ref).
+Computes the empirical (a.k.a. experimental) transiogram for
+categorical variable `var` stored in the `geotable`. The variable
+can be specified by name or index, and the first variable is used
+by default.
+
+    transiogram(partition, [var]; [options])
+
+Alternatively, computes the empirical transiogram of the geospatial
+`partition` as described in Hoffimann & Zadrozny 2019.
+
+## Options
+
+  * dir       - direction for directional transiogram (default to `nothing`)
+  * dirtol    - tolerance for directional transiogram (default to `1e-6u"m"`)
+  * maxlag    - maximum lag in length units (default to 1/2 of minimum side of bounding box)
+  * nlags     - number of lags (default to `20`)
+  * distance  - custom distance function (default to `Euclidean` distance)
+  * lagsearch - lag search method (default to `:ball`)
+
+Available lag search methods:
+
+  * `:full` - loop over all pairs of points available
+  * `:ball` - loop over all points within maximum lag
+
+All implemented lag search methods produce the exact same result.
+The `:ball` method is considerably faster when the maximum lag is
+much smaller than the bounding box of the domain.
+
+See also [`transiogramsurface`](@ref).
+
+## References
+
+* Carle, S.F. & Fogg, G.E. 1996. [Transition probability-based
+  indicator geostatistics](https://link.springer.com/article/10.1007/BF02083656)
+
+* Carle et al 1998. [Conditional Simulation of Hydrofacies Architecture:
+  A Transition Probability/Markov Approach](https://doi.org/10.2110/sepmcheg.01.147)
+
+* Hoffimann, J and Zadrozny, B. 2019. [Efficient variography with
+  partition variograms](https://www.sciencedirect.com/science/article/pii/S0098300419302936)
 """
-function DirectionalTransiogram(dir, data::AbstractGeoTable, var=1; dtol=1e-6u"m", kwargs...)
-  Π = partition(Xoshiro(123), data, DirectionPartition(dir; tol=dtol))
-  EmpiricalTransiogram(Π, var; kwargs...)
+function transiogram(
+  data::AbstractGeoTable,
+  var=1;
+  dir=nothing,
+  dirtol=1e-6u"m",
+  maxlag=defaultmaxlag(data),
+  nlags=20,
+  distance=Euclidean(),
+  lagsearch=:ball
+)
+  if isnothing(dir)
+    _transiogram(data, var, maxlag, nlags, distance, lagsearch)
+  else
+    Π = partition(Xoshiro(123), data, DirectionPartition(dir; tol=dirtol))
+    transiogram(Π, var; maxlag, nlags, distance, lagsearch)
+  end
 end
 
-"""
-    PlanarTransiogram(normal, geotable, [var]; ntol=1e-6u"m", [options])
-
-Computes the empirical transiogram for the categorical variable `var` stored in
-the `geotable` along a plane perpendicular to a `normal` direction with plane
-tolerance `ntol` in length units. Forwards `options` to the underlying
-[`EmpiricalTransiogram`](@ref).
-"""
-function PlanarTransiogram(normal, data::AbstractGeoTable, var=1; ntol=1e-6u"m", kwargs...)
-  Π = partition(Xoshiro(123), data, PlanePartition(normal; tol=ntol))
-  EmpiricalTransiogram(Π, var; kwargs...)
+function transiogram(part::Partition, var=1; kwargs...)
+  # categorical levels across subsets
+  gtb = parent(part)
+  cols = Tables.columns(values(gtb))
+  vals = Tables.getcolumn(cols, Symbol(var))
+  levs = levels(vals)
+  # retain geospatial data with at least two elements
+  filtered = Iterators.filter(d -> nelements(domain(d)) > 1, part)
+  @assert !isempty(filtered) "invalid partition of geospatial data, try increasing tolerance parameters"
+  t(d) = transiogram(d |> Levels(var => levs), var; kwargs...)
+  tmapreduce(t, merge, collect(filtered))
 end
 
 # -----------------
 # HELPER FUNCTIONS
 # -----------------
 
-function _transiogram(geotable, ::CarleEstimator, lagsearch::LagSearchMethod)
+function _transiogram(data, var, maxlag, nlags, distance, lagsearch)
+  # indicators of categorical variable
+  idata = data |> Select(var) |> OneHot(var)
+
+  # define transiogram estimator
+  estim = CarleEstimator()
+
+  # define lag search method
+  lsearch = lagsearchmethod(domain(idata), nlags, maxlag, distance, Symbol(lagsearch))
+
+  # perform estimation
+  counts, abscissas, ordinates, headcounts = _transiogramestimate(idata, estim, lsearch)
+
+  # extract variable names
+  names = Symbol.(levels(data[:, var]))
+
+  EmpiricalTransiogram(counts, abscissas, ordinates, headcounts, distance, estim, names)
+end
+
+function _transiogrameestimate(geotable, ::CarleEstimator, lagsearch::LagSearchMethod)
   # lag search parameters
   nlags, maxlag, distance = params(lagsearch)
 

@@ -14,7 +14,7 @@ using TableTransforms
 
   # empirical variograms and transiograms
   g = variogram(d, "z", maxlag=25)
-  t = EmpiricalTransiogram(c, "z", maxlag=25)
+  t = transiogram(c, "z", maxlag=25)
 
   # theoretical variograms and transiograms
   γ = ExponentialVariogram(ranges=(3, 2, 1))
