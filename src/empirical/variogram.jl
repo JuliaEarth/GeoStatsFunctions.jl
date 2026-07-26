@@ -24,26 +24,19 @@ nvariables(g::EmpiricalVariogram) = length(g.variables)
 
 variables(g::EmpiricalVariogram) = g.variables
 
-"""
-    merge(γα, γβ)
-
-Merge the empirical variogram `γα` with the empirical variogram `γβ`
-assuming that both variograms have the same number of lags, distance
-and estimator.
-"""
-function merge(γα::EmpiricalVariogram{ℒ,V,D,E}, γβ::EmpiricalVariogram{ℒ,V,D,E}) where {ℒ,V,D,E}
-  nα = γα.counts
-  nβ = γβ.counts
-  xα = γα.abscissas
-  xβ = γβ.abscissas
-  Yα = γα.ordinates
-  Yβ = γβ.ordinates
-  vα = γα.variables
-  vβ = γβ.variables
+function merge(gα::EmpiricalVariogram{ℒ,V,D,E}, gβ::EmpiricalVariogram{ℒ,V,D,E}) where {ℒ,V,D,E}
+  nα = gα.counts
+  nβ = gβ.counts
+  xα = gα.abscissas
+  xβ = gβ.abscissas
+  Yα = gα.ordinates
+  Yβ = gβ.ordinates
+  vα = gα.variables
+  vβ = gβ.variables
 
   # copy distance and estimator
-  d = γα.distance
-  e = γα.estimator
+  d = gα.distance
+  e = gα.estimator
 
   # merge function for estimator
   mergefun(yα, nα, yβ, nβ) = mergerule(e, yα, nα, yβ, nβ)

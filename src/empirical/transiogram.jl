@@ -25,13 +25,6 @@ nvariables(t::EmpiricalTransiogram) = length(t.variables)
 
 variables(t::EmpiricalTransiogram) = t.variables
 
-"""
-    merge(tα, tβ)
-
-Merge the empirical transiogram `tα` with the empirical transiogram `tβ`
-assuming that both transiograms have the same number of lags, distance
-and estimator.
-"""
 function merge(tα::EmpiricalTransiogram{ℒ,V,D,E}, tβ::EmpiricalTransiogram{ℒ,V,D,E}) where {ℒ,V,D,E}
   nα = tα.counts
   nβ = tβ.counts
