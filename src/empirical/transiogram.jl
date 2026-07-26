@@ -157,7 +157,7 @@ function transiogram(part::Partition, var=1; kwargs...)
   # retain geospatial data with at least two elements
   filtered = Iterators.filter(gtb -> nelements(domain(gtb)) > 1, part)
   @assert !isempty(filtered) "invalid partition of geospatial data, try increasing tolerance parameters"
-  trans(gtb) = _transiogram(gtb |> Levels(var => levs), var; kwargs...)
+  trans(gtb) = transiogram(gtb |> Levels(var => levs), var; kwargs...)
   tmapreduce(trans, merge, collect(filtered))
 end
 

@@ -140,7 +140,7 @@ function variogram(part::Partition, vars=1:(ncol(part[1]) - 1); kwargs...)
   # retain geospatial data with at least two elements
   filtered = Iterators.filter(gtb -> nelements(domain(gtb)) > 1, part)
   @assert !isempty(filtered) "invalid partition of geospatial data, try increasing tolerance parameters"
-  gamma(gtb) = _variogram(gtb, vars; kwargs...)
+  gamma(gtb) = variogram(gtb, vars; kwargs...)
   tmapreduce(gamma, merge, collect(filtered))
 end
 
