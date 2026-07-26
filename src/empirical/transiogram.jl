@@ -146,7 +146,14 @@ function transiogram(
   end
 end
 
-function transiogram(part::Partition, var=1; kwargs...)
+function transiogram(
+  part::Partition,
+  var=1;
+  maxlag=defaultmaxlag(parent(part)),
+  nlags=20,
+  distance=Euclidean(),
+  lagsearch=:ball
+)
   # categorical levels across subsets
   levs = let
     gtb = parent(part) |> Select(var)
@@ -157,7 +164,7 @@ function transiogram(part::Partition, var=1; kwargs...)
   # retain geospatial data with at least two elements
   filtered = Iterators.filter(gtb -> nelements(domain(gtb)) > 1, part)
   @assert !isempty(filtered) "invalid partition of geospatial data, try increasing tolerance parameters"
-  trans(gtb) = transiogram(gtb |> Levels(var => levs), var; kwargs...)
+  trans(gtb) = _transiogram(gtb |> Levels(var => levs), var; maxlag, nlags, distance, lagsearch)
   tmapreduce(trans, merge, collect(filtered))
 end
 
