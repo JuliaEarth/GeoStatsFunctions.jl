@@ -14,13 +14,6 @@
   @test nvariables(t[1:2]) == 2
   @test variables(t[1:2]) == variables(t)[1:2]
 
-  # same for directional transiograms
-  t = DirectionalTransiogram((0.0, 0.0, 1.0), gtb, "FACIES", maxlag=20, nlags=20)
-  for i in 1:5
-    ys = t.ordinates[i, i]
-    @test ys[1] > ys[10] > ys[20]
-  end
-
   # additional columns don't affect results
   csv = CSV.File(joinpath(datadir, "facies5.csv"))
   tab = (X=csv.X, Y=csv.Y, Z=csv.Z, FACIES=csv.FACIES, NAME="FACIES" .* string.(csv.FACIES))
@@ -32,5 +25,12 @@
 end
 
 @testset "directional transiogram" begin
-  # TODO:
+  # diagonal ordinates are non-increasing
+  csv = CSV.File(joinpath(datadir, "facies5.csv"))
+  gtb = georef(csv, ("X", "Y", "Z"))
+  t = transiogram(gtb, "FACIES", dir=(0.0, 0.0, 1.0), maxlag=20, nlags=20)
+  for i in 1:5
+    ys = t.ordinates[i, i]
+    @test ys[1] > ys[10] > ys[20]
+  end
 end
