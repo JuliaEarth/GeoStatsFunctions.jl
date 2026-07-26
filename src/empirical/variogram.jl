@@ -131,8 +131,8 @@ function variogram(
   if isnothing(dir)
     _variogram(geotable, vars, maxlag, nlags, distance, estimator, lagsearch)
   else
-    Π = partition(Xoshiro(123), geotable, DirectionPartition(dir; tol=dirtol))
-    variogram(Π, vars; maxlag, nlags, distance, estimator, lagsearch)
+    part = partition(Xoshiro(123), geotable, DirectionPartition(dir; tol=dirtol))
+    variogram(part, vars; maxlag, nlags, distance, estimator, lagsearch)
   end
 end
 

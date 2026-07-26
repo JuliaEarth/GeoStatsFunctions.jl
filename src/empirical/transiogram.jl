@@ -141,8 +141,8 @@ function transiogram(
   if isnothing(dir)
     _transiogram(geotable, var, maxlag, nlags, distance, lagsearch)
   else
-    Π = partition(Xoshiro(123), geotable, DirectionPartition(dir; tol=dirtol))
-    transiogram(Π, var; maxlag, nlags, distance, lagsearch)
+    part = partition(Xoshiro(123), geotable, DirectionPartition(dir; tol=dirtol))
+    transiogram(part, var; maxlag, nlags, distance, lagsearch)
   end
 end
 
