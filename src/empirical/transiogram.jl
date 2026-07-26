@@ -148,9 +148,9 @@ end
 
 function transiogram(part::Partition, var=1; kwargs...)
   # categorical levels across subsets
-  gtb = parent(part)
+  gtb = parent(part) |> Select(var)
   cols = Tables.columns(values(gtb))
-  vals = Tables.getcolumn(cols, Symbol(var))
+  vals = Tables.getcolumn(cols, 1)
   levs = levels(vals)
   # retain geospatial data with at least two elements
   filtered = Iterators.filter(d -> nelements(domain(d)) > 1, part)
