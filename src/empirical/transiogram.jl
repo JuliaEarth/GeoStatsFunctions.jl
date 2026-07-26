@@ -139,7 +139,7 @@ function transiogram(
   lagsearch=:ball
 )
   if isnothing(dir)
-    _transiogram(geotable, var, maxlag, nlags, distance, lagsearch)
+    _transiogram(geotable, var; maxlag, nlags, distance, lagsearch)
   else
     part = partition(Xoshiro(123), geotable, DirectionPartition(dir; tol=dirtol))
     transiogram(part, var; maxlag, nlags, distance, lagsearch)
@@ -148,22 +148,24 @@ end
 
 function transiogram(part::Partition, var=1; kwargs...)
   # categorical levels across subsets
-  gtb = parent(part) |> Select(var)
-  cols = Tables.columns(values(gtb))
-  vals = Tables.getcolumn(cols, 1)
-  levs = levels(vals)
+  levs = let
+    gtb = parent(part) |> Select(var)
+    cols = Tables.columns(values(gtb))
+    vals = Tables.getcolumn(cols, 1)
+    levels(vals)
+  end
   # retain geospatial data with at least two elements
-  filtered = Iterators.filter(d -> nelements(domain(d)) > 1, part)
+  filtered = Iterators.filter(gtb -> nelements(domain(gtb)) > 1, part)
   @assert !isempty(filtered) "invalid partition of geospatial data, try increasing tolerance parameters"
-  t(d) = transiogram(d |> Levels(var => levs), var; kwargs...)
-  tmapreduce(t, merge, collect(filtered))
+  trans(gtb) = _transiogram(gtb |> Levels(var => levs), var; kwargs...)
+  tmapreduce(trans, merge, collect(filtered))
 end
 
 # -----------------
 # HELPER FUNCTIONS
 # -----------------
 
-function _transiogram(geotable, var, maxlag, nlags, distance, lagsearch)
+function _transiogram(geotable, var; maxlag, nlags, distance, lagsearch)
   # indicators of categorical variable
   gtb = geotable |> Select(var) |> OneHot(var)
 

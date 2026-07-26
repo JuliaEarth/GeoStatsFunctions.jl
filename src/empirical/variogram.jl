@@ -129,7 +129,7 @@ function variogram(
   lagsearch=:ball
 )
   if isnothing(dir)
-    _variogram(geotable, vars, maxlag, nlags, distance, estimator, lagsearch)
+    _variogram(geotable, vars; maxlag, nlags, distance, estimator, lagsearch)
   else
     part = partition(Xoshiro(123), geotable, DirectionPartition(dir; tol=dirtol))
     variogram(part, vars; maxlag, nlags, distance, estimator, lagsearch)
@@ -138,17 +138,17 @@ end
 
 function variogram(part::Partition, vars=1:(ncol(part[1]) - 1); kwargs...)
   # retain geospatial data with at least two elements
-  filtered = Iterators.filter(d -> nelements(domain(d)) > 1, part)
+  filtered = Iterators.filter(gtb -> nelements(domain(gtb)) > 1, part)
   @assert !isempty(filtered) "invalid partition of geospatial data, try increasing tolerance parameters"
-  γ(d) = variogram(d, vars; kwargs...)
-  tmapreduce(γ, merge, collect(filtered))
+  gamma(gtb) = _variogram(gtb, vars; kwargs...)
+  tmapreduce(gamma, merge, collect(filtered))
 end
 
 # -----------------
 # HELPER FUNCTIONS
 # -----------------
 
-function _variogram(geotable, vars, maxlag, nlags, distance, estimator, lagsearch)
+function _variogram(geotable, vars; maxlag, nlags, distance, estimator, lagsearch)
   # selected variables
   gtb = geotable |> Select(vars)
 
