@@ -75,8 +75,8 @@ function variogramsurface(
   # estimate directional variograms across planes
   gs = map(θs) do θ
     dir = DirectionPartition(cos(θ) * u + sin(θ) * v; tol=dirtol)
-    g(plane) = variogram(partition(rng, plane, dir), vars; kwargs...)
-    tmapreduce(g, merge, planes)
+    gamma(plane) = variogram(partition(rng, plane, dir), vars; kwargs...)
+    tmapreduce(gamma, merge, planes)
   end
 
   # polar radii

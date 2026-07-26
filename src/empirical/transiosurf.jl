@@ -75,8 +75,8 @@ function transiogramsurface(
   # estimate directional transiograms across planes
   ts = map(θs) do θ
     dir = DirectionPartition(cos(θ) * u + sin(θ) * v; tol=dirtol)
-    t(plane) = transiogram(partition(rng, plane, dir), var; kwargs...)
-    tmapreduce(t, merge, planes)
+    trans(plane) = transiogram(partition(rng, plane, dir), var; kwargs...)
+    tmapreduce(trans, merge, planes)
   end
 
   # polar radii
