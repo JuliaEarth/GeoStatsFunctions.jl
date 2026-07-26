@@ -136,6 +136,12 @@ function variogram(
   end
 end
 
+# why is this faster than the "else" branch above?
+function dirvariogram(geotable, vars=1:(ncol(geotable) - 1); dir, dirtol=0.5u"m", kwargs...)
+  part = partition(Xoshiro(123), geotable, DirectionPartition(dir; tol=dirtol))
+  variogram(part, vars; kwargs...)
+end
+
 function variogram(part::Partition, vars=1:(ncol(part[1]) - 1); kwargs...)
   # retain geospatial data with at least two elements
   filtered = Iterators.filter(gtb -> nelements(domain(gtb)) > 1, part)
