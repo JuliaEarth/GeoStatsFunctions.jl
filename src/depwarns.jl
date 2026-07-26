@@ -77,13 +77,7 @@ function EmpiricalVariogramSurface(
   variogramsurface(data, vars; planetol=ptol, dirtol=dtol, kwargs...)
 end
 
-function EmpiricalTransiogramSurface(
-  data::AbstractGeoTable,
-  var=1;
-  ptol=0.5u"m",
-  dtol=0.5u"m",
-  kwargs...
-)
+function EmpiricalTransiogramSurface(data::AbstractGeoTable, var=1; ptol=0.5u"m", dtol=0.5u"m", kwargs...)
   Base.depwarn(
     """
     `EmpiricalTransiogramSurface(data, [var]; ptol=0.5u"m", dtol=0.5u"m", [options])` is deprecated.
