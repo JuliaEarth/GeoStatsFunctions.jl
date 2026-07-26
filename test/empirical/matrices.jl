@@ -1,4 +1,4 @@
-@testset "matrices" begin
+@testset "transition matrices" begin
   # helper function for tests
   function testratematrix(R)
     m, n = size(R)
