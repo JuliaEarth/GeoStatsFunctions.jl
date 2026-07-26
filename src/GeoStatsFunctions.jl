@@ -49,6 +49,9 @@ include("plotting.jl")
 # precompile workloads
 include("precompile.jl")
 
+# deprecation warnings
+include("depwarns.jl")
+
 function __init__()
   # register error hint for visualization functions
   # since this is a recurring issue for new users
