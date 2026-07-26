@@ -9,8 +9,8 @@ using PrecompileTools
   t2 = georef((; z=rand(5, 5, 5)))
   Gs = [GaussianVariogram, SphericalVariogram, ExponentialVariogram]
   @compile_workload begin
-    g1 = EmpiricalVariogram(t1, "z")
-    g2 = EmpiricalVariogram(t2, "z")
+    g1 = variogram(t1, "z")
+    g2 = variogram(t2, "z")
     γ1 = GeoStatsFunctions.fitany(Gs, g1)
     γ2 = GeoStatsFunctions.fitany(Gs, g2)
   end

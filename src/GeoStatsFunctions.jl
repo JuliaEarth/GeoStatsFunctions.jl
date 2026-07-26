@@ -49,6 +49,9 @@ include("plotting.jl")
 # precompile workloads
 include("precompile.jl")
 
+# deprecation warnings
+include("depwarns.jl")
+
 function __init__()
   # register error hint for visualization functions
   # since this is a recurring issue for new users
@@ -86,16 +89,19 @@ export
   nvariables,
   variables,
 
-  # convenience functions
-  DirectionalVariogram,
-  DirectionalTransiogram,
-  PlanarVariogram,
-  PlanarTransiogram,
-
   # empirical surfaces
   EmpiricalGeoStatsSurface,
   EmpiricalVariogramSurface,
   EmpiricalTransiogramSurface,
+  issymmetric,
+  nvariables,
+  variables,
+
+  # public api
+  variogram,
+  transiogram,
+  variogramsurface,
+  transiogramsurface,
 
   # theoretical functions
   GeoStatsFunction,

@@ -3,18 +3,11 @@
 # ------------------------------------------------------------------
 
 """
-    EmpiricalTransiogramSurface(geotable, var;
-                                normal=Vec(0,0,1), nangs=50,
-                                ptol=0.5u"m", dtol=0.5u"m",
-                                [options])
+    EmpiricalTransiogramSurface(θs, rs, zs, vs)
 
-Given a `normal` direction, estimate the transiogram of categorical variable `var`
-stored in `geotable` along all directions in the corresponding plane of variation.
-
-Optionally, specify the tolerance `ptol` in length units for the plane partition,
-the tolerance `dtol` in length units for the direction partition, the number of
-angles `nangs` in the plane, and forward the `options` to the underlying
-[`EmpiricalTransiogram`](@ref).
+Type that stores all information about the empirical (a.k.a. experimental)
+transiogram surface. It is returned by the [`transiogramsurface`](@ref) function
+and is considered an internal type (i.e., not intended for end-users).
 """
 struct EmpiricalTransiogramSurface{T,R,Z} <: EmpiricalGeoStatsSurface
   θs::Vector{T}
@@ -23,13 +16,37 @@ struct EmpiricalTransiogramSurface{T,R,Z} <: EmpiricalGeoStatsSurface
   vs::Vector{Symbol}
 end
 
-function EmpiricalTransiogramSurface(
+issymmetric(::Type{<:EmpiricalTransiogramSurface}) = false
+
+nvariables(t::EmpiricalTransiogramSurface) = size(first(t.zs), 1)
+
+variables(t::EmpiricalTransiogramSurface) = t.vs
+
+# -------------------
+# END-USER INTERFACE
+# -------------------
+
+"""
+    transiogramsurface(geotable, [var];
+                       normal=Vec(0,0,1), nangs=50,
+                       planetol=0.5u"m", dirtol=0.5u"m",
+                       [options])
+
+Given a `normal` direction, estimate the transiogram of categorical variable `var`
+stored in `geotable` along all directions in the corresponding plane of variation.
+
+Optionally, specify the tolerance `planetol` in length units for the plane partition,
+the tolerance `dirtol` in length units for the direction partition, the number of
+angles `nangs` in the plane, and forward the `options` to the underlying
+[`transiogram`](@ref).
+"""
+function transiogramsurface(
   data::AbstractGeoTable,
-  var;
+  var=1;
   normal=Vec(0, 0, 1),
   nangs=50,
-  ptol=0.5u"m",
-  dtol=0.5u"m",
+  planetol=0.5u"m",
+  dirtol=0.5u"m",
   kwargs...
 )
   # sanity checks
@@ -38,14 +55,14 @@ function EmpiricalTransiogramSurface(
   # deterministic results
   rng = Xoshiro(123)
 
-  Dim = embeddim(domain(data))
+  dim = embeddim(domain(data))
 
   # basis for surface
-  if Dim == 2
+  if dim == 2
     planes = [data]
     u, v = Vec(1.0, 0.0), Vec(0.0, 1.0)
-  elseif Dim == 3
-    subset = partition(rng, data, PlanePartition(normal; tol=ptol))
+  elseif dim == 3
+    subset = partition(rng, data, PlanePartition(normal; tol=planetol))
     planes = collect(subset)
     u, v = Meshes.householderbasis(normal)
   else
@@ -57,9 +74,9 @@ function EmpiricalTransiogramSurface(
 
   # estimate directional transiograms across planes
   ts = map(θs) do θ
-    dir = DirectionPartition(cos(θ) * u + sin(θ) * v; tol=dtol)
-    t(plane) = EmpiricalTransiogram(partition(rng, plane, dir), var; kwargs...)
-    tmapreduce(t, merge, planes)
+    dir = DirectionPartition(cos(θ) * u + sin(θ) * v; tol=dirtol)
+    trans(plane) = transiogram(partition(rng, plane, dir), var; kwargs...)
+    tmapreduce(trans, merge, planes)
   end
 
   # polar radii
@@ -73,9 +90,3 @@ function EmpiricalTransiogramSurface(
 
   EmpiricalTransiogramSurface(θs, rs, zs, vs)
 end
-
-issymmetric(::Type{<:EmpiricalTransiogramSurface}) = false
-
-nvariables(t::EmpiricalTransiogramSurface) = size(first(t.zs), 1)
-
-variables(t::EmpiricalTransiogramSurface) = t.vs

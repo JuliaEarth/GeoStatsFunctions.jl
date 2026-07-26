@@ -1,7 +1,7 @@
-@testset "EmpiricalTransiogramSurface" begin
+@testset "transiogramsurface" begin
   img = readdlm(joinpath(datadir, "anisotropic.tsv"))
-  data = georef((c=[v < 0 ? 1 : 2 for v in img],))
-  t = EmpiricalTransiogramSurface(data, :c, maxlag=50.0)
+  gtb = georef((c=[v < 0 ? 1 : 2 for v in img],))
+  t = transiogramsurface(gtb, "c", maxlag=50.0)
   @test sprint(show, t) == "EmpiricalTransiogramSurface"
   @test sprint(show, MIME"text/plain"(), t) == """
   EmpiricalTransiogramSurface
