@@ -29,14 +29,14 @@ variables(t::EmpiricalTransiogramSurface) = t.vs
 """
     transiogramsurface(geotable, [var];
                        normal=Vec(0,0,1), nangs=50,
-                       ptol=0.5u"m", dtol=0.5u"m",
+                       planetol=0.5u"m", dirtol=0.5u"m",
                        [options])
 
 Given a `normal` direction, estimate the transiogram of categorical variable `var`
 stored in `geotable` along all directions in the corresponding plane of variation.
 
-Optionally, specify the tolerance `ptol` in length units for the plane partition,
-the tolerance `dtol` in length units for the direction partition, the number of
+Optionally, specify the tolerance `planetol` in length units for the plane partition,
+the tolerance `dirtol` in length units for the direction partition, the number of
 angles `nangs` in the plane, and forward the `options` to the underlying
 [`transiogram`](@ref).
 """
@@ -45,8 +45,8 @@ function transiogramsurface(
   var=1;
   normal=Vec(0, 0, 1),
   nangs=50,
-  ptol=0.5u"m",
-  dtol=0.5u"m",
+  planetol=0.5u"m",
+  dirtol=0.5u"m",
   kwargs...
 )
   # sanity checks
@@ -62,7 +62,7 @@ function transiogramsurface(
     planes = [data]
     u, v = Vec(1.0, 0.0), Vec(0.0, 1.0)
   elseif dim == 3
-    subset = partition(rng, data, PlanePartition(normal; tol=ptol))
+    subset = partition(rng, data, PlanePartition(normal; tol=planetol))
     planes = collect(subset)
     u, v = Meshes.householderbasis(normal)
   else
@@ -74,7 +74,7 @@ function transiogramsurface(
 
   # estimate directional transiograms across planes
   ts = map(θs) do θ
-    dir = DirectionPartition(cos(θ) * u + sin(θ) * v; tol=dtol)
+    dir = DirectionPartition(cos(θ) * u + sin(θ) * v; tol=dirtol)
     t(plane) = transiogram(partition(rng, plane, dir), var; kwargs...)
     tmapreduce(t, merge, planes)
   end
