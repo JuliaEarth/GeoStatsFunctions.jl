@@ -118,20 +118,20 @@ See also [`variogramsurface`](@ref).
   partition variograms](https://www.sciencedirect.com/science/article/pii/S0098300419302936)
 """
 function variogram(
-  data::AbstractGeoTable,
-  vars=1:(ncol(data) - 1);
+  geotable::AbstractGeoTable,
+  vars=1:(ncol(geotable) - 1);
   dir=nothing,
   dirtol=0.5u"m",
-  maxlag=defaultmaxlag(data),
+  maxlag=defaultmaxlag(geotable),
   nlags=20,
   distance=Euclidean(),
   estimator=:matheron,
   lagsearch=:ball
 )
   if isnothing(dir)
-    _variogram(data, vars, maxlag, nlags, distance, estimator, lagsearch)
+    _variogram(geotable, vars, maxlag, nlags, distance, estimator, lagsearch)
   else
-    Π = partition(Xoshiro(123), data, DirectionPartition(dir; tol=dirtol))
+    Π = partition(Xoshiro(123), geotable, DirectionPartition(dir; tol=dirtol))
     variogram(Π, vars; maxlag, nlags, distance, estimator, lagsearch)
   end
 end
@@ -148,9 +148,9 @@ end
 # HELPER FUNCTIONS
 # -----------------
 
-function _variogram(data, vars, maxlag, nlags, distance, estimator, lagsearch)
+function _variogram(geotable, vars, maxlag, nlags, distance, estimator, lagsearch)
   # selected variables
-  sdata = data |> Select(vars)
+  gtb = geotable |> Select(vars)
 
   # define variogram estimator
   estim = if Symbol(estimator) == :matheron
@@ -162,13 +162,13 @@ function _variogram(data, vars, maxlag, nlags, distance, estimator, lagsearch)
   end
 
   # define lag search method
-  lsearch = lagsearchmethod(domain(sdata), nlags, maxlag, distance, Symbol(lagsearch))
+  lsearch = lagsearchmethod(domain(gtb), nlags, maxlag, distance, Symbol(lagsearch))
 
   # perform estimation
-  counts, abscissas, ordinates = _variogramestimate(sdata, estim, lsearch)
+  counts, abscissas, ordinates = _variogramestimate(gtb, estim, lsearch)
 
   # extract variable names
-  names = sdata |> values |> Tables.columns |> Tables.columnnames |> collect
+  names = gtb |> values |> Tables.columns |> Tables.columnnames |> collect
 
   EmpiricalVariogram(counts, abscissas, ordinates, distance, estim, names)
 end

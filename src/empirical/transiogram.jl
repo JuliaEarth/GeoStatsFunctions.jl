@@ -129,19 +129,19 @@ See also [`transiogramsurface`](@ref).
   partition variograms](https://www.sciencedirect.com/science/article/pii/S0098300419302936)
 """
 function transiogram(
-  data::AbstractGeoTable,
+  geotable::AbstractGeoTable,
   var=1;
   dir=nothing,
   dirtol=0.5u"m",
-  maxlag=defaultmaxlag(data),
+  maxlag=defaultmaxlag(geotable),
   nlags=20,
   distance=Euclidean(),
   lagsearch=:ball
 )
   if isnothing(dir)
-    _transiogram(data, var, maxlag, nlags, distance, lagsearch)
+    _transiogram(geotable, var, maxlag, nlags, distance, lagsearch)
   else
-    Π = partition(Xoshiro(123), data, DirectionPartition(dir; tol=dirtol))
+    Π = partition(Xoshiro(123), geotable, DirectionPartition(dir; tol=dirtol))
     transiogram(Π, var; maxlag, nlags, distance, lagsearch)
   end
 end
@@ -163,21 +163,21 @@ end
 # HELPER FUNCTIONS
 # -----------------
 
-function _transiogram(data, var, maxlag, nlags, distance, lagsearch)
+function _transiogram(geotable, var, maxlag, nlags, distance, lagsearch)
   # indicators of categorical variable
-  idata = data |> Select(var) |> OneHot(var)
+  gtb = geotable |> Select(var) |> OneHot(var)
 
   # define transiogram estimator
   estim = CarleEstimator()
 
   # define lag search method
-  lsearch = lagsearchmethod(domain(idata), nlags, maxlag, distance, Symbol(lagsearch))
+  lsearch = lagsearchmethod(domain(gtb), nlags, maxlag, distance, Symbol(lagsearch))
 
   # perform estimation
-  counts, abscissas, ordinates, headcounts = _transiogramestimate(idata, estim, lsearch)
+  counts, abscissas, ordinates, headcounts = _transiogramestimate(gtb, estim, lsearch)
 
   # extract variable names
-  names = Symbol.(levels(data[:, var]))
+  names = Symbol.(levels(geotable[:, var]))
 
   EmpiricalTransiogram(counts, abscissas, ordinates, headcounts, distance, estim, names)
 end
