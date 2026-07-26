@@ -57,3 +57,41 @@ function DirectionalTransiogram(dir, data::AbstractGeoTable, var=1; dtol=1e-6u"m
   )
   transiogram(data, var; dir=dir, dirtol=dtol, kwargs...)
 end
+
+function EmpiricalVariogramSurface(
+  data::AbstractGeoTable,
+  vars=1:(ncol(data) - 1);
+  ptol=0.5u"m",
+  dtol=0.5u"m",
+  kwargs...
+)
+  Base.depwarn(
+    """
+    `EmpiricalVariogramSurface(data, [vars]; ptol=0.5u"m", dtol=0.5u"m", [options])` is deprecated.
+
+    Use `variogramsurface(data, [vars]; planetol=ptol, dirtol=dtol, [options])` instead.
+    """,
+    :EmpiricalVariogramSurface,
+    force=true
+  )
+  variogramsurface(data, vars; planetol=ptol, dirtol=dtol, kwargs...)
+end
+
+function EmpiricalTransiogramSurface(
+  data::AbstractGeoTable,
+  var=1;
+  ptol=0.5u"m",
+  dtol=0.5u"m",
+  kwargs...
+)
+  Base.depwarn(
+    """
+    `EmpiricalTransiogramSurface(data, [var]; ptol=0.5u"m", dtol=0.5u"m", [options])` is deprecated.
+
+    Use `transiogramsurface(data, [var]; planetol=ptol, dirtol=dtol, [options])` instead.
+    """,
+    :EmpiricalTransiogramSurface,
+    force=true
+  )
+  transiogramsurface(data, var; planetol=ptol, dirtol=dtol, kwargs...)
+end
