@@ -100,7 +100,7 @@ Alternatively, computes the empirical transiogram of the geospatial
 ## Options
 
   * dir       - direction for directional transiogram (default to `nothing`)
-  * dirtol    - tolerance for directional transiogram (default to `1e-6u"m"`)
+  * dirtol    - tolerance for directional transiogram (default to `0.5u"m"`)
   * maxlag    - maximum lag in length units (default to 1/2 of minimum side of bounding box)
   * nlags     - number of lags (default to `20`)
   * distance  - custom distance function (default to `Euclidean` distance)
@@ -132,7 +132,7 @@ function transiogram(
   data::AbstractGeoTable,
   var=1;
   dir=nothing,
-  dirtol=1e-6u"m",
+  dirtol=0.5u"m",
   maxlag=defaultmaxlag(data),
   nlags=20,
   distance=Euclidean(),
