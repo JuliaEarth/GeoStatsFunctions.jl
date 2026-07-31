@@ -76,7 +76,7 @@ function funplot!(
   showtext=true,
   textsize=12,
   showhist=true,
-  histcolor=:slategray
+  histcolor=color
 )
   # maximum lag
   hmax = isnothing(maxlag) ? _maxlag(f) : GeoStatsFunctions.aslen(maxlag)
