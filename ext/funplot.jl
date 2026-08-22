@@ -2,32 +2,41 @@
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
 
-function funplot(f; link=nothing, kwargs...)
+function funplot(f; kwargs...)
+  fig = Makie.Figure()
+  funplot(fig, f; kwargs...)
+end
+
+function funplot(pos, f; link=nothing, kwargs...)
   # decide whether to link y axes of subplots
   ylink = isnothing(link) ? _ylink(f) : link
 
-  # initialize figure
+  # initialize layout
   n = nvariables(f)
   v = variables(f)
-  fig = Makie.Figure()
+  layout = _layout(pos)
+  axs = Makie.Axis[]
   for i in 1:n, j in 1:n
     issymmetric(f) && i < j && continue
-    ax = Makie.Axis(fig[i, j])
+    ax = Makie.Axis(layout[i, j])
     ax.title = issymmetric(f) ? "$(v[j]) → $(v[i])" : "$(v[i]) → $(v[j])"
     i == n && (ax.xlabel = "lag distance [m]")
     j == 1 && (ax.ylabel = _ylabel(f))
     i < n && Makie.hidexdecorations!(ax, grid=false)
     j > 1 && ylink && Makie.hideydecorations!(ax, grid=false)
+    push!(axs, ax)
   end
-  Makie.linkxaxes!(fig.content...)
-  ylink && Makie.linkyaxes!(fig.content...)
+  Makie.linkxaxes!(axs...)
+  ylink && Makie.linkyaxes!(axs...)
 
-  # fill figure with plots
-  funplot!(fig, f; kwargs...)
+  # fill layout with plots
+  funplot!(layout, f; kwargs...)
+
+  pos
 end
 
 function funplot!(
-  fig::Makie.Figure,
+  layout::Makie.GridLayout,
   f::GeoStatsFunction;
   # common options
   color=:teal,
@@ -52,7 +61,7 @@ function funplot!(
   n = nvariables(f)
   for i in 1:n, j in 1:n
     issymmetric(f) && i < j && continue
-    ax = Makie.content(fig[i, j])
+    ax = Makie.content(layout[i, j])
     for (k, Fₖ) in enumerate(F)
       Makie.lines!(ax, ustrip.(u"m", hs), Fₖ[i, j]; color, linewidth, linestyle=linestyle[k], label=label[k])
     end
@@ -60,11 +69,11 @@ function funplot!(
     d > 1 && Makie.axislegend(ax, position=position)
   end
 
-  fig
+  layout
 end
 
 function funplot!(
-  fig::Makie.Figure,
+  layout::Makie.GridLayout,
   f::EmpiricalGeoStatsFunction;
   # common options
   color=:slategray,
@@ -85,7 +94,7 @@ function funplot!(
   n = nvariables(f)
   for i in 1:n, j in 1:n
     issymmetric(f) && i < j && continue
-    ax = Makie.content(fig[i, j])
+    ax = Makie.content(layout[i, j])
 
     # retrieve coordinates and counts
     hs = f.abscissas
@@ -117,5 +126,7 @@ function funplot!(
     end
   end
 
-  fig
+  layout
 end
+
+funplot!(fig::Makie.Figure, f; kwargs...) = (funplot!(fig.layout, f; kwargs...); fig)
