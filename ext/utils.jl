@@ -20,7 +20,7 @@ _ylink(f::GeoStatsFunction) = false
 _ylink(f::Variogram) = true
 _ylink(f::Covariance) = true
 _ylink(f::Transiogram) = true
-_ylink(f::CompositeFunction) = allequal(unit.(sill(f)))
+_ylink(f::CompositeFunction) = allequal(unit(s) for s in sill(f))
 _ylink(f::EmpiricalVariogram) = allequal(unit.(first.(f.ordinates)))
 _ylink(f::EmpiricalTransiogram) = true
 
