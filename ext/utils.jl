@@ -24,8 +24,7 @@ _ylink(f::CompositeFunction) = _allequal(unit.(sill(f)))
 _ylink(f::EmpiricalVariogram) = _allequal(unit.(first.(f.ordinates)))
 _ylink(f::EmpiricalTransiogram) = true
 
-_allequal(u) = allequal([u])
-_allequal(u::AbstractArray) = allequal(u)
+_allequal(u) = u isa AbstractArray ? allequal(u) : true
 
 _eval(f, hs) = isisotropic(f) ? _isoeval(f, hs) : _anisoeval(f, hs)
 
