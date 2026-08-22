@@ -20,9 +20,11 @@ _ylink(f::GeoStatsFunction) = false
 _ylink(f::Variogram) = true
 _ylink(f::Covariance) = true
 _ylink(f::Transiogram) = true
-_ylink(f::CompositeFunction) = allequal(unit.(sill(f)))
-_ylink(f::EmpiricalVariogram) = allequal(unit.(first.(f.ordinates)))
+_ylink(f::CompositeFunction) = _allequal(unit.(sill(f)))
+_ylink(f::EmpiricalVariogram) = _allequal(unit.(first.(f.ordinates)))
 _ylink(f::EmpiricalTransiogram) = true
+
+_allequal(u) = u isa AbstractArray ? allequal(u) : true
 
 _eval(f, hs) = isisotropic(f) ? _isoeval(f, hs) : _anisoeval(f, hs)
 
