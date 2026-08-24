@@ -3,22 +3,29 @@
 # ------------------------------------------------------------------
 
 function surfplot(f; kwargs...)
-  # initialize figure
+  fig = Makie.Figure()
+  surfplot(fig, f; kwargs...)
+end
+
+function surfplot(pos, f; kwargs...)
+  # initialize layout
   n = nvariables(f)
   v = variables(f)
-  fig = Makie.Figure()
+  layout = _layout(pos)
   for i in 1:n, j in 1:n
     issymmetric(f) && i < j && continue
-    ax = Makie.PolarAxis(fig[i, j])
+    ax = Makie.PolarAxis(layout[i, j])
     ax.title = issymmetric(f) ? "$(v[j]) → $(v[i])" : "$(v[i]) → $(v[j])"
   end
 
-  # fill figure with plots
-  surfplot!(fig, f; kwargs...)
+  # fill layout with plots
+  surfplot!(layout, f; kwargs...)
+
+  pos
 end
 
 function surfplot!(
-  fig::Makie.Figure,
+  layout::Makie.GridLayout,
   f::GeoStatsFunction;
   # common options
   colormap=:viridis,
@@ -81,7 +88,7 @@ function surfplot!(
   n = nvariables(f)
   for i in 1:n, j in 1:n
     issymmetric(f) && i < j && continue
-    ax = Makie.content(fig[i, j])
+    ax = Makie.content(layout[i, j])
 
     # values in matrix form
     Zᵢⱼ = getindex.(Z, i, j)
@@ -92,14 +99,14 @@ function surfplot!(
     Makie.contour!(ax, θs, ustrip.(u"m", rs), ustrip.(Zᵢⱼ); colormap, levels, labels=true)
   end
 
-  fig
+  layout
 end
 
 _ncoords(f) = length(radii(metricball(f)))
 _ncoords(::CarleTransiogram{N}) where {N} = N
 
 function surfplot!(
-  fig::Makie.Figure,
+  layout::Makie.GridLayout,
   f::EmpiricalGeoStatsSurface;
   # common options
   colormap=:viridis,
@@ -131,7 +138,7 @@ function surfplot!(
   n = nvariables(f)
   for i in 1:n, j in 1:n
     issymmetric(f) && i < j && continue
-    ax = Makie.content(fig[i, j])
+    ax = Makie.content(layout[i, j])
 
     # values in matrix form
     Zᵢⱼ = getindex.(zs, i, j)
@@ -149,5 +156,7 @@ function surfplot!(
     Makie.contour!(ax, θs, ustrip.(u"m", rs), ustrip.(Z); colormap, levels, labels=true)
   end
 
-  fig
+  layout
 end
+
+surfplot!(fig::Makie.Figure, f; kwargs...) = (surfplot!(fig.layout, f; kwargs...); fig)

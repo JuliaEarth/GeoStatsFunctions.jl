@@ -4,8 +4,11 @@
 
 """
     funplot(f; [options])
+    funplot(pos, f; [options])
 
-Plot the geostatistical function `f` with given `options`.
+Plot the geostatistical function `f` with given `options`, optionally
+at the position `pos` of an existing figure or grid layout, e.g.
+`funplot(fig[1, 2], f)`.
 
 ## Common options:
 
@@ -53,8 +56,11 @@ function funplot! end
 
 """
     surfplot(f; [options])
+    surfplot(pos, f; [options])
 
-Plot the geostatistical surface `f` with given `options`.
+Plot the geostatistical surface `f` with given `options`, optionally
+at the position `pos` of an existing figure or grid layout, e.g.
+`surfplot(fig[1, 2], f)`.
 
 ## Common options
 

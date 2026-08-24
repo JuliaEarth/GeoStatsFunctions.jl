@@ -2,6 +2,14 @@
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
 
+_layout(fig::Makie.Figure) = fig.layout
+
+_layout(gl::Makie.GridLayout) = gl
+
+_layout(gp::Makie.GridPosition) = Makie.GridLayout(gp)
+
+_layout(gp::Makie.GridSubposition) = Makie.GridLayout(gp)
+
 _maxlag(f::GeoStatsFunction) = 3range(f)
 _maxlag(::PowerVariogram) = 3.0u"m"
 _maxlag(::NuggetEffect) = 3.0u"m"
