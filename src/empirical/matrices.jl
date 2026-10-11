@@ -72,11 +72,14 @@ function _countmatrix(dom, vals, minlag)
   # initialize matrix with counts
   C = zeros(Int, k, k)
 
+  # Euclidean distance
+  d = EuclideanDistance()
+
   # update counts along trajectory
   @inbounds for i in 1:(n - 1)
     c₁ = c[i]
     c₂ = c[i + 1]
-    h = evaluate(Euclidean(), centroid(dom, i), centroid(dom, i + 1))
+    h = d(centroid(dom, i), centroid(dom, i + 1))
     m = ceil(Int, h / 2δh)
     C[c₁, c₁] += m
     C[c₂, c₂] += m
@@ -85,13 +88,13 @@ function _countmatrix(dom, vals, minlag)
 
   # add head of first element
   c₁ = c[1]
-  h = evaluate(Euclidean(), centroid(dom, 1), centroid(dom, 2))
+  h = d(centroid(dom, 1), centroid(dom, 2))
   m = ceil(Int, h / 2δh)
   C[c₁, c₁] += m
 
   # add tail of last element
   c₂ = c[n]
-  h = evaluate(Euclidean(), centroid(dom, n - 1), centroid(dom, n))
+  h = d(centroid(dom, n - 1), centroid(dom, n))
   m = ceil(Int, h / 2δh)
   C[c₂, c₂] += m
 
@@ -111,8 +114,8 @@ function _domvals(data, var)
 end
 
 function _defaultminlag(data)
-  d = domain(data)
-  n = nelements(d)
-  h(i) = evaluate(Euclidean(), centroid(d, i), centroid(d, i + 1))
-  minimum(h(i) for i in 1:(n - 1)) / 2
+  dom = domain(data)
+  nel = nelements(dom)
+  h(i) = EuclideanDistance()(centroid(dom, i), centroid(dom, i + 1))
+  minimum(h(i) for i in 1:(nel - 1)) / 2
 end

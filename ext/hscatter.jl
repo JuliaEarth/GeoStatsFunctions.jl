@@ -9,8 +9,8 @@ function hscatter(
   lag=0.0u"m",
   # tolerance for lag distance
   tol=0.1u"m",
-  # distance from Distances.jl
-  distance=Euclidean(),
+  # distance from Meshes.jl
+  distance=EuclideanDistance(),
   # maximum number of samples
   nmax=4000,
   # size of points
@@ -117,7 +117,7 @@ function _hscatter(data, var₁, var₂, lag, tol, distance)
   # compute pairwise distance
   m, n = length(z₁), length(z₂)
   pairs = [(i, j) for j in 1:n for i in j:m]
-  dists = [evaluate(distance, c₁[i], c₂[j]) for (i, j) in pairs]
+  dists = [distance(c₁[i], c₂[j]) for (i, j) in pairs]
 
   # find indices with given lag
   match = findall(abs.(dists .- lag) .< tol)
