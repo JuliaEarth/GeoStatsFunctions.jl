@@ -45,6 +45,6 @@ function (γ::PowerVariogram)(h)
 end
 
 function (γ::PowerVariogram)(u::Point, v::Point)
-  h = evaluate(Euclidean(), u, v)
-  γ(h)
+  d = EuclideanDistance()
+  γ(d(u, v))
 end
