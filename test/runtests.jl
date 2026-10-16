@@ -6,6 +6,7 @@ using Unitful
 using CoDa
 using Distances
 using StaticArrays
+using CategoricalArrays
 using LinearAlgebra
 using CSV, DelimitedFiles
 using Test, StableRNGs

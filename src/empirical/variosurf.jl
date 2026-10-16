@@ -41,8 +41,8 @@ angles `nangs` in the plane, and forward the `options` to the underlying
 [`variogram`](@ref) calls.
 """
 function variogramsurface(
-  data::AbstractGeoTable,
-  vars=1:(ncol(data) - 1);
+  geotable::AbstractGeoTable,
+  vars=1:(ncol(geotable) - 1);
   normal=Vec(0, 0, 1),
   nangs=50,
   planetol=0.5u"m",
@@ -55,14 +55,14 @@ function variogramsurface(
   # deterministic results
   rng = Xoshiro(123)
 
-  dim = embeddim(domain(data))
+  dim = embeddim(domain(geotable))
 
   # basis for surface
   if dim == 2
-    planes = [data]
+    planes = [geotable]
     u, v = Vec(1.0, 0.0), Vec(0.0, 1.0)
   elseif dim == 3
-    subset = partition(rng, data, PlanePartition(normal; tol=planetol))
+    subset = partition(rng, geotable, PlanePartition(normal; tol=planetol))
     planes = collect(subset)
     u, v = Meshes.householderbasis(normal)
   else

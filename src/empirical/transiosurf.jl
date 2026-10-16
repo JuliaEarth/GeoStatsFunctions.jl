@@ -41,7 +41,7 @@ angles `nangs` in the plane, and forward the `options` to the underlying
 [`transiogram`](@ref).
 """
 function transiogramsurface(
-  data::AbstractGeoTable,
+  geotable::AbstractGeoTable,
   var=1;
   normal=Vec(0, 0, 1),
   nangs=50,
@@ -55,14 +55,25 @@ function transiogramsurface(
   # deterministic results
   rng = Xoshiro(123)
 
-  dim = embeddim(domain(data))
+  dim = embeddim(domain(geotable))
+
+  # make sure the variable is categorical
+  # so that levels are consistent across
+  # subsets in directional partition
+  vtb = geotable |> Select(var)
+  lev = let
+    cols = Tables.columns(values(vtb))
+    vals = Tables.getcolumn(cols, 1)
+    levels(vals)
+  end
+  gtb = vtb |> Levels(var => lev)
 
   # basis for surface
   if dim == 2
-    planes = [data]
+    planes = [gtb]
     u, v = Vec(1.0, 0.0), Vec(0.0, 1.0)
   elseif dim == 3
-    subset = partition(rng, data, PlanePartition(normal; tol=planetol))
+    subset = partition(rng, gtb, PlanePartition(normal; tol=planetol))
     planes = collect(subset)
     u, v = Meshes.householderbasis(normal)
   else

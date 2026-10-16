@@ -33,4 +33,12 @@ end
     ys = t.ordinates[i, i]
     @test ys[1] > ys[10] > ys[20]
   end
+
+  # handle categorical arrays properly
+  rng = StableRNG(2026)
+  tab = (; c=categorical(rand(rng, ["a", "b", "c"], 100), levels=["c", "b", "a"]))
+  pts = rand(rng, Point, 100)
+  gtb = georef(tab, pts)
+  t = transiogram(gtb, dir=(0.0, 0.0, 1.0))
+  @test t.variables == [:c, :b, :a]
 end
