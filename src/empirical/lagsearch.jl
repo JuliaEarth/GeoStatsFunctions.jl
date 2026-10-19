@@ -31,16 +31,16 @@ function lagsearchmethod(dom, nlags, maxlag, distance, option)
   # ball search with NearestNeighbors.jl requires AbstractFloat and MinkowskiMetric
   # https://github.com/KristofferC/NearestNeighbors.jl/issues/13
   isfloat = Unitful.numtype(Meshes.lentype(dom)) <: AbstractFloat
-  isminkowski = distance isa MinkowskiMetric
+  iseuclidean = distance isa EuclideanDistance
 
   # warn users requesting :ball option with invalid parameters
   (option == :ball && !isfloat) &&
     @warn "lag ball search requires floating point coordinates, falling back to lag full search"
-  (option == :ball && !isminkowski) &&
-    @warn "lag ball search requires Minkowski metric, falling back to lag full search"
+  (option == :ball && !iseuclidean) &&
+    @warn "lag ball search requires Euclidean distance, falling back to lag full search"
 
   # choose lag search method
-  if option == :ball && isfloat && isminkowski
+  if option == :ball && isfloat && iseuclidean
     LagBallSearch(nlags, maxlag, distance)
   else
     LagFullSearch(nlags, maxlag, distance)

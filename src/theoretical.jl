@@ -87,8 +87,7 @@ Evaluate the geostatistical function at points `p₁` and `p₂`.
 """
 function (f::GeoStatsFunction)(p₁::Point, p₂::Point)
   d = metric(metricball(f))
-  h = evaluate(d, p₁, p₂)
-  f(h)
+  f(d(p₁, p₂))
 end
 
 """

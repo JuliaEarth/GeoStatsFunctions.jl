@@ -124,7 +124,7 @@ function variogram(
   dirtol=0.5u"m",
   maxlag=defaultmaxlag(geotable),
   nlags=20,
-  distance=Euclidean(),
+  distance=EuclideanDistance(),
   estimator=:matheron,
   lagsearch=:ball
 )
@@ -141,7 +141,7 @@ function variogram(
   vars=1:(ncol(parent(part)) - 1);
   maxlag=defaultmaxlag(parent(part)),
   nlags=20,
-  distance=Euclidean(),
+  distance=EuclideanDistance(),
   estimator=:matheron,
   lagsearch=:ball
 )
@@ -235,7 +235,7 @@ function _variogramestimate(geotable, estim::VariogramEstimator, lagsearch::LagS
       pᵢ = pset[i]
 
       # evaluate geospatial lag
-      h = evaluate(distance, pᵢ, pⱼ)
+      h = distance(pᵢ, pⱼ)
 
       # early exit if out of range
       exit(h) && continue

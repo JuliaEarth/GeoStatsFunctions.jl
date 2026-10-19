@@ -38,12 +38,6 @@
   @test isequal(g₁.ordinates, g₂.ordinates)
   @test isequal(g₁.counts, g₂.counts)
 
-  # custom distance is recorded
-  rng = StableRNG(123)
-  gtb = georef((z=rand(rng, 2),), [Point(LatLon(0.0, 0.0)), Point(LatLon(0.0, 90.0))])
-  g = variogram(gtb, "z", distance=Haversine(6371.0), lagsearch=:full)
-  @test g.distance == Haversine(6371.0)
-
   # test variography with compositional data
   gtb = georef((z=rand(Composition{3}, 100),), rand(Point, 100))
   g = variogram(gtb, "z", maxlag=1.0)

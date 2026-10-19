@@ -9,9 +9,7 @@ using GeoTables
 
 using Optim
 using Tables
-using Distances
 using Bessels: gamma, besselk
-using NearestNeighbors: MinkowskiMetric
 using OhMyThreads: tmapreduce
 using DataScienceTraits
 using TableTransforms

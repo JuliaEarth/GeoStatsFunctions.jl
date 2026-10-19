@@ -135,7 +135,7 @@ function transiogram(
   dirtol=0.5u"m",
   maxlag=defaultmaxlag(geotable),
   nlags=20,
-  distance=Euclidean(),
+  distance=EuclideanDistance(),
   lagsearch=:ball
 )
   # make sure the variable is categorical
@@ -162,7 +162,7 @@ function transiogram(
   var=1;
   maxlag=defaultmaxlag(parent(part)),
   nlags=20,
-  distance=Euclidean(),
+  distance=EuclideanDistance(),
   lagsearch=:ball
 )
   # retain geospatial data with at least two elements
@@ -247,7 +247,7 @@ function _transiogramestimate(geotable, ::CarleEstimator, lagsearch::LagSearchMe
       pᵢ = pset[i]
 
       # evaluate geospatial lag
-      h = evaluate(distance, pᵢ, pⱼ)
+      h = distance(pᵢ, pⱼ)
 
       # early exit if out of range
       exit(h) && continue

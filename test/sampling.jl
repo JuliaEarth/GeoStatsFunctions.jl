@@ -28,7 +28,7 @@
 
   # deterministic samples in arbitrary geometries
   γ = GaussianVariogram()
-  G = PolyArea((0.0, 0.0), (0.5, -1.5), (1.0, 0.0), (1.5, 0.5), (1.0, 1.0), (0.5, 1.5), (-0.5, 0.5))
+  G = Pgon((0.0, 0.0), (0.5, -1.5), (1.0, 0.0), (1.5, 0.5), (1.0, 1.0), (0.5, 1.5), (-0.5, 0.5))
   ps1 = GeoStatsFunctions._sample(γ, G)
   ps2 = GeoStatsFunctions._sample(γ, G)
   @test ps1 == ps2
