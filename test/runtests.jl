@@ -4,7 +4,6 @@ using Meshes
 using GeoTables
 using Unitful
 using CoDa
-using Distances
 using StaticArrays
 using CategoricalArrays
 using LinearAlgebra

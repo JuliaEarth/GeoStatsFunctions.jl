@@ -7,7 +7,6 @@ module GeoStatsFunctionsMakieExt
 using GeoStatsFunctions
 using Meshes
 using Unitful
-using Distances
 using TableTransforms
 using LinearAlgebra
 using Statistics
