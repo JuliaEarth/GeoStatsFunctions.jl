@@ -1,16 +1,16 @@
 # ------------------------------------------------------------------
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
-
 """
-    EmpiricalVariogramSurface(θs, rs, zs, vs)
+    EmpiricalVariogramSurface(θs, ns, rs, zs, vs)
 
 Type that stores all information about the empirical (a.k.a. experimental)
 variogram surface. It is returned by the [`variogramsurface`](@ref) function
 and is considered an internal type (i.e., not intended for end-users).
 """
-struct EmpiricalVariogramSurface{T,R,Z} <: EmpiricalGeoStatsSurface
+struct EmpiricalVariogramSurface{T,R,Z,N} <: EmpiricalGeoStatsSurface
   θs::Vector{T}
+  ns::Vector{N}
   rs::Vector{R}
   zs::Vector{Z}
   vs::Vector{Symbol}
@@ -79,6 +79,9 @@ function variogramsurface(
     tmapreduce(gamma, merge, planes)
   end
 
+  # bin counts
+  ns = [g.counts for g in gs]
+
   # polar radii
   rs = first(gs).abscissas
 
@@ -88,5 +91,5 @@ function variogramsurface(
   # variable names
   vs = variables(first(gs))
 
-  EmpiricalVariogramSurface(θs, rs, zs, vs)
+  EmpiricalVariogramSurface(θs, ns, rs, zs, vs)
 end
