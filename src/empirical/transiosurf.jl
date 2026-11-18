@@ -3,14 +3,15 @@
 # ------------------------------------------------------------------
 
 """
-    EmpiricalTransiogramSurface(θs, rs, zs, vs)
+    EmpiricalTransiogramSurface(θs, ns, rs, zs, vs)
 
 Type that stores all information about the empirical (a.k.a. experimental)
 transiogram surface. It is returned by the [`transiogramsurface`](@ref) function
 and is considered an internal type (i.e., not intended for end-users).
 """
-struct EmpiricalTransiogramSurface{T,R,Z} <: EmpiricalGeoStatsSurface
+struct EmpiricalTransiogramSurface{T,N,R,Z} <: EmpiricalGeoStatsSurface
   θs::Vector{T}
+  ns::Vector{N}
   rs::Vector{R}
   zs::Vector{Z}
   vs::Vector{Symbol}
@@ -90,6 +91,9 @@ function transiogramsurface(
     tmapreduce(trans, merge, planes)
   end
 
+  # bin counts
+  ns = [t.counts for t in ts]
+
   # polar radii
   rs = first(ts).abscissas
 
@@ -99,5 +103,5 @@ function transiogramsurface(
   # variable names
   vs = variables(first(ts))
 
-  EmpiricalTransiogramSurface(θs, rs, zs, vs)
+  EmpiricalTransiogramSurface(θs, ns, rs, zs, vs)
 end
