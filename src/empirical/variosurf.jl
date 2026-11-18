@@ -8,7 +8,7 @@ Type that stores all information about the empirical (a.k.a. experimental)
 variogram surface. It is returned by the [`variogramsurface`](@ref) function
 and is considered an internal type (i.e., not intended for end-users).
 """
-struct EmpiricalVariogramSurface{T,R,Z,N} <: EmpiricalGeoStatsSurface
+struct EmpiricalVariogramSurface{T,N,R,Z} <: EmpiricalGeoStatsSurface
   θs::Vector{T}
   ns::Vector{N}
   rs::Vector{R}

@@ -9,7 +9,7 @@ Type that stores all information about the empirical (a.k.a. experimental)
 transiogram surface. It is returned by the [`transiogramsurface`](@ref) function
 and is considered an internal type (i.e., not intended for end-users).
 """
-struct EmpiricalTransiogramSurface{T,R,Z,N} <: EmpiricalGeoStatsSurface
+struct EmpiricalTransiogramSurface{T,N,R,Z} <: EmpiricalGeoStatsSurface
   θs::Vector{T}
   ns::Vector{N}
   rs::Vector{R}

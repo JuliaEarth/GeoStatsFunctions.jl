@@ -7,4 +7,6 @@
   EmpiricalVariogramSurface
   ├─ nangs: 50
   └─ nlags: 20"""
+  @test length(g.ns) == 50 # count for each of default nangs
+  @test all([length(n) == length(g.rs) for n in g.ns]) # count for every abscissa
 end
